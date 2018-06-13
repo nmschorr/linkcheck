@@ -38,6 +38,9 @@ ercodes = [400, 404, 408, 409, 501, 502, 503]
 badlist = ['#','com/#', '?', 'blogger.com', '/search', 'javascript:void(0)', 'widgetType','mailto:']
 firstSetOfLinks = None
 errstr = 'ERROR ---- ! ---Result code: '
+biglistOne = []
+finame = 'E:\\pylogs\\finame' + base2 + '-' + '.log'
+
 
 #ts = format(datetime.now(), '%Y%m%d.%H.%M%S')
 #tlogname = 'E:\\pylogs\\lnkchk_' + base2 + '-' + ts + '.log'

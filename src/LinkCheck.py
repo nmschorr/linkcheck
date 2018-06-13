@@ -5,27 +5,38 @@ from requests import *
 from selenium import webdriver
 from datetime import datetime
 from src.config import *
+from src.LinkCheckUtil import remcruft, print_er
+from src.LinkCheck import *
+import logging
+import logging.handlers
 
-class getlinks(object):
+class LinkCheck(object):
+    def logr(self):
+        logging.basicConfig(format='\n%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        logr = logging.getLogger('logr')
+        formatter = logging.Formatter(
+            '%(asctime)s-%(name)s-%(levelname)s: Message: %(message)s: Function: %(funcName)s',
+            datefmt='%m%d%y-%H.%M%S')
+        filehandle = logging.FileHandler(finame)
+        filehandle.setFormatter(formatter)
+        filehandle.setLevel(level=logging.DEBUG)
 
-#############---------------------------------------- end of def
+        console = logging.StreamHandler(sys.stdout)
+        console.setFormatter(formatter)
+        console.setLevel(level=logging.DEBUG)
 
-    def checkcrudlamb(this, localink, mlist):
-        res = 'good'
-        for i in mlist:
-            if i in localink:
-                res = 'bad'
-        #res = list(filter(lambda x: x in locallink, mlist))
-        return res   # good or bad for now
+        logr.setLevel(level=logging.DEBUG)
+        logr.addHandler(filehandle)
+        logr.addHandler(console)
+        logging.getLogger('').addHandler(console)  # add to root
+        logr.info('Completed configuring logger ')
+        lev = logging.getLogger().getEffectiveLevel()
+        print("\nLogging level is: ", lev)
+        return logr
 
-    #############---------------------------------------- end of def
-
-
-    #############---------------------------------------- end of def
     def makeerrorlist(this,locnewlist):
         print(this.makeerrorlist.__name__ + "here is locnewlist: ", locnewlist)
-        errorlist = []
-        ercodes = [400, 404, 408, 409, 501, 502, 503]
+        #ercodes = [400, 404, 408, 409, 501, 502, 503]
         ts = format(datetime.now(), '%Y%m%d.%H.%M%S')
         tlogname = 'E:\\pylogs\\linkcheckresults' + ts + '.log'
         tlognameHndl = open(tlogname, 'w')  #
@@ -47,14 +58,16 @@ class getlinks(object):
                 if int(err_resp) in ercodes:
                     errstr = 'ERROR ---- ! ---Result code: '
                     errorString = errstr + '{} in: {} from parent: {}'.format(err_resp, elink, theparent)
-                    print(Fore.RED + errorString)
+                    print(fred + errorString + fblack)
                     errorlist.append(errorString)
                     tlognameHndl.write(errorString +lnfeed )
                 else:
-                    print(Fore.BLACK + 'status code: ' + err_resp)
+                    print(fblack + 'status code: ' + err_resp)
 
         except BaseException as e:
             print('Exception trying: ', stringi, str(e))
+            this.logr.fatal(str(e),exc_info=True)
+
             pass
 
         tlognameHndl.close()
@@ -62,19 +75,14 @@ class getlinks(object):
 
 
     #############---------------------------------------- end of def
-
-    def getthelinks(this, webElementsLoc, parent = None):
-        print(this.getthelinks().__name__)
-        emLINK = None
-        baselinks = []
-        nonbaselinks = []
-        badlist = ['#','com/#', '?', 'blogger.com', '/search', 'javascript:void(0)', 'widgetType','mailto:']
-
-        if parent == None:
+    @classmethod
+    def getthelinks(this, locElements, parent=''):
+        #print(this.getthelinks().__name__)
+        if parent == '':
             parent = base1
 
         try:
-            for webElems in webElementsLoc:
+            for webElems in locElements:
                 emLINK = None
                 if webElems.tag_name == 'a':
                     emLINK = webElems.get_attribute('href')
@@ -82,7 +90,7 @@ class getlinks(object):
                     if any([type(emLINK) == 'NoneType' or emLINK == None]):
                         print('Found none type')
 
-                    elif this.checkcrudlamb(emLINK, badlist) == 'bad': 0
+                    elif remcruft(this, emLINK, badlist) == 'bad': 0
 
                     elif any([emLINK[0:6] == 'javasc', emLINK[0:1] == '/', emLINK[0:7] == 'mailto:', len(emLINK)< 7]):
                         print('found bad attr: ', emLINK)
@@ -98,6 +106,7 @@ class getlinks(object):
 
         except BaseException as e:
             print('Exception trying: ', emLINK, str(e))
+            this.logr.fatal(str(e),exc_info=True)
             pass
 
         nonbaselinksSorted = list(set(nonbaselinks))  ## sort and delete dupes
@@ -109,7 +118,6 @@ class getlinks(object):
 
     #############---------------------------------------- end of def
     def linky(this, firstSetLinks, biglistnew):
-        nnbseLinks = []
         for first_links in firstSetLinks:
             nnbseLinks = []
             placeholder = []
@@ -126,10 +134,7 @@ class getlinks(object):
         for b in big_ERR_listFinal:
             bigerr_h.write(b + lnfeed)
         bigerr_h.close()
-    #############---------------------------------------- end of def
 
-    def print_er(this,e):
-        for er2 in e: print('error: ', er2)
 
     #############---------------------------------------- end of def
 
@@ -144,49 +149,55 @@ class getlinks(object):
 
     #############---------------------------------------- end of def
     # begin:
-
-    def rungets(self):
+    @classmethod
+    def mainset(self, v):
+        mylog = LinkCheck.logr(self)
         driver = webdriver.Firefox()
+        v.driver = driver
         driver.implicitly_wait(10)
-        base_erlist =[]
-        firstSetOfLinks = None
+        elements = []
         print("in main section now")
-        biglistOne = []
+        #gg = LinkCheck()
         try:
             driver.get(address)
             elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
-            firstSetOfLinks, firstnonbaseLinks = getthelinks(elements, parent = None )
 
-            writefirstset(firstSetOfLinks)
+            firstSetOfLinks, firstnonbaseLinks =  v.getthelinks(elements)
 
-            base_erlist = this.makeerrorlist(firstSetOfLinks)  ## check for errors
-            firstnonbase_erlist = this.makeerrorlist(firstnonbaseLinks)  ## check for errors
-            this.print_er(base_erlist)
-            this.print_er(firstnonbase_erlist)
+            v.writefirstset(firstSetOfLinks)
 
-            biglist = this.linky(firstSetOfLinks, biglistOne)
+            base_erlist = v.makeerrorlist(firstSetOfLinks)  ## check for errors
+            firstnonbase_erlist = v.makeerrorlist(firstnonbaseLinks)  ## check for errors
+            print_er(base_erlist)
+            print_er(firstnonbase_erlist)
+
+            biglist = v.linky(firstSetOfLinks, biglistOne)
             print(lnfeed + 'Just did biglist sort ----------------------------------' + lnfeed)
-            big_ERR_list = this.makeerrorlist(biglist)  ####-----------------makeerrorlist---------makeerrorlist--
+            big_ERR_list = v.makeerrorlist(biglist)  ####-----------------makeerrorlist---------makeerrorlist--
             big_erlistFinal = list(set(base_erlist + big_ERR_list))  ####-----------------makeerrorlist---------makeerrorlist--
-            this.writefe(big_erlistFinal)
+            v.writefe(big_erlistFinal)
 
         except BaseException as e:
-            print('Exception trying outside loop: ', str(e))
+            print('Exception trying main outside loop: ', str(e))
+            #logr.fatal(str(e),exc_info=True)
+
             pass
 
-        print(Fore.BLACK + 'Done')
+        print(fblack + 'Done')
 
         driver.close()
 
     def main(self):
-        self.rungets()
+        print("in main")
+        v = LinkCheck()
+        v.mainset(v)
 
     if __name__ == '__main__':
-        print()
+        g = main(g)
 
 
-g = getlinks().rungets()
-
+g = LinkCheck()
+g.main()
 
 
 
