@@ -2,12 +2,7 @@
 
 import src.LinkCheckUtil as u
 import sys
-# from src.LinkCheckUtil import print_er, logger
-# from src.LinkCheckUtil import remcruft
-#####from src.LinkCheck import *
 from datetime import datetime
-#import urllib.request
-#from urllib.parse import urlparse
 from requests import *
 from selenium import webdriver
 from src.config import *
