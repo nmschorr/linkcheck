@@ -9,7 +9,7 @@ import logging
 import logging.handlers
 from colorama import Fore
 
-#############---------------------------------------- end of def
+    #############---------------------------------------- end of def
 
 def remcruft(localink, mlist):
     res = 'good'
@@ -19,26 +19,25 @@ def remcruft(localink, mlist):
     #res = list(filter(lambda x: x in locallink, mlist))
     return res   # good or bad for now
 
+    #############---------------------------------------- end of def
 
-def print_er(e):
-    for er2 in e:
+def print_er(err):
+    for er2 in err:
         print('error: ', er2)
-
-
 
     #############---------------------------------------- end of def
 
 def writefirstset_tofile(firstSetLinks):
     timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
     basefile = 'E:\\pylogs\\BaseLinks' + timestp + '.txt'
-    if firstSetLinks:  ## if the list isn't empty
-        filen1_h = open(basefile, 'w')  #
-        for b in firstSetLinks:
-            filen1_h.write(b[0] + lnfeed)
-        filen1_h.close()
+    filen1_h = open(basefile, 'w')  #
+    for b in firstSetLinks:
+        filen1_h.write(b[0] + lnfeed)
+    filen1_h.close()
 
-#############---------------------------------------- end of def
-def writebig(self, big_err_list_final):
+    #############---------------------------------------- end of def
+
+def writebig(big_err_list_final):
     print("inside writebig")
     timenow = format(datetime.now(), '%Y%m%d.%H.%M%S')
     bigerr_file = 'E:\\pylogs\\BIG_errs' + timenow + '.txt'

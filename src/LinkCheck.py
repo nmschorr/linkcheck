@@ -60,7 +60,7 @@ class LinkCheck(object):
 
     #############---------------------------------------- end of def
     def getthelinks(self, locElements, parent=''):
-        emLINK = None
+        emlink = ''
         baselinks = []
         nonbaselinks = []
         if parent == '':
@@ -68,34 +68,33 @@ class LinkCheck(object):
         logger = logging.getLogger('__main__')
 
         try:
-            for webElems in locElements:
-                emLINK = ''
-                if webElems.tag_name == 'a':
-                    emLINK = webElems.get_attribute('href')
-                    lenem = len(emLINK)
-                    if not lenem > 0:
-                        print("problem with len of link")
-
-                    if any([type(emLINK) == 'NoneType' or emLINK is None]):
+            for webelem in locElements:
+                if webelem.tag_name == 'a':
+                    if  type(webelem) == 'NoneType' or webelem is None:
                         print('Found none type')
 
-                    elif u.remcruft(emLINK, badlist) == 'bad':
-                        0
+                    else:
+                        emlink = webelem.get_attribute('href')
+                        emlen = len(emlink)
+                        bd=[emlink[0:6] == 'javasc', emlink[0:1] == '/', emlink[0:7] == 'mailto:', emlen < 7]
 
-                    elif any([emLINK[0:6] == 'javasc', emLINK[0:1] == '/', emLINK[0:7] == 'mailto:', lenem < 7]):
-                        print('found bad attr: ', emLINK)
+
+                    if u.remcruft(emlink, badlist) == 'bad': 0
+
+                    elif any(bd):
+                        print('found bad attr: ', emlink)
 
                     else:
-                        answer1 = emLINK.find(base1)  ## is the base in there?
-                        answer2 = emLINK.find(base2)  ## is the base in there?
+                        answer1 = emlink.find(base1)  ## is the base in there?
+                        answer2 = emlink.find(base2)  ## is the base in there?
 
                         if answer1 > 0 or answer2 > 0:  # if either are there
-                            baselinks.append((emLINK, parent))
+                            baselinks.append((emlink, parent))
                         else:
-                            nonbaselinks.append((emLINK, parent))
+                            nonbaselinks.append((emlink, parent))
 
         except BaseException as e:
-            print('Exception trying: ', emLINK, str(e))
+            print('Exception trying: ', emlink, str(e))
             logger.debug(str(e), exc_info=True)
             pass
 
