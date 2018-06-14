@@ -1,11 +1,10 @@
 # python 3
 
-import src.LinkCheckUtil as lc
+import src.LinkCheckUtil as u
 # from src.LinkCheckUtil import print_er, logr
 # from src.LinkCheckUtil import remcruft
 #####from src.LinkCheck import *
 from datetime import datetime
-import src.LinkCheckUtil as ut
 #import urllib.request
 #from urllib.parse import urlparse
 from requests import *
@@ -50,7 +49,6 @@ class LinkCheck(object):
         except BaseException as e:
             print('Exception trying: ', elink, str(e))
             logr.debug(str(e), exc_info=True)
-
             pass
 
         tlognameHndl.close()
@@ -58,11 +56,11 @@ class LinkCheck(object):
 
     #############---------------------------------------- end of def
     @classmethod
-    def getthelinks(cls, locElements, parent=''):
+    def getthelinks(self, locElements, parent=''):
         emLINK = None
         baselinks = []
         nonbaselinks = []
-        logr = lc.logr
+        logr = u.logr
         # print(self.getthelinks().__name__)
         if parent == '':
             parent = base1
@@ -79,7 +77,7 @@ class LinkCheck(object):
                     if any([type(emLINK) == 'NoneType' or emLINK is None]):
                         print('Found none type')
 
-                    elif lc.remcruft(emLINK, badlist) == 'bad':
+                    elif u.remcruft(emLINK, badlist) == 'bad':
                         0
 
                     elif any([emLINK[0:6] == 'javasc', emLINK[0:1] == '/', emLINK[0:7] == 'mailto:', lenem < 7]):
@@ -127,9 +125,7 @@ class LinkCheck(object):
 
     #############---------------------------------------- end of def
 
-    def writefirstset(self, firstSetLinks=None):
-        if firstSetLinks is None:
-            firstSetLinks = []
+    def writefirstset_tofile(self, firstSetLinks=[]):
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
         basefile = 'E:\\pylogs\\BaseLinks' + timestp + '.txt'
         if firstSetLinks:  ## if the list isn't empty
@@ -140,17 +136,15 @@ class LinkCheck(object):
 
     #############---------------------------------------- end of def
     # begin:
-    @classmethod
-    def run(cls):
-        logr = lc.logr()
+    def run(self):
+        logr = u.logr()
         driver = webdriver.Firefox()
-        cls.driver = driver
+        self.driver = driver
         driver.implicitly_wait(10)
         biglist_of_links = []
         biglist_of_errs = []
         print("in main section now")
-        # gg = LinkCheck()
-        logr.debug("yes")
+        logr.debug("In run")
         first_base_links = []
         first_nonbase_links = [()]
         first_nonbase_errs = []
@@ -158,32 +152,31 @@ class LinkCheck(object):
             driver.get(address)
             elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
 
-            first_base_links, first_nonbase_links = cls.getthelinks(elements)
+            first_base_links, first_nonbase_links = self.getthelinks(elements)
 
-            cls.writefirstset(first_base_links)
+            self.writefirstset_tofile(first_base_links)
             print("this is firstsetoflinks: ", first_base_links)
 
-            base_erlist = cls.makeerrorlist(cls.first_set)  ## check for errors
-            cls.print_er(base_erlist)
+            base_erlist = self.makeerrorlist(self.first_base_links)  ## check for errors
+            self.print_er(base_erlist)
 
             print("trying 2nd set")
 
-            first_nonbase_errs = cls.makeerrorlist(first_nonbase_links)  ## check for errors
-            cls.print_er(first_nonbase_errs)
+            first_nonbase_errs = self.makeerrorlist(first_nonbase_links)  ## check for errors
+            self.print_er(first_nonbase_errs)
 
-            biglist_of_links = cls.linky(driver, first_base_links, first_nonbase_links)
+            biglist_of_links = self.linky(driver, first_base_links, first_nonbase_links)
 
             print(lnfeed + 'Just did biglist sort ----------------------------------' + lnfeed)
 
-            biglist_of_errs = cls.makeerrorlist(biglist_of_links)  ####-----------------makeerrorlist---------makeerrorlist--
+            biglist_of_errs = self.makeerrorlist(biglist_of_links)  ####-----------------makeerrorlist---------makeerrorlist--
             big_erlistFinal = list(
                 set(first_nonbase_errs + biglist_of_errs))  ####-----------------makeerrorlist---------makeerrorlist--
-            cls.writebig(big_erlistFinal)
+            self.writebig(big_erlistFinal)
 
         except BaseException as e:
             print('Exception trying main outside loop: ', str(e))
-            # logr.fatal(str(e),exc_info=True)
-
+            logr.debug(str(e),exc_info=True)
             pass
 
         print(fblack + 'Done')
