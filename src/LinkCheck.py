@@ -14,10 +14,11 @@ from src.config import *
 
 class LinkCheck(object):
 
-    def makeerrorlist(self, locnewlist):
+    def makeerrorlist(self, locnewlist=[()]):
+        print('newisides: ', locnewlist)
         elink = ''
         errorlist = []
-        print(self.makeerrorlist.__name__ + "here is locnewlist: ", locnewlist)
+
         ts = format(datetime.now(), '%Y%m%d.%H.%M%S')
         tlogname = 'E:\\pylogs\\linkcheckresults' + ts + '.log'
         tlognameHndl = open(tlogname, 'w')  #
@@ -145,30 +146,38 @@ class LinkCheck(object):
         driver = webdriver.Firefox()
         cls.driver = driver
         driver.implicitly_wait(10)
-        biglistOne = []
+        biglist_of_links = []
+        biglist_of_errs = []
         print("in main section now")
         # gg = LinkCheck()
         logr.debug("yes")
-        firstSetLinks = []
+        first_base_links = []
+        first_nonbase_links = [()]
+        first_nonbase_errs = []
         try:
             driver.get(address)
             elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
 
-            firstSetOfLinks, firstnonbaseLinks = cls.getthelinks(elements)
+            first_base_links, first_nonbase_links = cls.getthelinks(elements)
 
-            cls.writefirstset(firstSetOfLinks)
-            print("this is firstsetoflinks: ", firstSetOfLinks)
-            base_erlist = cls.makeerrorlist(firstSetOfLinks)  ## check for errors
-            print("trying 2nd set")
-            firstnonbase_erlist = cls.makeerrorlist(firstnonbaseLinks)  ## check for errors
+            cls.writefirstset(first_base_links)
+            print("this is firstsetoflinks: ", first_base_links)
+
+            base_erlist = cls.makeerrorlist(cls.first_set)  ## check for errors
             cls.print_er(base_erlist)
-            cls.print_er(firstnonbase_erlist)
 
-            biglist = cls.linky(driver, firstSetOfLinks, biglistOne)
+            print("trying 2nd set")
+
+            first_nonbase_errs = cls.makeerrorlist(first_nonbase_links)  ## check for errors
+            cls.print_er(first_nonbase_errs)
+
+            biglist_of_links = cls.linky(driver, first_base_links, first_nonbase_links)
+
             print(lnfeed + 'Just did biglist sort ----------------------------------' + lnfeed)
-            big_ERR_list = cls.makeerrorlist(biglist)  ####-----------------makeerrorlist---------makeerrorlist--
+
+            biglist_of_errs = cls.makeerrorlist(biglist_of_links)  ####-----------------makeerrorlist---------makeerrorlist--
             big_erlistFinal = list(
-                set(base_erlist + big_ERR_list))  ####-----------------makeerrorlist---------makeerrorlist--
+                set(first_nonbase_errs + biglist_of_errs))  ####-----------------makeerrorlist---------makeerrorlist--
             cls.writebig(big_erlistFinal)
 
         except BaseException as e:
