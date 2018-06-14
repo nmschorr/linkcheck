@@ -3,7 +3,7 @@
 import sys
 # from requests import *
 # from selenium import webdriver
-# from datetime import datetime
+from datetime import datetime
 from src.config import *
 import logging
 import logging.handlers
@@ -24,25 +24,25 @@ def print_er(e):
     for er2 in e:
         print('error: ', er2)
 
-def logr():
-    logging.basicConfig(format='\n%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-    logr = logging.getLogger('logr')
-    formatter = logging.Formatter(
-        '%(asctime)s-%(name)s-%(levelname)s: Message: %(message)s: Function: %(funcName)s',
-        datefmt='%m%d%y-%H.%M%S')
-    filehandle = logging.FileHandler(finame)
-    filehandle.setFormatter(formatter)
-    filehandle.setLevel(level=logging.DEBUG)
 
-    console = logging.StreamHandler(sys.stdout)
-    console.setFormatter(formatter)
-    console.setLevel(level=logging.DEBUG)
 
-    logr.setLevel(level=logging.DEBUG)
-    logr.addHandler(filehandle)
-    logr.addHandler(console)
-    logging.getLogger('').addHandler(console)  # add to root
-    logr.info('Completed configuring logger ')
-    lev = logging.getLogger().getEffectiveLevel()
-    print("\nLogging level is: ", lev)
-    return logr
+    #############---------------------------------------- end of def
+
+def writefirstset_tofile(firstSetLinks):
+    timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
+    basefile = 'E:\\pylogs\\BaseLinks' + timestp + '.txt'
+    if firstSetLinks:  ## if the list isn't empty
+        filen1_h = open(basefile, 'w')  #
+        for b in firstSetLinks:
+            filen1_h.write(b[0] + lnfeed)
+        filen1_h.close()
+
+#############---------------------------------------- end of def
+def writebig(self, big_err_list_final):
+    print("inside writebig")
+    timenow = format(datetime.now(), '%Y%m%d.%H.%M%S')
+    bigerr_file = 'E:\\pylogs\\BIG_errs' + timenow + '.txt'
+    bigerr_h = open(bigerr_file, 'w')  #
+    for b in big_err_list_final:
+        bigerr_h.write(b + lnfeed)
+    bigerr_h.close()

@@ -1,7 +1,8 @@
 # python 3
 
 import src.LinkCheckUtil as u
-# from src.LinkCheckUtil import print_er, logr
+import sys
+# from src.LinkCheckUtil import print_er, logger
 # from src.LinkCheckUtil import remcruft
 #####from src.LinkCheck import *
 from datetime import datetime
@@ -10,19 +11,22 @@ from datetime import datetime
 from requests import *
 from selenium import webdriver
 from src.config import *
+import logging
+
+
+
 
 class LinkCheck(object):
-
-    def makeerrorlist(self, locnewlist=[()]):
+    def makeerrorlist(self, locnewlist=0):
         print('newisides: ', locnewlist)
         elink = ''
         errorlist = []
+        logger = logging.getLogger('__main__')
 
         ts = format(datetime.now(), '%Y%m%d.%H.%M%S')
         tlogname = 'E:\\pylogs\\linkcheckresults' + ts + '.log'
         tlognameHndl = open(tlogname, 'w')  #
         tlognameHndl.write('Error File:' + lnfeed)
-        logr = lc.logr
 
         try:  # check head
             for elinktup in locnewlist:
@@ -48,26 +52,24 @@ class LinkCheck(object):
 
         except BaseException as e:
             print('Exception trying: ', elink, str(e))
-            logr.debug(str(e), exc_info=True)
+            logger.debug(str(e), exc_info=True)
             pass
 
         tlognameHndl.close()
         return errorlist
 
     #############---------------------------------------- end of def
-    @classmethod
     def getthelinks(self, locElements, parent=''):
         emLINK = None
         baselinks = []
         nonbaselinks = []
-        logr = u.logr
-        # print(self.getthelinks().__name__)
         if parent == '':
             parent = base1
+        logger = logging.getLogger('__main__')
 
         try:
             for webElems in locElements:
-                emLINK = None
+                emLINK = ''
                 if webElems.tag_name == 'a':
                     emLINK = webElems.get_attribute('href')
                     lenem = len(emLINK)
@@ -94,7 +96,7 @@ class LinkCheck(object):
 
         except BaseException as e:
             print('Exception trying: ', emLINK, str(e))
-            logr.debug(str(e), exc_info=True)
+            logger.debug(str(e), exc_info=True)
             pass
 
         nonbaselinksSorted = list(set(nonbaselinks))  ## sort and delete dupes
@@ -106,6 +108,7 @@ class LinkCheck(object):
 
     #############---------------------------------------- end of def
     def linky(self, driver2, firstSetLinks, biglistnew):
+        biglistloc = []
         for first_links in firstSetLinks:
             driver2.get(first_links[0])  # get a page from a link on the home page
             placeholder, nnbseLinks = self.getthelinks(self.driver.find_elements_by_xpath('.//a'),
@@ -113,75 +116,83 @@ class LinkCheck(object):
             biglistloc = list(set(biglistnew + nnbseLinks))
         return sorted(biglistloc)
 
-    #############---------------------------------------- end of def
-    def writebig(self, big_ERR_listFinal):
-        print("inside writebig")
-        timenow = format(datetime.now(), '%Y%m%d.%H.%M%S')
-        bigerr_file = 'E:\\pylogs\\BIGerrs' + timenow + '.txt'
-        bigerr_h = open(bigerr_file, 'w')  #
-        for b in big_ERR_listFinal:
-            bigerr_h.write(b + lnfeed)
-        bigerr_h.close()
-
-    #############---------------------------------------- end of def
-
-    def writefirstset_tofile(self, firstSetLinks=[]):
-        timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
-        basefile = 'E:\\pylogs\\BaseLinks' + timestp + '.txt'
-        if firstSetLinks:  ## if the list isn't empty
-            filen1_h = open(basefile, 'w')  #
-            for b in firstSetLinks:
-                filen1_h.write(b[0] + lnfeed)
-            filen1_h.close()
 
     #############---------------------------------------- end of def
     # begin:
     def run(self):
-        logr = u.logr()
+        logging.basicConfig(format='\n%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        print(__name__)
+        logger = logging.getLogger(__name__)
+        formatter = logging.Formatter(
+            '%(asctime)s-%(name)s-%(levelname)s: Message: %(message)s: Function: %(funcName)s',
+            datefmt='%m%d%y-%H.%M%S')
+        timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
+        fname = 'E:\\pylogs\\Logger-' + timestp + '.log'
+        filehandle = logging.FileHandler(fname)
+        filehandle.setFormatter(formatter)
+        filehandle.setLevel(level=logging.DEBUG)
+
+        console = logging.StreamHandler(sys.stdout)
+        #console.setFormatter(formatter)
+        #console.setLevel(level=logging.DEBUG)
+
+        logger.setLevel(level=logging.DEBUG)
+        logger.addHandler(filehandle)
+        #logger.addHandler(console)
+        logging.getLogger('').addHandler(console)  # add to root
+        logger.info('Completed configuring logger')
+        lev = logging.getLogger().getEffectiveLevel()
+        print("\nLogging level is: ", lev)
+
+
         driver = webdriver.Firefox()
         self.driver = driver
         driver.implicitly_wait(10)
         biglist_of_links = []
         biglist_of_errs = []
         print("in main section now")
-        logr.debug("In run")
-        first_base_links = []
-        first_nonbase_links = [()]
-        first_nonbase_errs = []
+        logger.debug("In run")
+        self.first_base_links = []
+        first_nonbase_links = []
+        self.first_nonbase_errs = []
         try:
             driver.get(address)
             elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
 
             first_base_links, first_nonbase_links = self.getthelinks(elements)
 
-            self.writefirstset_tofile(first_base_links)
-            print("this is firstsetoflinks: ", first_base_links)
+            u.writefirstset_tofile(first_base_links)
 
             base_erlist = self.makeerrorlist(self.first_base_links)  ## check for errors
-            self.print_er(base_erlist)
+            u.print_er(base_erlist)
 
             print("trying 2nd set")
 
             first_nonbase_errs = self.makeerrorlist(first_nonbase_links)  ## check for errors
-            self.print_er(first_nonbase_errs)
+            u.print_er(first_nonbase_errs)
 
             biglist_of_links = self.linky(driver, first_base_links, first_nonbase_links)
+            lmsg = 'Just did biglist sort ----------------------------------'
+            print(lnfeed + lmsg + lnfeed)
 
-            print(lnfeed + 'Just did biglist sort ----------------------------------' + lnfeed)
-
-            biglist_of_errs = self.makeerrorlist(biglist_of_links)  ####-----------------makeerrorlist---------makeerrorlist--
-            big_erlistFinal = list(
+            biglist_of_errs = self.makeerrorlist(biglist_of_links)  #---makeerrorlist
+            big_err_list_final = list(
                 set(first_nonbase_errs + biglist_of_errs))  ####-----------------makeerrorlist---------makeerrorlist--
-            self.writebig(big_erlistFinal)
+            u.writebig(big_err_list_final)
 
         except BaseException as e:
             print('Exception trying main outside loop: ', str(e))
-            logr.debug(str(e),exc_info=True)
+            logger.debug(str(e),exc_info=True)
             pass
 
         print(fblack + 'Done')
 
         driver.close()
+
+    def __init__(self):
+        None
+        #logger = u.logger
+        #self.logger = logger
 
     def main(self):
         # LinkCheck().run()
