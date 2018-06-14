@@ -15,6 +15,7 @@ base2 = 'repercussions'
 #base2 = 'clarinetinstitute'
 
 address ='http://' + base1
+firstparent = address
 
 lnfeed = '\n'
 fred = Fore.RED

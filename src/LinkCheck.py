@@ -59,25 +59,27 @@ class LinkCheck(object):
         return errorlist
 
     #############---------------------------------------- end of def
-    def getthelinks(self, locElements, parent=''):
+    def getthelinks(self, locElements, parent=firstparent):
         emlink = ''
         baselinks = []
         nonbaselinks = []
-        if parent == '':
-            parent = base1
         logger = logging.getLogger('__main__')
+        keepgoing = True
 
         try:
             for webelem in locElements:
                 if webelem.tag_name == 'a':
-                    if  type(webelem) == 'NoneType' or webelem is None:
+                    if type(webelem) == 'NoneType' or webelem is None:
                         print('Found none type')
+                        keepgoing = False
 
                     else:
                         emlink = webelem.get_attribute('href')
                         emlen = len(emlink)
                         bd=[emlink[0:6] == 'javasc', emlink[0:1] == '/', emlink[0:7] == 'mailto:', emlen < 7]
+                        keepgoing = False
 
+                if keepgoing == True:
 
                     if u.remcruft(emlink, badlist) == 'bad': 0
 
@@ -108,10 +110,11 @@ class LinkCheck(object):
     #############---------------------------------------- end of def
     def linky(self, driver2, firstSetLinks, biglistnew):
         biglistloc = []
-        for first_links in firstSetLinks:
-            driver2.get(first_links[0])  # get a page from a link on the home page
+        for first_link in firstSetLinks:
+            parent =first_link[1]
+            driver2.get(first_link[0])  # get a page from a link on the home page
             placeholder, nnbseLinks = self.getthelinks(self.driver.find_elements_by_xpath('.//a'),
-                                                       parent=first_links)  ## for each link on homepage
+                                                       parent)  ## for each link on homepage
             biglistloc = list(set(biglistnew + nnbseLinks))
         return sorted(biglistloc)
 
@@ -158,7 +161,7 @@ class LinkCheck(object):
             driver.get(address)
             elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
 
-            first_base_links, first_nonbase_links = self.getthelinks(elements)
+            first_base_links, first_nonbase_links = self.getthelinks(elements, firstparent)
 
             u.writefirstset_tofile(first_base_links)
 
