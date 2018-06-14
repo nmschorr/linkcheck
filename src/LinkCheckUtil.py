@@ -1,13 +1,13 @@
 # python 3
 
 import sys
-from requests import *
-from selenium import webdriver
-from datetime import datetime
+# from requests import *
+# from selenium import webdriver
+# from datetime import datetime
 from src.config import *
-from src.LinkCheck import *
 import logging
 import logging.handlers
+from colorama import Fore
 
 #############---------------------------------------- end of def
 
