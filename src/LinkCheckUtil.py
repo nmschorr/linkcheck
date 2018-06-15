@@ -25,24 +25,27 @@ class linkckutil(object):
 
         #############---------------------------------------- end of def
 
-    def write_home_set_to_file(self, firstSetLinks):
+    def write_home_set_to_file(self, firstSetLinks, logger):
+        logger.info('In write_home_set_to_file to file.')
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
         basefile = 'E:\\pylogs\\BaseLinks' + timestp + '.txt'
         filen1_h = open(basefile, 'w')  #
         for b in firstSetLinks:
             filen1_h.write(b[0] + lnfeed)
         filen1_h.close()
+        logger.info('Done with write_home_set_to_file to file.')
 
         #############---------------------------------------- end of def
 
-    def writebig(self, big_err_list_final):
-        print("inside writebig")
+    def write_error_file(self, big_err_list_final, logger):
         timenow = format(datetime.now(), '%Y%m%d.%H.%M%S')
-        bigerr_file = 'E:\\pylogs\\BIG_errs' + timenow + '.txt'
+        logger.info('In write_error_file - timenow')
+        bigerr_file = 'E:\\pylogs\\ERRORS.' + timenow + '.txt'
         bigerr_h = open(bigerr_file, 'w')  #
         for b in big_err_list_final:
             bigerr_h.write(b + lnfeed)
         bigerr_h.close()
+        logger.info('Done with write_error_file - timenow')
 
     #############---------------------------------------- end of def
 

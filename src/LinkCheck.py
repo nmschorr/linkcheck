@@ -108,8 +108,6 @@ class LinkCheck(object):
         hrefw= []
         baselinks=[]
         nonbaselinks=[]
-        keepgoing=True
-        emlen = 1
 
         try:
             for webelem in locElements:
@@ -142,7 +140,6 @@ class LinkCheck(object):
                                         nonbaselinks.append((hrefw, parent))  # tuple
 
         except BaseException as e:
-            print('Exception trying: '+ str(hrefw) + str(e))
             logger.debug(str(e), exc_info=True)
             pass
 
@@ -156,29 +153,28 @@ class LinkCheck(object):
     #############---------------------------------------- end of def
 
     def GET_MORE_LINKS(self, loc_elems=[]):
-        #third = []
-        first = []
-        sec = []
-        first2 = []
-        sec2 = []
+        homelinks = []
+        alienlinks = []
+        homelinks2 = []
+        alienlinks2 = []
 
         for each_tuple in loc_elems:
-            child = each_tuple[0]  # get a page from a link on the home page
-            parent = each_tuple[1]
-            driver.get(child)
+            tchild = each_tuple[0]  # get a page from a link on the home page
+            tparent = each_tuple[1]
+            driver.get(tchild)
             child_elements = driver.find_elements_by_xpath('.//a')
 
             try:
-            #selenium.common.exceptions.UnexpectedAlertPresentException:
-                first, sec =  self.GET_MANY_LINKS_LARGE(child_elements, parent)
-
-                first2 = list(set(first))
-                sec2 = list(set(sec))
+                homelinks, alienlinks =  self.GET_MANY_LINKS_LARGE(child_elements, tparent)
+                homelinks2 = list(set(homelinks))
+                alienlinks2 = list(set(alienlinks))
+                                                    # selenium.common.exceptions.UnexpectedAlertPresentException:
             except UnexpectedAlertPresentException:
-                print('alert')
+                logger.debug('ALERT! -- UnexpectedAlertPresentException on: {}'.format(tchild))
+                logger('ALERT! -- UnexpectedAlertPresentException on: {}'.format(tchild))
                 pass
 
-        return first2, sec2
+        return homelinks2, alienlinks2
 
     #############---------------------------------------- end of def
     # begin:
@@ -186,97 +182,93 @@ class LinkCheck(object):
         global logger
         logger = mu.setuplogger()
         print_er = mu.print_er
-        writebig = mu.writebig
+        write_error_file = mu.write_error_file
         write_home_set_to_file = mu.write_home_set_to_file
         makeerrorlist = self.makeerrorlist
+        home_00 = []
+        alien_00 = []
+        parent = address
 
         global driver
         driver = webdriver.Firefox()
         driver.implicitly_wait(10)
-
-         
-        print("In main() now")
         logger.debug("In main()")
-        home_sum_total = []
-        first_nonbase_links = []
-        #first_nonbase_errs = []
+
         try:
+            logger.info('Getting first address: {}'.format(address))
             driver.get(address)
-            parent = address
-            homepage_elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
-
-   ##first time:  HOME PAGE ONLY  ##first time:
-
-            home_sum_total, homepg_foreign_links \
-            = self.GET_MANY_LINKS_LARGE(homepage_elements, parent) #list, 1 str
-
-            write_home_set_to_file(home_sum_total)  # first simple file
-
-            base_erlist = makeerrorlist(home_sum_total)  ## on first simple file only
-            print_er(base_erlist)
-
-            print("trying 2nd set")
+            home_elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
+                     ##first time:  HOME PAGE ONLY  ##first time:
+            home_00, alien_0  = self.GET_MANY_LINKS_LARGE(home_elements, parent)     # list, str
 
         except BaseException as e:
-            print('Exception trying main outside loop in run pt1: ', str(e))
+            logger.debug('Exception trying main outside loop in run pt1: {}'.format(e.msg))
             logger.debug(str(e), exc_info=True)
-        pass
+            pass
 
         try:
-            first_nonbase_errs = self.makeerrorlist(first_nonbase_links)  ## check for errors
-            print_er(first_nonbase_errs)
+            logger.info('doing GET_MORE_LINKS next')
+                        #2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time
 
-            print('doing GET_MORE_LINKS next')
-
-
-#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time
-
-            home_1, alien_1 = self.GET_MORE_LINKS(home_sum_total)
+            home_1, alien_1 = self.GET_MORE_LINKS(home_00)
+            home_xtras_1 = [item for item in home_1 if item not in home_00]
+            home_00 = list(set(home_00 + home_xtras_1))
 
     # ------------------------------------------------------------------------------------
-            home_2, alien_2 = self.GET_MORE_LINKS(home_1)
+            home_2, alien_2 = self.GET_MORE_LINKS(home_xtras_1)
 
-            home_xtras_3 = [item for item in home_2 if item not in home_1]
+            home_xtras_2 = [item for item in home_2 if item not in home_1]
 
-            home_sum_total = list(set(home_sum_total + home_xtras_3))
+            home_00 = list(set(home_00 + home_xtras_2))
 
-    #------------------------------------------------------------------------------------
+            # ------------------------------------------------------------------------------------
+
+            home_3, alien_3 = self.GET_MORE_LINKS(home_xtras_2)
+
+            home_xtras_3 = [item for item in home_3 if item not in home_00]
+
+            home_00 = list(set(home_00 + home_xtras_3))
+
+        #------------------------------------------------------------------------------------
             home_4, alien_4 = self.GET_MORE_LINKS(home_xtras_3)
 
-            home_xtras_4 = [item for item in home_4 if item not in home_sum_total]
+            home_xtras_4 = [item for item in home_4 if item not in home_00]
 
-            home_sum_total = list(set(home_sum_total + home_xtras_4))
+            home_00 = list(set(home_00 + home_xtras_4))
 
     #------------------------------------------------------------------------------------
             home_5, alien_5 = self.GET_MORE_LINKS(home_xtras_4)
 
-            home_xtras_5 = [item for item in home_5 if item not in home_sum_total]
+            home_xtras_5 = [item for item in home_5 if item not in home_00]
 
-            home_sum_total = list(set(home_sum_total + home_xtras_5))
+            home_00 = list(set(home_00 + home_xtras_5))
 
     # ------------------------------------------------------------------------------------
             home_6, alien_6 = self.GET_MORE_LINKS(home_xtras_5)
 
-            home_xtras_6 = [item for item in home_6 if item not in home_sum_total]
+            home_xtras_6 = [item for item in home_6 if item not in home_00]
 
-            home_sum_total = list(set(home_sum_total + home_xtras_6))
+            home_00 = list(set(home_00 + home_xtras_6))
 
             # ------------------------------------------------------------------------------------
-            write_home_set_to_file(home_sum_total)
+            write_home_set_to_file(home_00, logger)
+            home_00_a = list(set(home_00))
+            home_00_b = sorted(home_00_a)
+
+            # ------------------------------------------------------------------------------------
+            alien_00 = home_00 + alien_1 + alien_2 + alien_3 + alien_4 + alien_5 + alien_6
+            alien_00_a = list(set(alien_00))
+            alien_00_b = sorted(alien_00_a)
+            write_home_set_to_file(alien_00_b, logger)
+
+            logger.info("here")
 
 
-            thi, alien_7 = self.GET_MORE_LINKS(homepg_foreign_links)   ## throw out thi
+            home_errs = self.makeerrorlist(home_00_b)  #---makeerrorlist
+            alien_errs = self.makeerrorlist(alien_00_b)  #---makeerrorlist
 
-
-            lmsg = 'Just did biglist sort ----------------------------------'
-            print(lnfeed + lmsg + lnfeed)
-
-            biglist_link_new = home_sum_total + alien_1 + alien_2 + alien_4 + alien_5 + alien_6 + alien_7
-            biglist_links = list(set(biglist_link_new))
-            biglist_of_errs = self.makeerrorlist(biglist_links)  #---makeerrorlist
-            big_err_list_final = list(
-                set(first_nonbase_errs + biglist_of_errs))  ####-----------------makeerrorlist---------makeerrorlist--
-            writebig(big_err_list_final)
+            write_error_file(home_errs, logger)
+            write_error_file(alien_errs, logger)
 
         except BaseException as e:
             print('Exception trying main outside loop in run pt2: ' + str(e))
