@@ -156,14 +156,17 @@ class LinkCheck(object):
     #############---------------------------------------- end of def
 
     def GET_MORE_LINKS(self, loc_elems=[]):
-        third = []
+        #third = []
+        first = []
+        sec = []
+        first2 = []
+        sec2 = []
 
         for each_tuple in loc_elems:
             child = each_tuple[0]  # get a page from a link on the home page
             parent = each_tuple[1]
             driver.get(child)
             child_elements = driver.find_elements_by_xpath('.//a')
-
 
             try:
             #selenium.common.exceptions.UnexpectedAlertPresentException:
@@ -194,7 +197,7 @@ class LinkCheck(object):
          
         print("In main() now")
         logger.debug("In main()")
-        first_base_links = []
+        home_sum_total = []
         first_nonbase_links = []
         #first_nonbase_errs = []
         try:
@@ -262,13 +265,13 @@ class LinkCheck(object):
             write_home_set_to_file(home_sum_total)
 
 
-            thi, alien_4 = self.GET_MORE_LINKS(homepg_foreign_links)   ## throw out thi
+            thi, alien_7 = self.GET_MORE_LINKS(homepg_foreign_links)   ## throw out thi
 
 
             lmsg = 'Just did biglist sort ----------------------------------'
             print(lnfeed + lmsg + lnfeed)
 
-            biglist_link_new = home_sum_total + alien_1 + alien_2 + alien_3
+            biglist_link_new = home_sum_total + alien_1 + alien_2 + alien_4 + alien_5 + alien_6 + alien_7
             biglist_links = list(set(biglist_link_new))
             biglist_of_errs = self.makeerrorlist(biglist_links)  #---makeerrorlist
             big_err_list_final = list(

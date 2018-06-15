@@ -25,7 +25,7 @@ class linkckutil(object):
 
         #############---------------------------------------- end of def
 
-    def writefirstset_tofile(self, firstSetLinks):
+    def write_home_set_to_file(self, firstSetLinks):
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
         basefile = 'E:\\pylogs\\BaseLinks' + timestp + '.txt'
         filen1_h = open(basefile, 'w')  #
