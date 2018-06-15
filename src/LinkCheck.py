@@ -5,6 +5,7 @@ from requests import *
 from selenium import webdriver
 from src.config import *
 from src.LinkCheckUtil import linkckutil
+from selenium.common.exceptions import UnexpectedAlertPresentException
 
 class LinkCheck(object):
 
@@ -141,7 +142,7 @@ class LinkCheck(object):
                                         nonbaselinks.append((hrefw, parent))  # tuple
 
         except BaseException as e:
-            print('Exception trying: '+ hrefw + str(e))
+            print('Exception trying: '+ str(hrefw) + str(e))
             logger.debug(str(e), exc_info=True)
             pass
 
@@ -163,10 +164,17 @@ class LinkCheck(object):
             driver.get(child)
             child_elements = driver.find_elements_by_xpath('.//a')
 
-            first, sec =  self.GET_MANY_LINKS_LARGE(child_elements, parent)
 
-            first2 = list(set(first))
-            sec2 = list(set(sec))
+            try:
+            #selenium.common.exceptions.UnexpectedAlertPresentException:
+                first, sec =  self.GET_MANY_LINKS_LARGE(child_elements, parent)
+
+                first2 = list(set(first))
+                sec2 = list(set(sec))
+            except UnexpectedAlertPresentException:
+                print('alert')
+                pass
+
         return first2, sec2
 
     #############---------------------------------------- end of def
@@ -235,13 +243,13 @@ class LinkCheck(object):
 
             biglist_link_new = fir + sec + thi + fou
             biglist_links = list(set(biglist_link_new))
-            biglist_of_errs = self.makeerrorlist(biglist_of_links)  #---makeerrorlist
+            biglist_of_errs = self.makeerrorlist(biglist_links)  #---makeerrorlist
             big_err_list_final = list(
                 set(first_nonbase_errs + biglist_of_errs))  ####-----------------makeerrorlist---------makeerrorlist--
             writebig(big_err_list_final)
 
         except BaseException as e:
-            print('Exception trying main outside loop in run pt2: ', str(e))
+            print('Exception trying main outside loop in run pt2: ' + str(e))
             logger.debug(str(e),exc_info=True)
             pass
 
