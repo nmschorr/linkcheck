@@ -8,7 +8,9 @@ from src import LinkCheckUtil
 
 
 class LinkCheck(object):
-    def makeerrorlist(self, locnewlist=0):
+
+    def makeerrorlist(self, locnewlist, u):
+        logger = u._ulogger
         print('newisides: ', locnewlist)
         elink = ''
         errorlist = []
@@ -42,14 +44,16 @@ class LinkCheck(object):
 
         except BaseException as e:
             print('Exception trying: ', elink, str(e))
-            self.logger.debug(str(e), exc_info=True)
+            logger.debug(str(e), exc_info=True)
             pass
 
         tlognameHndl.close()
         return errorlist
 
     #############---------------------------------------- end of def
-    def getthelinks(self, locElements, parent=firstparent):
+    def getthelinks(self, locElements, parent=firstparent, u = 0):
+        logger = u._ulogger
+        remcruft = u.remcruft
         emlink = ''
         baselinks = []
         nonbaselinks = []
@@ -71,7 +75,7 @@ class LinkCheck(object):
 
                 if keepgoing == True:
 
-                    if self.u.remcruft(emlink, badlist) == 'bad': 0
+                    if remcruft(emlink, badlist) == 'bad': 0
 
                     elif any(bd):
                         print('found bad attr: ', emlink)
@@ -87,7 +91,7 @@ class LinkCheck(object):
 
         except BaseException as e:
             print('Exception trying: ', emlink, str(e))
-            self.logger.debug(str(e), exc_info=True)
+            logger.debug(str(e), exc_info=True)
             pass
 
         nonbaselinksSorted = list(set(nonbaselinks))  ## sort and delete dupes
@@ -99,51 +103,57 @@ class LinkCheck(object):
 
     #############---------------------------------------- end of def
     # begin:
-    def run(self):
+    def main(self, u):
+        logger = u._logger
+        print_er = u.print_er
+        writebig = u.writebig
+        writefirstset_tofile = u.writefirstset_tofile
+        makeerrorlist = self.makeerrorlist
+        linky = u.linky
         driver = webdriver.Firefox()
         self.driver = driver
         driver.implicitly_wait(10)
-        #biglist_of_links = []
-        #biglist_of_errs = []
+
+         
         print("in main section now")
-        self.logger.debug("In run")
-        self.first_base_links = []
+        logger.debug("In run")
+        first_base_links = []
         first_nonbase_links = []
-        self.first_nonbase_errs = []
+        first_nonbase_errs = []
         try:
             driver.get(address)
             elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
 
-            first_base_links, first_nonbase_links = self.getthelinks(elements, firstparent)
+            first_base_links, first_nonbase_links = self.getthelinks(elements, firstparent, u)
 
-            self.u.writefirstset_tofile(first_base_links)
+            writefirstset_tofile(first_base_links)  # first simple file
 
-            base_erlist = self.makeerrorlist(self.first_base_links)  ## check for errors
-            self.u.print_er(base_erlist)
+            base_erlist = makeerrorlist(first_base_links, u)  ## on first simple file only
+            print_er(base_erlist)
 
             print("trying 2nd set")
 
         except BaseException as e:
             print('Exception trying main outside loop in run pt1: ', str(e))
-            self.logger.debug(str(e), exc_info=True)
+            logger.debug(str(e), exc_info=True)
         pass
 
         try:
-            first_nonbase_errs = self.makeerrorlist(first_nonbase_links)  ## check for errors
-            self.u.print_er(first_nonbase_errs)
+            first_nonbase_errs = self.makeerrorlist(first_nonbase_links, u)  ## check for errors
+            print_er(first_nonbase_errs)
 
-            biglist_of_links = self.u.linky(driver, first_base_links, first_nonbase_links)
+            biglist_of_links = linky(driver, first_base_links, first_nonbase_links)
             lmsg = 'Just did biglist sort ----------------------------------'
             print(lnfeed + lmsg + lnfeed)
 
-            biglist_of_errs = self.makeerrorlist(biglist_of_links)  #---makeerrorlist
+            biglist_of_errs = self.makeerrorlist(biglist_of_links, u)  #---makeerrorlist
             big_err_list_final = list(
                 set(first_nonbase_errs + biglist_of_errs))  ####-----------------makeerrorlist---------makeerrorlist--
-            self.u.writebig(big_err_list_final)
+            writebig(big_err_list_final)
 
         except BaseException as e:
             print('Exception trying main outside loop in run pt2: ', str(e))
-            self.logger.debug(str(e),exc_info=True)
+            logger.debug(str(e),exc_info=True)
             pass
 
         print(fblack + 'Done')
@@ -152,16 +162,12 @@ class LinkCheck(object):
 
     def __init__(self):
         print(__name__)
-        self.u, self.logger = LinkCheckUtil.runme()
-        self.run()
+        u = LinkCheckUtil()  # instantiate class which sets up logger
+        self.u = u
+        self.main(u)
+
+if __name__ == "__main__":  ## if loaded and called by something else, go fish
+    print(__name__)
 
 
-    def main(self):
-        self.run()
-
-    if __name__ == "__main__":
-        print(__name__)
-
-
-LinkCheck()
-# LinkCheck().run()
+LinkCheck()   ## run this file

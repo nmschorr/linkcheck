@@ -81,23 +81,9 @@ class LinkCheckUtil(object):
         print("\nLogging level is: ", lev)
         return logger1
 
-    def makelogger(self):
-        self.logger = self.setuplogger()
-
-    def main(self):
-        print(__name__)
-
     def __init__(self):
-        print(__name__)
+        _logger = self.setuplogger()
 
 
 
-
-
-
-        #from src import LinkCheckUtil
-
-
-# u = LinkCheckUtil()
-# logger = u.makelogger()
 
