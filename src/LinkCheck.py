@@ -184,7 +184,7 @@ class LinkCheck(object):
         logger = mu.setuplogger()
         print_er = mu.print_er
         writebig = mu.writebig
-        writefirstset_tofile = mu.writefirstset_tofile
+        write_home_set_to_file = mu.write_home_set_to_file
         makeerrorlist = self.makeerrorlist
 
         global driver
@@ -204,12 +204,12 @@ class LinkCheck(object):
 
    ##first time:  HOME PAGE ONLY  ##first time:
 
-            homepg_native_links, homepg_foreign_links \
+            home_sum_total, homepg_foreign_links \
             = self.GET_MANY_LINKS_LARGE(homepage_elements, parent) #list, 1 str
 
-            writefirstset_tofile(homepg_native_links)  # first simple file
+            write_home_set_to_file(home_sum_total)  # first simple file
 
-            base_erlist = makeerrorlist(homepg_native_links)  ## on first simple file only
+            base_erlist = makeerrorlist(home_sum_total)  ## on first simple file only
             print_er(base_erlist)
 
             print("trying 2nd set")
@@ -228,20 +228,47 @@ class LinkCheck(object):
 
 #2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time
 
-            fir,sec = self.GET_MORE_LINKS(homepg_native_links)
-            thi, fou = self.GET_MORE_LINKS(homepg_foreign_links)
+            home_1, alien_1 = self.GET_MORE_LINKS(home_sum_total)
+
+    # ------------------------------------------------------------------------------------
+            home_2, alien_2 = self.GET_MORE_LINKS(home_1)
+
+            home_xtras_3 = [item for item in home_2 if item not in home_1]
+
+            home_sum_total = list(set(home_sum_total + home_xtras_3))
+
+    #------------------------------------------------------------------------------------
+            home_4, alien_4 = self.GET_MORE_LINKS(home_xtras_3)
+
+            home_xtras_4 = [item for item in home_4 if item not in home_sum_total]
+
+            home_sum_total = list(set(home_sum_total + home_xtras_4))
+
+    #------------------------------------------------------------------------------------
+            home_5, alien_5 = self.GET_MORE_LINKS(home_xtras_4)
+
+            home_xtras_5 = [item for item in home_5 if item not in home_sum_total]
+
+            home_sum_total = list(set(home_sum_total + home_xtras_5))
+
+    # ------------------------------------------------------------------------------------
+            home_6, alien_6 = self.GET_MORE_LINKS(home_xtras_5)
+
+            home_xtras_6 = [item for item in home_6 if item not in home_sum_total]
+
+            home_sum_total = list(set(home_sum_total + home_xtras_6))
+
+            # ------------------------------------------------------------------------------------
+            write_home_set_to_file(home_sum_total)
+
+
+            thi, alien_4 = self.GET_MORE_LINKS(homepg_foreign_links)   ## throw out thi
+
+
             lmsg = 'Just did biglist sort ----------------------------------'
             print(lnfeed + lmsg + lnfeed)
 
-
-
-
-
-
-
-
-
-            biglist_link_new = fir + sec + thi + fou
+            biglist_link_new = home_sum_total + alien_1 + alien_2 + alien_3
             biglist_links = list(set(biglist_link_new))
             biglist_of_errs = self.makeerrorlist(biglist_links)  #---makeerrorlist
             big_err_list_final = list(
