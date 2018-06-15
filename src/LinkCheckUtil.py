@@ -45,15 +45,6 @@ class linkckutil(object):
         bigerr_h.close()
 
     #############---------------------------------------- end of def
-    def linky(self, driver2, firstSetLinks, biglistnew):
-        biglistloc = []
-        for first_link in firstSetLinks:
-            parent =first_link[1]
-            driver2.get(first_link[0])  # get a page from a link on the home page
-            placeholder, nnbseLinks = self.getthelinks(self.driver.find_elements_by_xpath('.//a'),
-                                                       parent)  ## for each link on homepage
-            biglistloc = list(set(biglistnew + nnbseLinks))
-        return sorted(biglistloc)
 
     #############---------------------------------------- end of def
     def setuplogger(self):
@@ -76,15 +67,15 @@ class linkckutil(object):
         logger1.setLevel(level=logging.DEBUG)
         logger1.addHandler(filehandle)
         logger1.addHandler(console)
-        logging.getLogger('').addHandler(console)  # add to root
-        logger1.info('Completed configuring logger')
+        ##logging.getLogger('').addHandler(console)  # add to root
+
         lev = logging.getLogger().getEffectiveLevel()
-        print("\nLogging level is: ", lev)
+        logger1.info('Completed configuring logger. Logging level is: '+ str(lev))
         return logger1
 
     def __init__(self, adict):
         self.__dict__.update(adict)   #globals
-        _logger = self.setuplogger()
+        #_logger = self.setuplogger()
 
     #def main(self):
 

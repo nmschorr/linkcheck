@@ -8,8 +8,7 @@ from src.LinkCheckUtil import linkckutil
 
 class LinkCheck(object):
 
-    def makeerrorlist(self, locnewlist, mu):
-        logger = self.mlogger
+    def makeerrorlist(self, locnewlist):
         print('new locnewlist: ', locnewlist)
         elink = ''
         errorlist = []
@@ -50,70 +49,83 @@ class LinkCheck(object):
         return errorlist
 
     #############---------------------------------------- end of def
-    def getthelinks(self, locElements, parent, u):
-        logger = self.mlogger
-        remcruft = u.remcruft
-
+    def getthelinks(self, locElements, parent):
+        remcruft = mu.remcruft
+        emlink= [] 
+        baselinks=[]
+        nonbaselinks=[]
+        keepgoing=True
+        
         try:
             for webelem in locElements:
-                u.keepgoing = True
+                keepgoing = True
                 if webelem.tag_name == 'a':
                     if type(webelem) == 'NoneType' or webelem is None:
                         print('Found none type')
-                        u.keepgoing = False
+                        keepgoing = False
 
                     else:  # setup for next section
-                        u.emlink = webelem.get_attribute('href')
-                        u.emlen = len(u.emlink)
-                        badchecks=[u.emlink[0:6] == 'javasc', u.emlink[0:1] == '/', u.emlink[0:7] == 'mailto:', u.emlen < 7]
+                        emlink = webelem.get_attribute('href')
+                        mu.emlen = len(emlink)
+                        badchecks=[emlink[0:6] == 'javasc', emlink[0:1] == '/', emlink[0:7] == 'mailto:', mu.emlen < 7]
 
-                if u.keepgoing == True:
+                if keepgoing == True:
 
-                    if remcruft(u.emlink, badlist) == 'bad': None
+                    if remcruft(emlink, badlist) == 'bad': None
 
                     elif any(badchecks):
-                        print('found bad attr: ', u.emlink)
+                        print('found bad attr: ', emlink)
 
                     else:
-                        ans1 = u.emlink.find(base1)  ## is the base in there?
-                        ans2 = u.emlink.find(base2)  ## is the base in there?
+                        ans1 = emlink.find(base1)  ## is the base in there?
+                        ans2 = emlink.find(base2)  ## is the base in there?
 
                         if (ans1 + ans2) > 0:  # if either are there
-                            u.baselinks.append(u.emlink, parent)
+                            baselinks.append((emlink, parent)) # tuple
                         else:
-                            u.nonbaselinks.append(u.emlink, parent)
+                            nonbaselinks.append((emlink, parent))  # tuple
 
         except BaseException as e:
-            print('Exception trying: ', u.emlink, str(e))
+            print('Exception trying: ', emlink, str(e))
             logger.debug(str(e), exc_info=True)
             pass
 
-        nonbaselinksSorted = list(set(u.nonbaselinks))  ## sort and delete dupes
+        nonbaselinksSorted = list(set(nonbaselinks))  ## sort and delete dupes
 
-        baselinksSort = list(set(u.baselinks))
+        baselinksSort = list(set(baselinks))
         baselinksSorted = sorted(baselinksSort)
 
         return baselinksSorted, nonbaselinksSorted
 
     #############---------------------------------------- end of def
-    # begin:
-    def main(self, mutil):
-        print()
-        mlogger = mutil.setuplogger()
-        self.mlogger = mlogger
-        print_er = mutil.print_er
-        writebig = mutil.writebig
-        writefirstset_tofile = mutil.writefirstset_tofile
-        makeerrorlist = self.makeerrorlist
-        linky = mutil.linky
 
+    def linky(self, driver2, firstSetLinks, biglistnew):
+        biglistloc = []
+        for first_link in firstSetLinks:
+            parent = first_link[1]
+            driver2.get(first_link[0])  # get a page from a link on the home page
+            placeholder, nnbseLinks = \
+                self.getthelinks(driver.find_elements_by_xpath('.//a'), parent)  # for each link on homepage
+            biglistloc = list(set(biglistnew + nnbseLinks))
+        return sorted(biglistloc)
+
+    #############---------------------------------------- end of def
+    # begin:
+    def main(self):
+        global logger
+        logger = mu.setuplogger()
+        print_er = mu.print_er
+        writebig = mu.writebig
+        writefirstset_tofile = mu.writefirstset_tofile
+        makeerrorlist = self.makeerrorlist
+
+        global driver
         driver = webdriver.Firefox()
-        self.driver = driver
         driver.implicitly_wait(10)
 
          
-        print("in main section now")
-        mlogger.debug("In main()")
+        print("In main() now")
+        logger.debug("In main()")
         first_base_links = []
         first_nonbase_links = []
         #first_nonbase_errs = []
@@ -121,49 +133,50 @@ class LinkCheck(object):
             driver.get(address)
             elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
 
-            first_base_links, first_nonbase_links = self.getthelinks(elements, firstparent, mutil)
+            first_base_links, first_nonbase_links = self.getthelinks(elements, firstparent)
 
             writefirstset_tofile(first_base_links)  # first simple file
 
-            base_erlist = makeerrorlist(first_base_links, mutil)  ## on first simple file only
+            base_erlist = makeerrorlist(first_base_links)  ## on first simple file only
             print_er(base_erlist)
 
             print("trying 2nd set")
 
         except BaseException as e:
             print('Exception trying main outside loop in run pt1: ', str(e))
-            mlogger.debug(str(e), exc_info=True)
+            logger.debug(str(e), exc_info=True)
         pass
 
         try:
-            first_nonbase_errs = self.makeerrorlist(first_nonbase_links, mutil)  ## check for errors
+            first_nonbase_errs = self.makeerrorlist(first_nonbase_links)  ## check for errors
             print_er(first_nonbase_errs)
 
-            biglist_of_links = linky(driver, first_base_links, first_nonbase_links)
+            biglist_of_links = self.linky(driver, first_base_links, first_nonbase_links)
             lmsg = 'Just did biglist sort ----------------------------------'
             print(lnfeed + lmsg + lnfeed)
 
-            biglist_of_errs = self.makeerrorlist(biglist_of_links, mutil)  #---makeerrorlist
+            biglist_of_errs = self.makeerrorlist(biglist_of_links)  #---makeerrorlist
             big_err_list_final = list(
                 set(first_nonbase_errs + biglist_of_errs))  ####-----------------makeerrorlist---------makeerrorlist--
             writebig(big_err_list_final)
 
         except BaseException as e:
             print('Exception trying main outside loop in run pt2: ', str(e))
-            mlogger.debug(str(e),exc_info=True)
+            logger.debug(str(e),exc_info=True)
             pass
 
         print(fblack + 'Done')
         driver.close()
 
     def __init__(self):
-        print(__name__)
-        self.utils = linkckutil(gdict)  # instantiate class which sets up logger, etc.
-
-        self.main(self.utils)
+        print('Init: ' + __name__)
+        global mu
+        mu = linkckutil()  # instantiate class which sets up logger, etc.
+        self.main()
+                                # mu = linkckutil(gdict)  # instantiate class which sets up logger, etc.
 
 if __name__ == "__main__":  ## if loaded and called by something else, go fish
-    print(__name__)
+    None
 
 
 LinkCheck()   ## run this file
