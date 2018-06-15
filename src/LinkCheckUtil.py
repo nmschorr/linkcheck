@@ -7,7 +7,7 @@ import sys
 
     #############---------------------------------------- end of def
 
-class LinkCheckUtil(object):
+class linkckutil(object):
 
     def remcruft(self, localink, mlist):
         res = 'good'
@@ -72,6 +72,7 @@ class LinkCheckUtil(object):
         console.setFormatter(formatter)
         console.setLevel(level=logging.DEBUG)
 
+
         logger1.setLevel(level=logging.DEBUG)
         logger1.addHandler(filehandle)
         logger1.addHandler(console)
@@ -81,8 +82,11 @@ class LinkCheckUtil(object):
         print("\nLogging level is: ", lev)
         return logger1
 
-    def __init__(self):
+    def __init__(self, adict):
+        self.__dict__.update(adict)   #globals
         _logger = self.setuplogger()
+
+    #def main(self):
 
 
 

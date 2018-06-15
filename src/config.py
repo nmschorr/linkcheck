@@ -26,6 +26,7 @@ badlist = ['#','com/#', '?', 'blogger.com', '/search', 'javascript:void(0)', 'wi
 gerrstr = 'ERROR ---- ! ---Result code: '
 finame = 'E:\\pylogs\\finame' + base2 + '-' + '.log'
 
+gdict = { 'emlink' : [], 'baselinks' : [], 'nonbaselinks' : [], 'keepgoing' : True}
 
 
 
