@@ -6,6 +6,7 @@ from selenium import webdriver
 from src.config import *
 from src.LinkCheckUtil import linkckutil
 from selenium.common.exceptions import UnexpectedAlertPresentException
+from selenium.common.exceptions import StaleElementReferenceException
 
 class LinkCheck(object):
 
@@ -19,21 +20,21 @@ class LinkCheck(object):
                 theparent = elinktup[1]
                 logger.info('Inside Loop:' + lnfeed)
                 resp = str(head(elink, data=None, timeout=30))
-                logger.info(fblack + 'resp: ', resp)
+                logger.info('resp: ' + resp)
                 err_resp = resp[11:14]
                 responstr = 'checked: ' + elink + ' -resp: ' + err_resp + lnfeed
                 logger.info(responstr)
 
                 if int(err_resp) in ercodes:
                     errorString = gerrstr + '{} in: {} from parent: {}'.format(err_resp, elink, theparent)
-                    logger.info(fred + errorString + fblack)
+                    logger.info(errorString)
                     errorlist.append(errorString)
                     logger.info(errorString + lnfeed)
                 else:
-                    logger.info(fblack + 'status code: ' + err_resp)
+                    logger.info('status code: ' + err_resp)
 
         except BaseException as e:
-            logger.info('Exception in: LinkCheck')
+            logger.debug('Exception in: ')
             logger.debug(str(e), exc_info=True)
             pass
 
@@ -73,6 +74,10 @@ class LinkCheck(object):
                                         baselinks.append((hrefw, parent)) # tuple
                                     else:
                                         nonbaselinks.append((hrefw, parent))  # tuple
+
+        except StaleElementReferenceException as s:
+            logger.debug(str(s), exc_info=True)
+            pass
 
         except BaseException as e:
             logger.debug(str(e), exc_info=True)
@@ -144,71 +149,69 @@ class LinkCheck(object):
 
             home_1, alien_1 = self.GET_MORE_LINKS(home_00)
             home_xtras_1 = [item for item in home_1 if item not in home_00]
-            home_00 = list(set(home_00 + home_xtras_1))
+            home_00a = list(set(home_00 + home_xtras_1))
 
     # ------------------------------------------------------------------------------------
             home_2, alien_2 = self.GET_MORE_LINKS(home_xtras_1)
 
-            home_xtras_2 = [item for item in home_2 if item not in home_1]
+            home_xtras_2 = [item for item in home_2 if item not in home_00a]
 
-            home_00 = list(set(home_00 + home_xtras_2))
+            home_00b = list(set(home_00a + home_xtras_2))
 
             # ------------------------------------------------------------------------------------
 
             home_3, alien_3 = self.GET_MORE_LINKS(home_xtras_2)
 
-            home_xtras_3 = [item for item in home_3 if item not in home_00]
+            home_xtras_3 = [item for item in home_3 if item not in home_00b]
 
-            home_00 = list(set(home_00 + home_xtras_3))
+            home_00c = list(set(home_00b + home_xtras_3))
 
         #------------------------------------------------------------------------------------
             home_4, alien_4 = self.GET_MORE_LINKS(home_xtras_3)
 
-            home_xtras_4 = [item for item in home_4 if item not in home_00]
+            home_xtras_4 = [item for item in home_4 if item not in home_00c]
 
-            home_00 = list(set(home_00 + home_xtras_4))
+            home_00d = list(set(home_00 + home_xtras_4))
 
     #------------------------------------------------------------------------------------
             home_5, alien_5 = self.GET_MORE_LINKS(home_xtras_4)
 
-            home_xtras_5 = [item for item in home_5 if item not in home_00]
+            home_xtras_5 = [item for item in home_5 if item not in home_00d]
 
-            home_00 = list(set(home_00 + home_xtras_5))
+            home_00e = list(set(home_00 + home_xtras_5))
 
     # ------------------------------------------------------------------------------------
             home_6, alien_6 = self.GET_MORE_LINKS(home_xtras_5)
 
-            home_xtras_6 = [item for item in home_6 if item not in home_00]
+            home_xtras_6 = [item for item in home_6 if item not in home_00e]
 
-            home_00 = list(set(home_00 + home_xtras_6))
+            home_00f = list(set(home_00 + home_xtras_6))
 
-            # ------------------------------------------------------------------------------------
-            mu.write_home_set_to_file(home_00, logger)
-            home_00_a = list(set(home_00))
-            home_00_b = sorted(home_00_a)
+     #  WRITE!!       # ------------------------------------------------------------------------------------
+            home_00final = sorted(home_00f)
+            mu.write_home_set_to_file(home_00final, logger)
 
             # ------------------------------------------------------------------------------------
             alien_00 = home_00 + alien_1 + alien_2 + alien_3 + alien_4 + alien_5 + alien_6
-            alien_00_a = list(set(alien_00))
-            alien_00_b = sorted(alien_00_a)
-            mu.write_home_set_to_file(alien_00_b, logger)
+            alien_00a = list(set(alien_00))
+            alien_00final = sorted(alien_00a)
+            mu.write_home_set_to_file(alien_00final, logger)
 
             logger.info("just did write_home_set_to_file")
 
-            home_errs = self.make_error_list(home_00_b)  #---make_error_list
-            alien_errs = self.make_error_list(alien_00_b)  #---make_error_list
+            home_errs = self.make_error_list(home_00final)  #---make_error_list
+            alien_errs = self.make_error_list(alien_00final)  #---make_error_list
             all_errors_00 = home_errs + alien_errs
             all_errors_00a = list(set(all_errors_00))
-            all_errors_00b = sorted(home_all_errors_00a00_a)
+            all_errors_00final = sorted(all_errors_00a)
 
-            mu.write_error_file(all_errors_00b, logger)
+            mu.write_error_file(all_errors_00final, logger)
 
         except BaseException as e:
-            logger.info('Exception trying main outside loop in run pt2: ' + e.msg)
             logger.debug(str(e),exc_info=True)
             pass
 
-        logger.info(fblack + 'Done')
+        logger.info('Done')
         driver.close()
 
     def __init__(self):
