@@ -48,45 +48,100 @@ class LinkCheck(object):
         tlognameHndl.close()
         return errorlist
 
-    #############---------------------------------------- end of def
-    def getthelinks(self, locElements, parent):
+
+#====================================================
+    def getthelinks_two(self, hrefz, parent):
         remcruft = mu.remcruft
-        emlink= [] 
+        hrefw = []
+        baselinks = []
+        nonbaselinks = []
+        keepgoing = True
+        emlen = 1
+
+        try:
+            for webelem in locElements:
+                if webelem.tag_name == 'a':
+                    print('TYPE OF OBJECT: -----' + str(type(webelem)))
+
+                    if type(webelem) is not 'NoneType':
+                        if webelem is not None:
+                            hrefw = webelem.get_attribute('href')
+                            print('JUST GOT hrefw: -----' + str(hrefw))
+                            print('TYPE OF hrefw: -----' + str(type(hrefw)))
+
+                            if type(hrefw) is str:
+                                emlen = len(hrefw)
+                                badchecks = [hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:',
+                                             emlen < 7]
+
+                                if remcruft(hrefw, badlist) == 'bad':
+                                    0
+
+                                elif any(badchecks):
+                                    print('found bad attr: ' + str(hrefw))
+
+                                else:
+                                    ans1 = hrefw.find(base1)  ## is the base in there?
+                                    ans2 = hrefw.find(base2)  ## is the base in there?
+
+                                    if (ans1 + ans2) > 0:  # if either are there
+                                        baselinks.append((hrefw, parent))  # tuple
+                                    else:
+                                        nonbaselinks.append((hrefw, parent))  # tuple
+
+        except BaseException as e:
+            print('Exception trying: ' + hrefw + str(e))
+            logger.debug(str(e), exc_info=True)
+            pass
+
+        nonbaselinksSorted = list(set(nonbaselinks))  ## sort and delete dupes
+
+        baselinksSort = list(set(baselinks))
+        baselinksSorted = sorted(baselinksSort)
+
+        return baselinksSorted, nonbaselinksSorted
+
+    #############---------------------------------------- end of def
+    def GET_MANY_LINKS_LARGE(self, locElements, parent):
+        remcruft = mu.remcruft
+        hrefw= []
         baselinks=[]
         nonbaselinks=[]
         keepgoing=True
-        
+        emlen = 1
+
         try:
             for webelem in locElements:
-                keepgoing = True
                 if webelem.tag_name == 'a':
-                    if type(webelem) == 'NoneType' or webelem is None:
-                        print('Found none type')
-                        keepgoing = False
+                    print('TYPE OF OBJECT: -----' + str(type(webelem)))
 
-                    else:  # setup for next section
-                        emlink = webelem.get_attribute('href')
-                        mu.emlen = len(emlink)
-                        badchecks=[emlink[0:6] == 'javasc', emlink[0:1] == '/', emlink[0:7] == 'mailto:', mu.emlen < 7]
+                    if type(webelem) is not 'NoneType':
+                        if webelem is not None:
+                            hrefw = webelem.get_attribute('href')
+                            print('JUST GOT hrefw: -----' + str(hrefw))
+                            print('TYPE OF hrefw: -----' + str(type(hrefw)))
 
-                if keepgoing == True:
+                            if type(hrefw) is str:
+                                emlen = len(hrefw)
+                                badchecks=[hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:', emlen < 7]
 
-                    if remcruft(emlink, badlist) == 'bad': None
+                                if remcruft(hrefw, badlist) == 'bad':
+                                    0
 
-                    elif any(badchecks):
-                        print('found bad attr: ', emlink)
+                                elif any(badchecks):
+                                    print('found bad attr: ' + str(hrefw))
 
-                    else:
-                        ans1 = emlink.find(base1)  ## is the base in there?
-                        ans2 = emlink.find(base2)  ## is the base in there?
+                                else:
+                                    ans1 = hrefw.find(base1)  ## is the base in there?
+                                    ans2 = hrefw.find(base2)  ## is the base in there?
 
-                        if (ans1 + ans2) > 0:  # if either are there
-                            baselinks.append((emlink, parent)) # tuple
-                        else:
-                            nonbaselinks.append((emlink, parent))  # tuple
+                                    if (ans1 + ans2) > 0:  # if either are there
+                                        baselinks.append((hrefw, parent)) # tuple
+                                    else:
+                                        nonbaselinks.append((hrefw, parent))  # tuple
 
         except BaseException as e:
-            print('Exception trying: ', emlink, str(e))
+            print('Exception trying: '+ hrefw + str(e))
             logger.debug(str(e), exc_info=True)
             pass
 
@@ -99,15 +154,20 @@ class LinkCheck(object):
 
     #############---------------------------------------- end of def
 
-    def linky(self, driver2, firstSetLinks, biglistnew):
-        biglistloc = []
-        for first_link in firstSetLinks:
-            parent = first_link[1]
-            driver2.get(first_link[0])  # get a page from a link on the home page
-            placeholder, nnbseLinks = \
-                self.getthelinks(driver.find_elements_by_xpath('.//a'), parent)  # for each link on homepage
-            biglistloc = list(set(biglistnew + nnbseLinks))
-        return sorted(biglistloc)
+    def GET_MORE_LINKS(self, loc_elems=[]):
+        third = []
+
+        for each_tuple in loc_elems:
+            child = each_tuple[0]  # get a page from a link on the home page
+            parent = each_tuple[1]
+            driver.get(child)
+            child_elements = driver.find_elements_by_xpath('.//a')
+
+            first, sec =  self.GET_MANY_LINKS_LARGE(child_elements, parent)
+
+            first2 = list(set(first))
+            sec2 = list(set(sec))
+        return first2, sec2
 
     #############---------------------------------------- end of def
     # begin:
@@ -131,13 +191,17 @@ class LinkCheck(object):
         #first_nonbase_errs = []
         try:
             driver.get(address)
-            elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
+            parent = address
+            homepage_elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
 
-            first_base_links, first_nonbase_links = self.getthelinks(elements, firstparent)
+   ##first time:  HOME PAGE ONLY  ##first time:
 
-            writefirstset_tofile(first_base_links)  # first simple file
+            homepg_native_links, homepg_foreign_links \
+            = self.GET_MANY_LINKS_LARGE(homepage_elements, parent) #list, 1 str
 
-            base_erlist = makeerrorlist(first_base_links)  ## on first simple file only
+            writefirstset_tofile(homepg_native_links)  # first simple file
+
+            base_erlist = makeerrorlist(homepg_native_links)  ## on first simple file only
             print_er(base_erlist)
 
             print("trying 2nd set")
@@ -151,10 +215,26 @@ class LinkCheck(object):
             first_nonbase_errs = self.makeerrorlist(first_nonbase_links)  ## check for errors
             print_er(first_nonbase_errs)
 
-            biglist_of_links = self.linky(driver, first_base_links, first_nonbase_links)
+            print('doing GET_MORE_LINKS next')
+
+
+#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time
+
+            fir,sec = self.GET_MORE_LINKS(homepg_native_links)
+            thi, fou = self.GET_MORE_LINKS(homepg_foreign_links)
             lmsg = 'Just did biglist sort ----------------------------------'
             print(lnfeed + lmsg + lnfeed)
 
+
+
+
+
+
+
+
+
+            biglist_link_new = fir + sec + thi + fou
+            biglist_links = list(set(biglist_link_new))
             biglist_of_errs = self.makeerrorlist(biglist_of_links)  #---makeerrorlist
             big_err_list_final = list(
                 set(first_nonbase_errs + biglist_of_errs))  ####-----------------makeerrorlist---------makeerrorlist--

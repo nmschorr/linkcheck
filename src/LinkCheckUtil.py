@@ -19,7 +19,7 @@ class linkckutil(object):
 
         #############---------------------------------------- end of def
 
-    def print_er(self, err):
+    def print_er(self, err=[]):
         for er2 in err:
             print('error: ', er2)
 
@@ -73,11 +73,10 @@ class linkckutil(object):
         logger1.info('Completed configuring logger. Logging level is: '+ str(lev))
         return logger1
 
-    def __init__(self, adict):
-        self.__dict__.update(adict)   #globals
-        #_logger = self.setuplogger()
+    def __init__(self):
+        None
+        #self.__dict__.update(adict)   #globals
 
-    #def main(self):
 
 
 
