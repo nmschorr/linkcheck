@@ -54,8 +54,8 @@ class linkckutil(object):
 
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
         logging.basicConfig(format='\n%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-        logger1 = logging.getLogger('__name__')
-        formatter = logging.Formatter('%(asctime)s-%(name)s-%(levelname)s: Message: %(message)s: Function: %(funcName)s',
+        logger1 = logging.getLogger('mainlogger')
+        formatter = logging.Formatter('%(asctime)s-%(levelname)s: Message: %(message)s: Function: %(funcName)s',
             datefmt='%m%d%y-%H.%M%S')
         fname = 'E:\\pylogs\\Logger-' + timestp + '.log'
         filehandle = logging.FileHandler(fname)

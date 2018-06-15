@@ -9,126 +9,61 @@ from selenium.common.exceptions import UnexpectedAlertPresentException
 
 class LinkCheck(object):
 
-    def makeerrorlist(self, locnewlist):
-        print('new locnewlist: ', locnewlist)
-        elink = ''
+    def make_error_list(self, locnewlist):
+        logger.info('new locnewlist: ')
         errorlist = []
-
-        ts = format(datetime.now(), '%Y%m%d.%H.%M%S')
-        tlogname = 'E:\\pylogs\\linkcheckresults' + ts + '.log'
-        tlognameHndl = open(tlogname, 'w')  #
-        tlognameHndl.write('Error File:' + lnfeed)
 
         try:  # check head
             for elinktup in locnewlist:
-                
                 elink = elinktup[0]
                 theparent = elinktup[1]
-                tlognameHndl.write('Inside Loop:' + lnfeed)
-
+                logger.info('Inside Loop:' + lnfeed)
                 resp = str(head(elink, data=None, timeout=30))
-                print(fblack + 'resp: ', resp)
+                logger.info(fblack + 'resp: ', resp)
                 err_resp = resp[11:14]
-
                 responstr = 'checked: ' + elink + ' -resp: ' + err_resp + lnfeed
-                tlognameHndl.write(responstr)
+                logger.info(responstr)
 
                 if int(err_resp) in ercodes:
                     errorString = gerrstr + '{} in: {} from parent: {}'.format(err_resp, elink, theparent)
-                    print(fred + errorString + fblack)
+                    logger.info(fred + errorString + fblack)
                     errorlist.append(errorString)
-                    tlognameHndl.write(errorString + lnfeed)
+                    logger.info(errorString + lnfeed)
                 else:
-                    print(fblack + 'status code: ' + err_resp)
+                    logger.info(fblack + 'status code: ' + err_resp)
 
         except BaseException as e:
-            print('Exception trying: ', elink, str(e))
+            logger.info('Exception in: LinkCheck')
             logger.debug(str(e), exc_info=True)
             pass
 
-        tlognameHndl.close()
         return errorlist
-
-
-#====================================================
-    def getthelinks_two(self, hrefz, parent):
-        remcruft = mu.remcruft
-        hrefw = []
-        baselinks = []
-        nonbaselinks = []
-        keepgoing = True
-        emlen = 1
-
-        try:
-            for webelem in locElements:
-                if webelem.tag_name == 'a':
-                    print('TYPE OF OBJECT: -----' + str(type(webelem)))
-
-                    if type(webelem) is not 'NoneType':
-                        if webelem is not None:
-                            hrefw = webelem.get_attribute('href')
-                            print('JUST GOT hrefw: -----' + str(hrefw))
-                            print('TYPE OF hrefw: -----' + str(type(hrefw)))
-
-                            if type(hrefw) is str:
-                                emlen = len(hrefw)
-                                badchecks = [hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:',
-                                             emlen < 7]
-
-                                if remcruft(hrefw, badlist) == 'bad':
-                                    0
-
-                                elif any(badchecks):
-                                    print('found bad attr: ' + str(hrefw))
-
-                                else:
-                                    ans1 = hrefw.find(base1)  ## is the base in there?
-                                    ans2 = hrefw.find(base2)  ## is the base in there?
-
-                                    if (ans1 + ans2) > 0:  # if either are there
-                                        baselinks.append((hrefw, parent))  # tuple
-                                    else:
-                                        nonbaselinks.append((hrefw, parent))  # tuple
-
-        except BaseException as e:
-            print('Exception trying: ' + hrefw + str(e))
-            logger.debug(str(e), exc_info=True)
-            pass
-
-        nonbaselinksSorted = list(set(nonbaselinks))  ## sort and delete dupes
-
-        baselinksSort = list(set(baselinks))
-        baselinksSorted = sorted(baselinksSort)
-
-        return baselinksSorted, nonbaselinksSorted
 
     #############---------------------------------------- end of def
     def GET_MANY_LINKS_LARGE(self, locElements, parent):
-        remcruft = mu.remcruft
-        hrefw= []
         baselinks=[]
         nonbaselinks=[]
 
         try:
             for webelem in locElements:
                 if webelem.tag_name == 'a':
-                    print('TYPE OF OBJECT: -----' + str(type(webelem)))
+                    logger.info('TYPE OF OBJECT: -----' + str(type(webelem)))
 
                     if type(webelem) is not 'NoneType':
                         if webelem is not None:
                             hrefw = webelem.get_attribute('href')
-                            print('JUST GOT hrefw: -----' + str(hrefw))
-                            print('TYPE OF hrefw: -----' + str(type(hrefw)))
+                            logger.info('JUST GOT hrefw: -----' + str(hrefw))
+                            logger.info('TYPE OF hrefw: -----' + str(type(hrefw)))
 
                             if type(hrefw) is str:
                                 emlen = len(hrefw)
                                 badchecks=[hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:', emlen < 7]
 
-                                if remcruft(hrefw, badlist) == 'bad':
+                                if mu.remcruft(hrefw, badlist) == 'bad':
                                     0
 
                                 elif any(badchecks):
-                                    print('found bad attr: ' + str(hrefw))
+                                    logger.info('found bad attr: ' + str(hrefw))
 
                                 else:
                                     ans1 = hrefw.find(base1)  ## is the base in there?
@@ -143,7 +78,8 @@ class LinkCheck(object):
             logger.debug(str(e), exc_info=True)
             pass
 
-        nonbaselinksSorted = list(set(nonbaselinks))  ## sort and delete dupes
+        nonbaselinksSort = list(set(nonbaselinks))  ## sort and delete dupes
+        nonbaselinksSorted = sorted(nonbaselinksSort)  ## sort and delete dupes
 
         baselinksSort = list(set(baselinks))
         baselinksSorted = sorted(baselinksSort)
@@ -181,10 +117,6 @@ class LinkCheck(object):
     def main(self):
         global logger
         logger = mu.setuplogger()
-        print_er = mu.print_er
-        write_error_file = mu.write_error_file
-        write_home_set_to_file = mu.write_home_set_to_file
-        makeerrorlist = self.makeerrorlist
         home_00 = []
         alien_00 = []
         parent = address
@@ -251,7 +183,7 @@ class LinkCheck(object):
             home_00 = list(set(home_00 + home_xtras_6))
 
             # ------------------------------------------------------------------------------------
-            write_home_set_to_file(home_00, logger)
+            mu.write_home_set_to_file(home_00, logger)
             home_00_a = list(set(home_00))
             home_00_b = sorted(home_00_a)
 
@@ -259,23 +191,24 @@ class LinkCheck(object):
             alien_00 = home_00 + alien_1 + alien_2 + alien_3 + alien_4 + alien_5 + alien_6
             alien_00_a = list(set(alien_00))
             alien_00_b = sorted(alien_00_a)
-            write_home_set_to_file(alien_00_b, logger)
+            mu.write_home_set_to_file(alien_00_b, logger)
 
-            logger.info("here")
+            logger.info("just did write_home_set_to_file")
 
+            home_errs = self.make_error_list(home_00_b)  #---make_error_list
+            alien_errs = self.make_error_list(alien_00_b)  #---make_error_list
+            all_errors_00 = home_errs + alien_errs
+            all_errors_00a = list(set(all_errors_00))
+            all_errors_00b = sorted(home_all_errors_00a00_a)
 
-            home_errs = self.makeerrorlist(home_00_b)  #---makeerrorlist
-            alien_errs = self.makeerrorlist(alien_00_b)  #---makeerrorlist
-
-            write_error_file(home_errs, logger)
-            write_error_file(alien_errs, logger)
+            mu.write_error_file(all_errors_00b, logger)
 
         except BaseException as e:
-            print('Exception trying main outside loop in run pt2: ' + str(e))
+            logger.info('Exception trying main outside loop in run pt2: ' + e.msg)
             logger.debug(str(e),exc_info=True)
             pass
 
-        print(fblack + 'Done')
+        logger.info(fblack + 'Done')
         driver.close()
 
     def __init__(self):
