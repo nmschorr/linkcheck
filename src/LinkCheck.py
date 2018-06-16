@@ -1,27 +1,28 @@
 # python 3
 
-from datetime import datetime
 from requests import *
 from selenium import webdriver
 from src.config import *
 from src.LinkCheckUtil import linkckutil
 from selenium.common.exceptions import UnexpectedAlertPresentException
 from selenium.common.exceptions import StaleElementReferenceException
-from time import sleep
+#from time import sleep
+
 
 class LinkCheck(object):
 
-    def make_error_list(self, locnewlist):
-        logger.info('new locnewlist: ')
+    @staticmethod
+    def make_error_list(locnewlist):
+        logger.info('Starting make_errorList ')
         errorlist = []
 
         try:  # check head
             for elinktup in locnewlist:
                 elink = elinktup[0]
                 theparent = elinktup[1]
-                logger.info('Inside Loop:' + lnfeed)
+                #logger.info('Inside Loop:' + lnfeed)
                 resp = str(head(elink, data=None, timeout=30))
-                logger.info('resp: ' + resp)
+                #logger.info('resp: ' + resp)
                 err_resp = resp[11:14]
                 responstr = 'checked: ' + elink + ' -resp: ' + err_resp + lnfeed
                 logger.info(responstr)
@@ -42,42 +43,41 @@ class LinkCheck(object):
         return errorlist
 
     #############---------------------------------------- end of def
-    def GET_MANY_LINKS_LARGE(self, locElements, parent):
-        baselinks=[]
-        nonbaselinks=[]
+    @staticmethod
+    def GET_MANY_LINKS_LARGE(locElements, parent):
+        baselinks = []
+        nonbaselinks = []
 
         try:
             for webelem in locElements:
                 if webelem.tag_name == 'a':
-                    logger.info('TYPE OF OBJECT: -----' + str(type(webelem)))
+                    # logger.info('TYPE OF OBJECT: -----' + str(type(webelem)))
 
                     if type(webelem) is not 'NoneType':
                         if webelem is not None:
                             hrefw = webelem.get_attribute('href')
-                            logger.info('JUST GOT hrefw: -----' + str(hrefw))
-                            logger.info('TYPE OF hrefw: -----' + str(type(hrefw)))
+                            # logger.info('JUST GOT hrefw: -----' + str(hrefw)) logger.info('TYPE OF hrefw: -----' + str(type(hrefw)))
 
                             if type(hrefw) is str:
                                 emlen = len(hrefw)
-                                badchecks=[hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:', emlen < 7]
+                                badchecks = [hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:',
+                                             emlen < 7]
 
-
-                                if hrefw == 'http://www.repercussions.com/contact.htm':
-                                    print('found it!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-                                    sleep(1)
+                                # if hrefw == 'http://www.repercussions.com/contact.htm':
 
                                 if mu.remcruft(hrefw, badlist) == 'bad':
                                     0
 
                                 elif any(badchecks):
-                                    logger.info('found bad attr: ' + str(hrefw))
+                                    msg = 'Found bad attr: ' + hrefw
+                                    logger.info(msg)
 
                                 else:
                                     ans1 = hrefw.find(base1)  ## is the base in there?
                                     ans2 = hrefw.find(base2)  ## is the base in there?
 
                                     if (ans1 + ans2) > 0:  # if either are there
-                                        baselinks.append((hrefw, parent)) # tuple
+                                        baselinks.append((hrefw, parent))  # tuple
                                     else:
                                         nonbaselinks.append((hrefw, parent))  # tuple
 
@@ -102,8 +102,8 @@ class LinkCheck(object):
     def GET_MORE_LINKS(self, loc_elems=[]):
         homelinks = []
         alienlinks = []
-        homelinks2 = []
-        alienlinks2 = []
+        homelinksSetList = []
+        alienlinksSetList = []
         homelinks_all = []
         alienlinks_all = []
 
@@ -114,20 +114,23 @@ class LinkCheck(object):
             child_elements = driver.find_elements_by_xpath('.//a')
 
             try:
-                homelinks, alienlinks =  self.GET_MANY_LINKS_LARGE(child_elements, tparent)
-                homelinks2 = list(set(homelinks))
-                alienlinks2 = list(set(alienlinks))
+                homelinks, alienlinks = self.GET_MANY_LINKS_LARGE(child_elements, tparent)
+                homelinksSetList = list(set(homelinks))
+                alienlinksSetList = list(set(alienlinks))
 
-                                                    # selenium.common.exceptions.UnexpectedAlertPresentException:
-            except UnexpectedAlertPresentException:
+                # selenium.common.exceptions.UnexpectedAlertPresentException:
+            except UnexpectedAlertPresentException as e:
                 logger.debug('ALERT! -- UnexpectedAlertPresentException on: {}'.format(tchild))
-                logger('ALERT! -- UnexpectedAlertPresentException on: {}'.format(tchild))
+                logger.debug(str(e), exc_info=True)
                 pass
 
-            homelinks_all += homelinks2
-            alienlinks_all += alienlinks2
+            homelinks_all += homelinksSetList
+            alienlinks_all += alienlinksSetList
 
-        return list(set(homelinks_all)), list(set(alienlinks2))
+        homelinks_all_sorted = list(set(homelinks_all))
+        alienlinks_all_sorted = list(set(alienlinks_all))
+
+        return homelinks_all_sorted, alienlinks_all_sorted
 
     #############---------------------------------------- end of def
     # begin:
@@ -147,20 +150,20 @@ class LinkCheck(object):
             logger.info('Getting first address: {}'.format(address))
             driver.get(address)
             home_elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
-                     ##first time:  HOME PAGE ONLY  ##first time:
-            home_0, alien_0  = self.GET_MANY_LINKS_LARGE(home_elements, parent)     # list, str
+            ##first time:  HOME PAGE ONLY  ##first time:
+            home_0, alien_0 = self.GET_MANY_LINKS_LARGE(home_elements, parent)  # list, str
 
         except BaseException as e:
-            logger.debug('Exception trying main outside loop in run pt1: {}'.format(e.msg))
+            logger.debug('Exception trying main outside loop in run pt1: {}'.format(str(e.with_traceback())))
             logger.debug(str(e), exc_info=True)
             pass
 
         try:
             home_1, alien_1 = self.GET_MORE_LINKS(home_0)
-            home_xtras_1 = [item for item in home_1 if item not in home_0]   ## get the new diffs
-            home_all_1 = list(set(home_1 + home_xtras_1))   ## add them to base set
+            home_xtras_1 = [item for item in home_1 if item not in home_0]  ## get the new diffs
+            home_all_1 = list(set(home_1 + home_xtras_1))  ## add them to base set
 
-    # ------------------------------------------------------------------------------------
+            # ------------------------------------------------------------------------------------
             home_2, alien_2 = self.GET_MORE_LINKS(home_xtras_1)
 
             home_xtras_2 = [item for item in home_2 if item not in home_all_1]
@@ -175,50 +178,50 @@ class LinkCheck(object):
 
             home_all_3 = list(set(home_all_2 + home_xtras_3))
 
-        #------------------------------------------------------------------------------------
+            # ------------------------------------------------------------------------------------
             home_4, alien_4 = self.GET_MORE_LINKS(home_xtras_3)
 
             home_xtras_4 = [item for item in home_4 if item not in home_all_3]
 
             home_all_4 = list(set(home_all_3 + home_xtras_4))
 
-    #------------------------------------------------------------------------------------
+            # ------------------------------------------------------------------------------------
             home_5, alien_5 = self.GET_MORE_LINKS(home_xtras_4)
 
             home_xtras_5 = [item for item in home_5 if item not in home_all_4]
 
             home_all_5 = list(set(home_all_4 + home_xtras_5))
 
-    # ------------------------------------------------------------------------------------
+            # ------------------------------------------------------------------------------------
             home_6, alien_6 = self.GET_MORE_LINKS(home_xtras_5)
 
             home_xtras_6 = [item for item in home_6 if item not in home_all_5]
 
             home_all_6 = list(set(home_all_5 + home_xtras_6))
 
-     #  WRITE!!       # ------------------------------------------------------------------------------------
+            #  WRITE!!       # ------------------------------------------------------------------------------------
             home_all_final = sorted(home_all_6)
-            mu.write_home_set_to_file(home_all_final, logger,'home')
+            mu.write_home_set_to_file(home_all_final, logger, 'home')
 
             # ------------------------------------------------------------------------------------
             alien_00a = alien_0 + alien_1 + alien_2 + alien_3 + alien_4 + alien_5 + alien_6
             alien_00b = list(set(alien_00a))
             alien_00final = sorted(alien_00b)
-            mu.write_home_set_to_file(alien_00final, logger,'alien')
+            mu.write_home_set_to_file(alien_00final, logger, 'alien')
 
             logger.info("just did write_home_set_to_file")
 
-            home_errs = self.make_error_list(home_all_final)  #---make_error_list
-            alien_errs = self.make_error_list(alien_00final)  #---make_error_list
+            home_errs = self.make_error_list(home_all_final)  # ---make_error_list
+            alien_errs = self.make_error_list(alien_00final)  # ---make_error_list
 
             home_errs_b = list(set(home_errs))
-            alien_errs_b= list(set(alien_errs))
+            alien_errs_b = list(set(alien_errs))
 
-            mu.write_error_file(home_errs_b, logger,'home')
-            mu.write_error_file(alien_errs_b, logger,'alien')
+            mu.write_error_file(home_errs_b, logger, 'home')
+            mu.write_error_file(alien_errs_b, logger, 'alien')
 
         except BaseException as e:
-            logger.debug(str(e),exc_info=True)
+            logger.debug(str(e), exc_info=True)
             pass
 
         logger.info('Done')
@@ -229,10 +232,10 @@ class LinkCheck(object):
         global mu
         mu = linkckutil()  # instantiate class which sets up logger, etc.
         self.main()
-                                # mu = linkckutil(gdict)  # instantiate class which sets up logger, etc.
+        # mu = linkckutil(gdict)  # instantiate class which sets up logger, etc.
+
 
 if __name__ == "__main__":  ## if loaded and called by something else, go fish
     None
 
-
-LinkCheck()   ## run this file
+LinkCheck()  ## run this file
