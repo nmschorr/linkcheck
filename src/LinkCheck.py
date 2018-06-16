@@ -6,6 +6,7 @@ from src.config import *
 from src.LinkCheckUtil import linkckutil
 from selenium.common.exceptions import UnexpectedAlertPresentException
 from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import TimeoutException
 #from time import sleep
 
 
@@ -127,8 +128,8 @@ class LinkCheck(object):
                 alienlinksSetList = list(set(alienlinks))
 
                 # selenium.common.exceptions.UnexpectedAlertPresentException:
-            except UnexpectedAlertPresentException as e:
-                logger.debug('ALERT! -- UnexpectedAlertPresentException on: {}'.format(tchild))
+            except (UnexpectedAlertPresentException, TimeoutException) as e:
+                logger.debug('ALERT! -- on: {}'.format(tchild))
                 logger.debug(str(e), exc_info=True)
                 pass
             except BaseException as e:
@@ -146,6 +147,9 @@ class LinkCheck(object):
 
     # ------------------------------------------------------------------------------------
     def homeset(self, home_0, alien_0):
+        home_all_final = []
+        alien_all_final = []
+
         try:
             home_1, alien_1 = self.GET_MORE_LINKS(home_0)
             home_xtras_1 = [item for item in home_1 if item not in home_0]  ## get the new diffs
@@ -199,7 +203,7 @@ class LinkCheck(object):
             mu.write_error_file(home_errs_b, logger, 'home')
             mu.write_error_file(alien_errs_b, logger, 'alien')
 
-        except BaseException as e:
+        except (UnexpectedAlertPresentException, TimeoutException, BaseException) as e:
             logger.debug(str(e), exc_info=True)
             pass
 
