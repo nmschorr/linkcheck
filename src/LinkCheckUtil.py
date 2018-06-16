@@ -35,7 +35,7 @@ class linkckutil(object):
     def write_error_file(self, big_err_list_final, logger, ttype):
         timenow = format(datetime.now(), '%Y%m%d.%H.%M%S')
         logger.info('In write_error_file - timenow')
-        bigerr_file = 'E:\\pylogs\\ERRORS.' + ttype + timenow + '.txt'
+        bigerr_file = 'E:\\pylogs\\ERRORS.' + ttype + timenow + '.log'
         bigerr_h = open(bigerr_file, 'w')  #
         for b in big_err_list_final:
             bigerr_h.write(b + lnfeed)
