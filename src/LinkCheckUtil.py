@@ -19,16 +19,11 @@ class linkckutil(object):
 
         #############---------------------------------------- end of def
 
-    def print_er(self, err=[]):
-        for er2 in err:
-            print('error: ', er2)
 
-        #############---------------------------------------- end of def
-
-    def write_home_set_to_file(self, firstSetLinks, logger):
+    def write_home_set_to_file(self, firstSetLinks, logger, ttype):
         logger.info('In write_home_set_to_file to file.')
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
-        basefile = 'E:\\pylogs\\BaseLinks' + timestp + '.txt'
+        basefile = 'E:\\pylogs\\Links_'+ ttype + timestp + '.txt'
         filen1_h = open(basefile, 'w')  #
         for b in firstSetLinks:
             filen1_h.write(b[0] + lnfeed)
@@ -37,26 +32,26 @@ class linkckutil(object):
 
         #############---------------------------------------- end of def
 
-    def write_error_file(self, big_err_list_final, logger):
+    def write_error_file(self, big_err_list_final, logger, ttype):
         timenow = format(datetime.now(), '%Y%m%d.%H.%M%S')
         logger.info('In write_error_file - timenow')
-        bigerr_file = 'E:\\pylogs\\ERRORS.' + timenow + '.txt'
+        bigerr_file = 'E:\\pylogs\\ERRORS.' + ttype + timenow + '.txt'
         bigerr_h = open(bigerr_file, 'w')  #
         for b in big_err_list_final:
             bigerr_h.write(b + lnfeed)
         bigerr_h.close()
         logger.info('Done with write_error_file - timenow')
 
-    #############---------------------------------------- end of def
 
     #############---------------------------------------- end of def
     def setuplogger(self):
 
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
-        logging.basicConfig(format='\n%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+            #logging.basicConfig(format='\n%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
         logger1 = logging.getLogger('mainlogger')
-        formatter = logging.Formatter('%(asctime)s-%(levelname)s: Message: %(message)s: Function: %(funcName)s',
-            datefmt='%m%d%y-%H.%M%S')
+
+        formatter = logging.Formatter('%(asctime)s-%(levelname)s: Msg: %(message)s: Function: %(funcName)s',
+                                      datefmt='%m%d%y-%H.%M%S')
         fname = 'E:\\pylogs\\Logger-' + timestp + '.log'
         filehandle = logging.FileHandler(fname)
         filehandle.setFormatter(formatter)
@@ -66,11 +61,10 @@ class linkckutil(object):
         console.setFormatter(formatter)
         console.setLevel(level=logging.DEBUG)
 
-
         logger1.setLevel(level=logging.DEBUG)
         logger1.addHandler(filehandle)
         logger1.addHandler(console)
-        ##logging.getLogger('').addHandler(console)  # add to root
+                                                ##logging.getLogger('').addHandler(console)  # add to root
 
         lev = logging.getLogger().getEffectiveLevel()
         logger1.info('Completed configuring logger. Logging level is: '+ str(lev))

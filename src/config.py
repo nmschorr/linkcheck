@@ -10,23 +10,19 @@ from colorama import Fore
 # # base1 = 'astrology1234.com'
 # # base2 = '//astrologistblog.blogspot'
 base1 = 'www.repercussions.com'
-base2 = 'repercussions'
+base2 = 'repercussions.com'
 #base1 = 'www.clarinetinstitute.com'
-#base2 = 'clarinetinstitute'
+#base2 = 'clarinetinstitute.com'
 
 address ='http://' + base1
 firstparent = address
 
 lnfeed = '\n'
-fred = Fore.RED
-fblack = Fore.BLACK
-#res = 'good'
 ercodes = [400, 404, 408, 409, 501, 502, 503]
 badlist = ['#','com/#', '?', 'blogger.com', '/search', 'javascript:void(0)', 'widgetType','mailto:']
 gerrstr = 'ERROR ---- ! ---Result code: '
 finame = 'E:\\pylogs\\finame' + base2 + '-' + '.log'
-
-gdict = { 'emlink' : [], 'baselinks' : [], 'nonbaselinks' : [], 'keepgoing' : True}
+#gdict = { 'emlink' : [], 'baselinks' : [], 'nonbaselinks' : [], 'keepgoing' : True}
 
 
 

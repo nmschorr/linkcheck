@@ -7,6 +7,7 @@ from src.config import *
 from src.LinkCheckUtil import linkckutil
 from selenium.common.exceptions import UnexpectedAlertPresentException
 from selenium.common.exceptions import StaleElementReferenceException
+from time import sleep
 
 class LinkCheck(object):
 
@@ -60,6 +61,11 @@ class LinkCheck(object):
                                 emlen = len(hrefw)
                                 badchecks=[hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:', emlen < 7]
 
+
+                                if hrefw == 'http://www.repercussions.com/contact.htm':
+                                    print('found it!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+                                    sleep(1)
+
                                 if mu.remcruft(hrefw, badlist) == 'bad':
                                     0
 
@@ -98,6 +104,8 @@ class LinkCheck(object):
         alienlinks = []
         homelinks2 = []
         alienlinks2 = []
+        homelinks_all = []
+        alienlinks_all = []
 
         for each_tuple in loc_elems:
             tchild = each_tuple[0]  # get a page from a link on the home page
@@ -109,21 +117,25 @@ class LinkCheck(object):
                 homelinks, alienlinks =  self.GET_MANY_LINKS_LARGE(child_elements, tparent)
                 homelinks2 = list(set(homelinks))
                 alienlinks2 = list(set(alienlinks))
+
                                                     # selenium.common.exceptions.UnexpectedAlertPresentException:
             except UnexpectedAlertPresentException:
                 logger.debug('ALERT! -- UnexpectedAlertPresentException on: {}'.format(tchild))
                 logger('ALERT! -- UnexpectedAlertPresentException on: {}'.format(tchild))
                 pass
 
-        return homelinks2, alienlinks2
+            homelinks_all += homelinks2
+            alienlinks_all += alienlinks2
+
+        return list(set(homelinks_all)), list(set(alienlinks2))
 
     #############---------------------------------------- end of def
     # begin:
     def main(self):
         global logger
         logger = mu.setuplogger()
-        home_00 = []
-        alien_00 = []
+        home_0 = []
+        alien_0 = []
         parent = address
 
         global driver
@@ -136,7 +148,7 @@ class LinkCheck(object):
             driver.get(address)
             home_elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
                      ##first time:  HOME PAGE ONLY  ##first time:
-            home_00, alien_0  = self.GET_MANY_LINKS_LARGE(home_elements, parent)     # list, str
+            home_0, alien_0  = self.GET_MANY_LINKS_LARGE(home_elements, parent)     # list, str
 
         except BaseException as e:
             logger.debug('Exception trying main outside loop in run pt1: {}'.format(e.msg))
@@ -144,68 +156,66 @@ class LinkCheck(object):
             pass
 
         try:
-            logger.info('doing GET_MORE_LINKS next')
-                        #2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time#2nd time
-
-            home_1, alien_1 = self.GET_MORE_LINKS(home_00)
-            home_xtras_1 = [item for item in home_1 if item not in home_00]
-            home_00a = list(set(home_00 + home_xtras_1))
+            home_1, alien_1 = self.GET_MORE_LINKS(home_0)
+            home_xtras_1 = [item for item in home_1 if item not in home_0]   ## get the new diffs
+            home_all_1 = list(set(home_1 + home_xtras_1))   ## add them to base set
 
     # ------------------------------------------------------------------------------------
             home_2, alien_2 = self.GET_MORE_LINKS(home_xtras_1)
 
-            home_xtras_2 = [item for item in home_2 if item not in home_00a]
+            home_xtras_2 = [item for item in home_2 if item not in home_all_1]
 
-            home_00b = list(set(home_00a + home_xtras_2))
+            home_all_2 = list(set(home_all_1 + home_xtras_2))
 
             # ------------------------------------------------------------------------------------
 
             home_3, alien_3 = self.GET_MORE_LINKS(home_xtras_2)
 
-            home_xtras_3 = [item for item in home_3 if item not in home_00b]
+            home_xtras_3 = [item for item in home_3 if item not in home_all_2]
 
-            home_00c = list(set(home_00b + home_xtras_3))
+            home_all_3 = list(set(home_all_2 + home_xtras_3))
 
         #------------------------------------------------------------------------------------
             home_4, alien_4 = self.GET_MORE_LINKS(home_xtras_3)
 
-            home_xtras_4 = [item for item in home_4 if item not in home_00c]
+            home_xtras_4 = [item for item in home_4 if item not in home_all_3]
 
-            home_00d = list(set(home_00 + home_xtras_4))
+            home_all_4 = list(set(home_all_3 + home_xtras_4))
 
     #------------------------------------------------------------------------------------
             home_5, alien_5 = self.GET_MORE_LINKS(home_xtras_4)
 
-            home_xtras_5 = [item for item in home_5 if item not in home_00d]
+            home_xtras_5 = [item for item in home_5 if item not in home_all_4]
 
-            home_00e = list(set(home_00 + home_xtras_5))
+            home_all_5 = list(set(home_all_4 + home_xtras_5))
 
     # ------------------------------------------------------------------------------------
             home_6, alien_6 = self.GET_MORE_LINKS(home_xtras_5)
 
-            home_xtras_6 = [item for item in home_6 if item not in home_00e]
+            home_xtras_6 = [item for item in home_6 if item not in home_all_5]
 
-            home_00f = list(set(home_00 + home_xtras_6))
+            home_all_6 = list(set(home_all_5 + home_xtras_6))
 
      #  WRITE!!       # ------------------------------------------------------------------------------------
-            home_00final = sorted(home_00f)
-            mu.write_home_set_to_file(home_00final, logger)
+            home_all_final = sorted(home_all_6)
+            mu.write_home_set_to_file(home_all_final, logger,'home')
 
             # ------------------------------------------------------------------------------------
-            alien_00 = home_00 + alien_1 + alien_2 + alien_3 + alien_4 + alien_5 + alien_6
-            alien_00a = list(set(alien_00))
-            alien_00final = sorted(alien_00a)
-            mu.write_home_set_to_file(alien_00final, logger)
+            alien_00a = alien_0 + alien_1 + alien_2 + alien_3 + alien_4 + alien_5 + alien_6
+            alien_00b = list(set(alien_00a))
+            alien_00final = sorted(alien_00b)
+            mu.write_home_set_to_file(alien_00final, logger,'alien')
 
             logger.info("just did write_home_set_to_file")
 
-            home_errs = self.make_error_list(home_00final)  #---make_error_list
+            home_errs = self.make_error_list(home_all_final)  #---make_error_list
             alien_errs = self.make_error_list(alien_00final)  #---make_error_list
-            all_errors_00 = home_errs + alien_errs
-            all_errors_00a = list(set(all_errors_00))
-            all_errors_00final = sorted(all_errors_00a)
 
-            mu.write_error_file(all_errors_00final, logger)
+            home_errs_b = list(set(home_errs))
+            alien_errs_b= list(set(alien_errs))
+
+            mu.write_error_file(home_errs_b, logger,'home')
+            mu.write_error_file(alien_errs_b, logger,'alien')
 
         except BaseException as e:
             logger.debug(str(e),exc_info=True)
