@@ -1,47 +1,14 @@
 # python 3
 
-from requests import *
+#from requests import *
 from selenium import webdriver
 from src.config import *
 from src.LinkCheckUtil import linkckutil
 from selenium.common.exceptions import UnexpectedAlertPresentException
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
-#from time import sleep
-
 
 class LinkCheck(object):
-
-    @staticmethod
-    def make_error_list(locnewlist):
-        logger.info('Starting make_errorList ')
-        errorlist = []
-
-        try:  # check head
-            for elinktup in locnewlist:
-                elink = elinktup[0]
-                theparent = elinktup[1]
-                #logger.info('Inside Loop:' + lnfeed)
-                resp = str(head(elink, data=None, timeout=30))
-                #logger.info('resp: ' + resp)
-                err_resp = resp[11:14]
-                responstr = 'checked: ' + elink + ' -resp: ' + err_resp + lnfeed
-                logger.info(responstr)
-
-                if int(err_resp) in ercodes:
-                    errorString = gerrstr + '{} in: {} from parent: {}'.format(err_resp, elink, theparent)
-                    logger.info(errorString)
-                    errorlist.append(errorString)
-                    logger.info(errorString + lnfeed)
-                else:
-                    logger.info('status code: ' + err_resp)
-
-        except BaseException as e:
-            logger.debug('Exception in: ')
-            logger.debug(str(e), exc_info=True)
-            pass
-
-        return errorlist
 
     #############---------------------------------------- end of def
     @staticmethod
@@ -70,7 +37,7 @@ class LinkCheck(object):
                                     logger.info(msg)
 
                                 else:
-                                    if talien == False:
+                                    if talien == False:  #don't get alien links
                                         html4 = hrefw[-4:]  #html
                                         htm3 = hrefw[-3:]  #htm
                                         php = hrefw[-3:]  #htm
@@ -87,7 +54,8 @@ class LinkCheck(object):
                                                 home_links.append((hrefw, parent))  # add to main home list
                                         else:
                                             alien_links.append((hrefw, parent))    # tuple - put pdfs here \
-                                    else:                                                # since they won't be searched for links
+                                    else: #if talien == true
+                                                                #  since they won't be searched for links
                                         alien_links.append((hrefw, parent))  # tuple - put pdfs, txt, mid, jpg etc here \
 
         except StaleElementReferenceException as s:
@@ -115,6 +83,7 @@ class LinkCheck(object):
         alienlinksSetList = []
         homelinks_all = []
         alienlinks_all = []
+        global driver
 
         for each_tuple in loc_elems:
             tchild = each_tuple[0]  # get a page from a link on the home page
@@ -130,15 +99,23 @@ class LinkCheck(object):
                 alienlinksSetList = list(set(alienlinks))
 
                 # selenium.common.exceptions.UnexpectedAlertPresentException:
-            except (UnexpectedAlertPresentException, TimeoutException) as e:
-                webdriver.TargetLocator.switchTo()
-
-
-
-            except (UnexpectedAlertPresentException, TimeoutException) as e:
+            except (UnexpectedAlertPresentException) as e:
                 logger.debug('ALERT! -- on: {}'.format(tchild))
                 logger.debug(str(e), exc_info=True)
+                alert = driver.switch_to.alert
+                driver.switch_to.alert.dismiss()
                 pass
+
+
+            except (TimeoutException) as e:
+                logger.debug('ALERT! Timeout: {}'.format(tchild))
+                logger.debug(str(e), exc_info=True)
+                driver.quit()
+                logger.debug('ALERT! quit driver')
+                driver = webdriver.Firefox()
+                logger.debug('Restarted driver')
+                pass
+
             except BaseException as e:
                 logger.debug('ALERT! --BaseException: {}'.format(tchild))
                 logger.debug(str(e), exc_info=True)
@@ -193,26 +170,29 @@ class LinkCheck(object):
             mu.write_home_set_to_file(alien_all_final, logger, 'alien')
             logger.info("just did write_home_set_to_file")
 
-        except: None
+        except BaseException as e:
+            logger.debug(str(e), exc_info=True)
+            pass
 
         return home_all_final, alien_all_final
 
-        #############---------------------------------------- end of def
+    #     #############---------------------------------------- end of def
+    #
+    # def geterrs(self, home_all_final, alien_all_final):
+    #     try:
+    #         home_errs = self.make_error_list(home_all_final)  # ---make_error_list
+    #         alien_errs = self.make_error_list(alien_all_final)  # ---make_error_list
+    #
+    #         home_errs_b = list(set(home_errs))
+    #         alien_errs_b = list(set(alien_errs))
+    #
+    #         mu.write_error_file(home_errs_b, logger, 'home')
+    #         mu.write_error_file(alien_errs_b, logger, 'alien')
+    #
+    #     except (UnexpectedAlertPresentException, TimeoutException, BaseException) as e:
+    #         logger.debug(str(e), exc_info=True)
+    #         pass
 
-    def geterrs(self, home_all_final, alien_all_final):
-        try:
-            home_errs = self.make_error_list(home_all_final)  # ---make_error_list
-            alien_errs = self.make_error_list(alien_all_final)  # ---make_error_list
-
-            home_errs_b = list(set(home_errs))
-            alien_errs_b = list(set(alien_errs))
-
-            mu.write_error_file(home_errs_b, logger, 'home')
-            mu.write_error_file(alien_errs_b, logger, 'alien')
-
-        except (UnexpectedAlertPresentException, TimeoutException, BaseException) as e:
-            logger.debug(str(e), exc_info=True)
-            pass
 
     #############---------------------------------------- end of def
     # begin:
@@ -222,13 +202,14 @@ class LinkCheck(object):
         alien_0 = []
         parent = address
         global driver
+        driver = webdriver.Firefox()
+        driver.implicitly_wait(10)
+        driver.get(address)
+
+        logger = mu.setuplogger()
+        logger.debug('In main() Getting first address: {}'.format(address))
 
         try:
-            logger = mu.setuplogger()
-            driver = webdriver.Firefox()
-            driver.implicitly_wait(10)
-            logger.debug('In main() Getting first address: {}'.format(address))
-            driver.get(address)
             home_elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
                  ##first time:  HOME PAGE ONLY  ##first time:
             home_0, alien_0 = self.GET_MANY_LINKS_LARGE(home_elements, parent, False)  # list, str

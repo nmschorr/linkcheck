@@ -1,13 +1,68 @@
 # python 3
 
 from datetime import datetime
-from src.config import *
-import logging
 import sys
+from requests import *
+from src.config import *
+from selenium.common.exceptions import UnexpectedAlertPresentException
+#from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import TimeoutException
 
     #############---------------------------------------- end of def
 
 class linkckutil(object):
+
+        #############---------------------------------------- end of def
+
+    def geterrs(self, home_all_final, alien_all_final, logr):
+        try:
+            home_errs = self.make_error_list(home_all_final, logr)  # ---make_error_list
+            alien_errs = self.make_error_list(alien_all_final, logr)  # ---make_error_list
+
+            home_errs_b = list(set(home_errs))
+            alien_errs_b = list(set(alien_errs))
+
+            self.write_error_file(home_errs_b, logr, 'home')
+            self.write_error_file(alien_errs_b, logr, 'alien')
+
+        except (UnexpectedAlertPresentException, TimeoutException, BaseException) as e:
+            logr.debug(str(e), exc_info=True)
+            pass
+
+
+        #############---------------------------------------- end of def
+
+    def make_error_list(locnewlist, loggr):
+        loggr.info('Starting make_errorList ')
+        errorlist = []
+
+        try:  # check head
+            for elinktup in locnewlist:
+                elink = elinktup[0]
+                theparent = elinktup[1]
+                # loggr.info('Inside Loop:' + lnfeed)
+                resp = str(head(elink, data=None, timeout=30))
+                # loggr.info('resp: ' + resp)
+                err_resp = resp[11:14]
+                responstr = 'checked: ' + elink + ' -resp: ' + err_resp + lnfeed
+                loggr.info(responstr)
+
+                if int(err_resp) in ercodes:
+                    errorString = gerrstr + '{} in: {} from parent: {}'.format(err_resp, elink, theparent)
+                    loggr.info(errorString)
+                    errorlist.append(errorString)
+                    loggr.info(errorString + lnfeed)
+                else:
+                    loggr.info('status code: ' + err_resp)
+
+        except BaseException as e:
+            loggr.debug('Exception in: ')
+            loggr.debug(str(e), exc_info=True)
+            pass
+
+        return errorlist
+
+    #############---------------------------------------- end of def
 
     def remcruft(self, localink, mlist):
         res = 'good'
@@ -17,7 +72,7 @@ class linkckutil(object):
         #res = list(filter(lambda x: x in locallink, mlist))
         return res   # good or bad for now
 
-        #############---------------------------------------- end of def
+    #############---------------------------------------- end of def
 
 
     def write_home_set_to_file(self, firstSetLinks, logger, ttype):
