@@ -45,19 +45,17 @@ class LinkCheck(object):
 
     #############---------------------------------------- end of def
     @staticmethod
-    def GET_MANY_LINKS_LARGE(locElements, parent):
+    def GET_MANY_LINKS_LARGE(locElements, parent, talien=True):
         home_links = []
         alien_links = []
 
         try:
             for webelem in locElements:
                 if webelem.tag_name == 'a':
-                    # logger.info('TYPE OF OBJECT: -----' + str(type(webelem)))
 
                     if type(webelem) is not 'NoneType':
                         if webelem is not None:
                             hrefw = webelem.get_attribute('href')
-                            # logger.info('JUST GOT hrefw: -----' + str(hrefw)) logger.info('TYPE OF hrefw: -----' + str(type(hrefw)))
 
                             if type(hrefw) is str:
                                 emlen = len(hrefw)
@@ -65,28 +63,32 @@ class LinkCheck(object):
                                              emlen < 7]
 
                                 # if hrefw == 'http://www.repercussions.com/contact.htm':
-
-                                if mu.remcruft(hrefw, badlist) == 'bad':
-                                    0
+                                if mu.remcruft(hrefw, badlist) == 'bad': 0
 
                                 elif any(badchecks):
                                     msg = 'Found bad attr: ' + hrefw
                                     logger.info(msg)
 
                                 else:
-                                    html4 = hrefw[-4:]  #html
-                                    htm3 = hrefw[-3:]  #htm
+                                    if talien == False:
+                                        html4 = hrefw[-4:]  #html
+                                        htm3 = hrefw[-3:]  #htm
+                                        php = hrefw[-3:]  #htm
+                                        phpx = hrefw[-3:-1]  #phpx
+                                        lastchar = hrefw[-1:]
 
-                                    ans1 = hrefw.find(home_1)  ## is the home_ in there?
-                                    ans2 = hrefw.find(home_2)  ## is the home_ in there?
+                                        ans1 = hrefw.find(home_1)  ## is the home_ in there?
+                                        ans2 = hrefw.find(home_2)  ## is the home_ in there?
 
-                                    if html4 == 'html' or htm3 == 'htm':
+                                        if html4 == 'html' or htm3 == 'htm' or lastchar == '/'\
+                                                or php == 'php' or phpx == 'php':
 
-                                        if (ans1 + ans2) > 0 :  # if either are there
-                                            home_links.append((hrefw, parent))  # add to main home list
-                                    else:
-                                        alien_links.append((hrefw, parent))    # tuple - put pdfs here \
-                                                                                # since they won't be searched for links
+                                            if (ans1 + ans2) > 0 :  # if either are there
+                                                home_links.append((hrefw, parent))  # add to main home list
+                                        else:
+                                            alien_links.append((hrefw, parent))    # tuple - put pdfs here \
+                                    else:                                                # since they won't be searched for links
+                                        alien_links.append((hrefw, parent))  # tuple - put pdfs, txt, mid, jpg etc here \
 
         except StaleElementReferenceException as s:
             logger.debug(str(s), exc_info=True)
@@ -123,11 +125,16 @@ class LinkCheck(object):
             child_elements = driver.find_elements_by_xpath('.//a')
 
             try:
-                homelinks, alienlinks = self.GET_MANY_LINKS_LARGE(child_elements, tparent)
+                homelinks, alienlinks = self.GET_MANY_LINKS_LARGE(child_elements, tparent, True)
                 homelinksSetList = list(set(homelinks))
                 alienlinksSetList = list(set(alienlinks))
 
                 # selenium.common.exceptions.UnexpectedAlertPresentException:
+            except (UnexpectedAlertPresentException, TimeoutException) as e:
+                webdriver.TargetLocator.switchTo()
+
+
+
             except (UnexpectedAlertPresentException, TimeoutException) as e:
                 logger.debug('ALERT! -- on: {}'.format(tchild))
                 logger.debug(str(e), exc_info=True)
@@ -224,11 +231,14 @@ class LinkCheck(object):
             driver.get(address)
             home_elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
                  ##first time:  HOME PAGE ONLY  ##first time:
-            home_0, alien_0 = self.GET_MANY_LINKS_LARGE(home_elements, parent)  # list, str
+            home_0, alien_0 = self.GET_MANY_LINKS_LARGE(home_elements, parent, False)  # list, str
+
             home_all_final, alien_all_final = self.homeset(home_0, alien_0)
+
             self.geterrs(home_all_final, alien_all_final)
-            logger.info('Done')
+            logger.info('Done with main()')
             driver.close()
+            logger.info('Done close driver. Bye.')
 
         except BaseException as e:
             logger.debug(str(e), exc_info=True)

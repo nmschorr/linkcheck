@@ -2,17 +2,18 @@
 
 from colorama import Fore
 
-# # address = 'http://astrology1234.com'
-# # address = 'http://astrologistblog.blogspot.com'
+home_1 = 'astrology1234.com'
+home_2 = 'astrologistblog.blogspot.com'
 # # thebase = '//astrologistblog.blogspot.com'
 # # address = 'http://www.repercussions.com'
 # # thebase = '//www.repercussions.com'
 #base1 = 'astrology1234.com'
 #base2 = 'astrologistblog.blogspot.com'
-#base1 = 'www.repercussions.com'
-#base2 = 'repercussions.com'
-home_1   = 'www.clarinetinstitute.com'
-home_2 = 'clarinetinstitute.com'
+#home_1 = 'www.repercussions.com'
+#home_2 = 'repercussions.com'
+#home_1   = 'www.clarinetinstitute.com'
+#home_2 = 'clarinetinstitute.com'
+
 
 address ='http://' + home_1
 lnfeed = '\n'
