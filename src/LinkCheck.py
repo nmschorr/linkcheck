@@ -13,31 +13,51 @@ from selenium.common.exceptions import TimeoutException
 
 class linkcheck(linkckutil):
 
-    def restartdrvr(self,drver):
-        drver.quit()
-        logger.debug('ALERT! quit driver from restartdrvr')
-        drver = webdriver.Firefox()
-        logger.debug('Restarted driver from restartdrvr')
-        return drver
+    def logalert(self, ee, child):
+        logger.debug('ALERT! -- on: {}'.format(child))
+        logger.debug(str(ee), exc_info=True)
+        try:
+            alert = driver.switch_to.alert
+            driver.switch_to.alert.dismiss()
+        except:
+            self.restartdrvr(driver, logger)
+            pass
 
-    #############---------------------------------------- def
-    def check_file_extension(self,hrefw=''): # chk for appropriate exts for homelinks only
-        html4 = hrefw[-4:]  # html
-        htm3 = hrefw[-3:]  # htm
-        php = hrefw[-3:]  # htm
-        phpx = hrefw[-3:-1]  # phpx
-        lastchar = hrefw[-1:]
-        if any([html4 == 'html', htm3 == 'htm', lastchar == '/', php == 'php', phpx == 'php']):
-            return True
-        else:
-            return False
+
+    def GET_HOME_LINKS(self, locElements, parent):
+        home_links = []
+        global driver
+
+        try:
+            for webelem in locElements:
+                if webelem.tag_name == 'a' and type(webelem) is not 'NoneType' and webelem is not None:
+                    hrefw = webelem.get_attribute('href')
+
+                    if type(hrefw) is str:
+                        emlen = len(hrefw)
+                        badchecks = [hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:', emlen < 7]
+                        if self.remcruft(hrefw, badlist) == 'bad':   0
+                        elif any(badchecks):  0
+                        else:
+                            if self.check_file_extension(hrefw):  # chk for appropriate exts for homelinks only
+                                if (hrefw.find(home_1) + hrefw.find(home_1)) > 0:  # if either are there
+                                    home_links.append((hrefw, parent))  # add to main home list\
+
+        except StaleElementReferenceException as s:
+            logger.debug(str(s), exc_info=True)
+            pass
+
+        except BaseException as e:
+            logger.debug(str(e), exc_info=True)
+            driver = self.restartdrvr(driver, logger)
+            pass
+
+        return sorted(list(set(home_links)))
 
     #############---------------------------------------- def
     #@staticmethod
-    def GET_MANY_LINKS_LARGE(self, locElements, parent, talien=True):
-        home_links = []
+    def GET_ALIEN_LINKS(self, locElements, parent):
         alien_links = []
-        remcruft = self.remcruft
         global driver
 
         try:
@@ -48,81 +68,45 @@ class linkcheck(linkckutil):
                     if type(hrefw) is str:
                         emlen = len(hrefw)
                         badchecks = [hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:',emlen < 7]
-                        if remcruft(hrefw, badlist) == 'bad': 0
+                        if self.remcruft(hrefw, badlist) == 'bad': 0
                         elif any(badchecks): 0
-                                            #logger.info('Found bad attr: ' + hrefw)
-                        else:
-                            if talien == False:  #don't get alien links
-                                ans1 = hrefw.find(home_1)  ## is the home_ in there?
-                                ans2 = hrefw.find(home_2)  ## is the home_ in there?
-
-                                if self.check_file_extension(hrefw): # chk for appropriate exts for homelinks only
-
-                                    if (ans1 + ans2) > 0 :  # if either are there
-                                        home_links.append((hrefw, parent))  # add to main home list
-                                else:
-                                    alien_links.append((hrefw, parent))    # tuple - put pdfs here \
-                            else: #if talien == true
-                                                        #  since they won't be searched for links
-                                alien_links.append((hrefw, parent))  # tuple - put pdfs, txt, mid, jpg etc here \
+                        elif (hrefw.find(home_1) + hrefw.find(home_1)) == 0:  ## now home links found
+                            alien_links.append((hrefw, parent))  # tuple - put pdfs, txt, mid, jpg etc here \
 
         except StaleElementReferenceException as s:
             logger.debug(str(s), exc_info=True)
             pass
 
-        except BaseException as e:
-            logger.debug(str(e), exc_info=True)
-            driver = self.restartdrvr(driver)
+        except (UnexpectedAlertPresentException) as e:
+            self.logalert(self, e, hrefw)
             pass
 
-        alien_linksSort = list(set(alien_links))  ## sort and delete dupes
-        alien_linksSorted = sorted(alien_linksSort)  ## sort and delete dupes
+        except BaseException as e:
+            logger.debug(str(e), exc_info=True)
+            driver = self.restartdrvr(driver, logger)
+            pass
 
-        home_linksSort = list(set(home_links))
-        home_linksSorted = sorted(home_linksSort)
-
-        return home_linksSorted, alien_linksSorted
+        return sorted(list(set(alien_links)))
 
     #############---------------------------------------- end of def
 
-    def GET_MORE_LINKS(self, loc_elems=[]):
-        homelinks = []
-        alienlinks = []
-        homelinksSetList = []
-        alienlinksSetList = []
-        homelinks_all = []
-        alienlinks_all = []
+    def GET_MORE_LINKS_home(self, loc_elems=[]):
         global driver
+        homelinks = []
+        homelinksSetList = []
+        homelinks_all = []
 
         for each_tuple in loc_elems:
-            tchild = each_tuple[0]  # get a page from a link on the home page
-            tparent = each_tuple[1]
+            tchild, tparent = each_tuple  # get a page from a link on the home page
+                                                    #  tparent = each_tuple[1]
             print("child: " +  tchild)
             logger.info(tchild)
             driver.get(tchild)
             child_elements = driver.find_elements_by_xpath('.//a')
 
-            try:
-                homelinks, alienlinks = self.GET_MANY_LINKS_LARGE(child_elements, tparent, True)
+            try:                              ### get only alien links here
+                homelinks = self.GET_HOME_LINKS(child_elements, tparent)
                 homelinksSetList = list(set(homelinks))
-                alienlinksSetList = list(set(alienlinks))
-
-                # selenium.common.exceptions.UnexpectedAlertPresentException:
-            except (UnexpectedAlertPresentException) as e:
-                logger.debug('ALERT! -- on: {}'.format(tchild))
-                logger.debug(str(e), exc_info=True)
-
-                try:
-                    alert = driver.switch_to.alert
-                    driver.switch_to.alert.dismiss()
-                except:
-                    driver.quit()
-                    logger.debug('ALERT! quit driver')
-                    driver = webdriver.Firefox()
-                    logger.debug('Restarted driver')
-                    pass
-
-                pass
 
             except (TimeoutException) as e:
                 logger.debug('ALERT! Timeout: {}'.format(tchild))
@@ -132,7 +116,6 @@ class linkcheck(linkckutil):
                 driver = webdriver.Firefox()
                 logger.debug('Restarted driver')
                 pass
-
             except BaseException as e:
                 logger.debug('ALERT! --BaseException: {}'.format(tchild))
                 logger.debug(str(e), exc_info=True)
@@ -141,60 +124,91 @@ class linkcheck(linkckutil):
                 driver = webdriver.Firefox()
                 logger.debug('Restarted driver')
                 pass
+            except (UnexpectedAlertPresentException) as e:
+                self.logalert(self, e, tchild)
+                pass
 
-            homelinks_all += homelinksSetList
-            alienlinks_all += alienlinksSetList
+            homelinks_all = list(set(homelinks_all + homelinksSetList))
 
-        homelinks_all_sorted = list(set(homelinks_all))
-        alienlinks_all_sorted = list(set(alienlinks_all))
+        return sorted(list(set(homelinks_all)))
 
-        return homelinks_all_sorted, alienlinks_all_sorted
+    def GET_MORE_LINKS_alien(self, loc_elems=[]):
+        global driver
+        alienlinks = []
+        alienlinksSetList = []
+        alienlinks_all = []
+
+        for each_tuple in loc_elems:
+            tchild, tparent = each_tuple  # get a page from a link on the home page
+                                                    #  tparent = each_tuple[1]
+            logger.info("child: {}".tchild)
+            driver.get(tchild)
+            child_elements = driver.find_elements_by_xpath('.//a')
+
+            try:                              ### get only alien links here
+                alienlinks = self.GET_ALIEN_LINKS(child_elements, tparent)
+                alienlinksSetList = list(set(alienlinks))
+
+            except (TimeoutException) as e:
+                logger.debug('ALERT! Timeout: {}'.format(tchild))
+                logger.debug(str(e), exc_info=True)
+                driver.quit()
+                logger.debug('ALERT! quit driver')
+                driver = webdriver.Firefox()
+                logger.debug('Restarted driver')
+                pass
+            except BaseException as e:
+                logger.debug('ALERT! --BaseException: {}'.format(tchild))
+                logger.debug(str(e), exc_info=True)
+                driver.quit()
+                logger.debug('ALERT! quit driver')
+                driver = webdriver.Firefox()
+                logger.debug('Restarted driver')
+                pass
+            except (UnexpectedAlertPresentException) as e:
+                self.logalert(self, e, tchild)
+                pass
+
+            alienlinks_all = sorted(list(set(alienlinks_all + alienlinksSetList)))
+
+        return alienlinks_all
+
+    # ------------------------------------------------------------------------------------
+    def scoop_new_links(self, myhome, home_all):
+        homenew, aliennew = self.GET_MORE_LINKS(myhome)
+        scoop = [i for i in homenew if i not in myhome]  ## get the new diffs
+        home_all = list(set(home_all + scoop))
+        return homenew, list(set(aliennew)), home_all
 
     # ------------------------------------------------------------------------------------
     def homeset(self, home_0, alien_0):
         global driver
         home_all_final = []
         alien_all_final = []
+        home_all = []
 
         try:
-            home_1, alien_1 = self.GET_MORE_LINKS(home_0)
-            home_xtras_1 = [item for item in home_1 if item not in home_0]  ## get the new diffs
-            home_all_1 = list(set(home_1 + home_xtras_1))  ## add them to base set
+            logger.info("in homeset. doing new set now")
+            home_1, alien_1, home_all = self.scoop_new_links(home_0, home_all)
+            home_2, alien_2, home_all = self.scoop_new_links(home_1, home_all)
+            home_3, alien_3, home_all = self.scoop_new_links(home_2, home_all)
+            home_4, alien_4, home_all = self.scoop_new_links(home_3, home_all)
+            home_5, alien_5, home_all = self.scoop_new_links(home_4, home_all)
+            home_6, alien_6, home_all = self.scoop_new_links(home_5, home_all)
+            logger.info("done with new set")
 
-            home_2, alien_2 = self.GET_MORE_LINKS(home_xtras_1)
-            home_xtras_2 = [item for item in home_2 if item not in home_all_1]
-            home_all_2 = list(set(home_all_1 + home_xtras_2))
-
-            home_3, alien_3 = self.GET_MORE_LINKS(home_xtras_2)
-            home_xtras_3 = [item for item in home_3 if item not in home_all_2]
-            home_all_3 = list(set(home_all_2 + home_xtras_3))
-
-            home_4, alien_4 = self.GET_MORE_LINKS(home_xtras_3)
-            home_xtras_4 = [item for item in home_4 if item not in home_all_3]
-            home_all_4 = list(set(home_all_3 + home_xtras_4))
-
-            home_5, alien_5 = self.GET_MORE_LINKS(home_xtras_4)
-            home_xtras_5 = [item for item in home_5 if item not in home_all_4]
-            home_all_5 = list(set(home_all_4 + home_xtras_5))
-
-            home_6, alien_6 = self.GET_MORE_LINKS(home_xtras_5)
-            home_xtras_6 = [item for item in home_6 if item not in home_all_5]
-            home_all_6 = list(set(home_all_5 + home_xtras_6 + home_0))   ## home_0 was never added
-
-            #  WRITE!!       # ------------------------------------------------------------------------------------
-            home_all_final = sorted(home_all_6)
-            self.write_home_set_to_file(home_all_final, logger, 'home')
-
-            # ------------------------------------------------------------------------------------
-            alien_00a = alien_0 + alien_1 + alien_2 + alien_3 + alien_4 + alien_5 + alien_6
-            alien_00b = list(set(alien_00a))
-            alien_all_final = sorted(alien_00b)
+            alien_all_final = sorted(list(set(alien_0 + alien_1 + alien_2 + alien_3 + alien_4 + alien_5 + alien_6)))
+            self.write_home_set_to_file(sorted(home_all), logger, 'home')
             self.write_home_set_to_file(alien_all_final, logger, 'alien')
             logger.info("just did write_home_set_to_file")
 
+        except (UnexpectedAlertPresentException) as e:
+            self.logalert(self, e, 'e')
+            pass
+
         except BaseException as e:
             logger.debug(str(e), exc_info=True)
-            driver = self.restartdrvr(driver)
+            driver = self.restartdrvr(driver, logger)
             pass
 
         return home_all_final, alien_all_final
@@ -219,8 +233,11 @@ class linkcheck(linkckutil):
         try:
             home_elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
                  ##first time:  HOME PAGE ONLY  ##first time:
-            home_0, alien_0 = self.GET_MANY_LINKS_LARGE(home_elements, parent, False)  # list, str
 
+            logger.info("Step One")
+            home_0 = self.GET_HOME_LINKS(home_elements, parent) #false: get all # list, str
+            alien_0 = self.GET_ALIEN_LINKS(home_elements, parent) #false: get all # list, str
+            logger.info("Step Two")
             home_all_final, alien_all_final = self.homeset(home_0, alien_0)
 
             self.geterrs(home_all_final, alien_all_final, logger)
@@ -230,13 +247,11 @@ class linkcheck(linkckutil):
 
         except BaseException as e:
             logger.debug(str(e), exc_info=True)
-            driver = self.restartdrvr(driver)
+            driver = self.restartdrvr(driver, logger)
             pass
 
     def __init__(self):
-        print('Init: ' + __name__)
-                    # global mu
-                    # mu = linkckutil()  # instantiate class which sets up logger, etc.
+        print('In: ' + __name__)
         self.main()
 
 if __name__ == "__main__":  ## if loaded and called by something else, go fish

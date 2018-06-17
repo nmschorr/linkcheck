@@ -7,10 +7,33 @@ from src.config import *
 from selenium.common.exceptions import UnexpectedAlertPresentException
 #from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
+from selenium import webdriver
 
     #############---------------------------------------- end of def
 
+
 class linkckutil(object):
+
+        #############---------------------------------------- end of def
+    def restartdrvr(self, drver, logr):
+        drver.quit()
+        logr.debug('ALERT! quit driver from restartdrvr')
+        drver = webdriver.Firefox()
+        logr.debug('Restarted driver from restartdrvr')
+        return drver
+
+        #############---------------------------------------- end of def
+
+    def check_file_extension(self, hrefw=''):  # chk for appropriate exts for homelinks only
+        html4 = hrefw[-4:]  # html
+        htm3 = hrefw[-3:]  # htm
+        php = hrefw[-3:]  # htm
+        phpx = hrefw[-3:-1]  # phpx
+        lastchar = hrefw[-1:]
+        if any([html4 == 'html', htm3 == 'htm', lastchar == '/', php == 'php', phpx == 'php']):
+            return True
+        else:
+            return False
 
         #############---------------------------------------- end of def
 
@@ -22,8 +45,8 @@ class linkckutil(object):
             home_errs_b = list(set(home_errs))
             alien_errs_b = list(set(alien_errs))
 
-            self.write_error_file(home_errs_b, logr, 'home')
-            self.write_error_file(alien_errs_b, logr, 'alien')
+            self.write_error_file(sorted(home_errs_b), logr, 'home')
+            self.write_error_file(sorted(alien_errs_b), logr, 'alien')
 
         except (UnexpectedAlertPresentException, TimeoutException, BaseException) as e:
             logr.debug(str(e), exc_info=True)
