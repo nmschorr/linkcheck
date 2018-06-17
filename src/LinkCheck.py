@@ -8,18 +8,33 @@ from selenium.common.exceptions import UnexpectedAlertPresentException
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
 
-class LinkCheck(object):
 
-    #############---------------------------------------- end of def
-    @staticmethod
-    def GET_MANY_LINKS_LARGE(locElements, parent, talien=True):
+#############---------------------------------------- def
+
+class linkcheck(linkckutil):
+
+    #############---------------------------------------- def
+    def check_file_extension(hrefw=''): # chk for appropriate exts for homelinks only
+        html4 = hrefw[-4:]  # html
+        htm3 = hrefw[-3:]  # htm
+        php = hrefw[-3:]  # htm
+        phpx = hrefw[-3:-1]  # phpx
+        lastchar = hrefw[-1:]
+        if any([html4 == 'html', htm3 == 'htm', lastchar == '/', php == 'php', phpx == 'php']):
+            return True
+        else:
+            return False
+
+    #############---------------------------------------- def
+    #@staticmethod
+    def GET_MANY_LINKS_LARGE(self, locElements, parent, talien=True):
         home_links = []
         alien_links = []
+        remcruft = self.remcruft
 
         try:
             for webelem in locElements:
                 if webelem.tag_name == 'a':
-
                     if type(webelem) is not 'NoneType':
                         if webelem is not None:
                             hrefw = webelem.get_attribute('href')
@@ -28,27 +43,17 @@ class LinkCheck(object):
                                 emlen = len(hrefw)
                                 badchecks = [hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:',
                                              emlen < 7]
+                                                            # if hrefw == 'http://www.repercussions.com/contact.htm':
+                                if remcruft(hrefw, badlist) == 'bad': 0
 
-                                # if hrefw == 'http://www.repercussions.com/contact.htm':
-                                if mu.remcruft(hrefw, badlist) == 'bad': 0
-
-                                elif any(badchecks):
-                                    msg = 'Found bad attr: ' + hrefw
-                                    logger.info(msg)
-
+                                elif any(badchecks): 0
+                                                    #logger.info('Found bad attr: ' + hrefw)
                                 else:
                                     if talien == False:  #don't get alien links
-                                        html4 = hrefw[-4:]  #html
-                                        htm3 = hrefw[-3:]  #htm
-                                        php = hrefw[-3:]  #htm
-                                        phpx = hrefw[-3:-1]  #phpx
-                                        lastchar = hrefw[-1:]
-
                                         ans1 = hrefw.find(home_1)  ## is the home_ in there?
                                         ans2 = hrefw.find(home_2)  ## is the home_ in there?
 
-                                        if html4 == 'html' or htm3 == 'htm' or lastchar == '/'\
-                                                or php == 'php' or phpx == 'php':
+                                        if self.check_file_extension(hrefw): # chk for appropriate exts for homelinks only
 
                                             if (ans1 + ans2) > 0 :  # if either are there
                                                 home_links.append((hrefw, parent))  # add to main home list
@@ -161,13 +166,13 @@ class LinkCheck(object):
 
             #  WRITE!!       # ------------------------------------------------------------------------------------
             home_all_final = sorted(home_all_6)
-            mu.write_home_set_to_file(home_all_final, logger, 'home')
+            self.write_home_set_to_file(home_all_final, logger, 'home')
 
             # ------------------------------------------------------------------------------------
             alien_00a = alien_0 + alien_1 + alien_2 + alien_3 + alien_4 + alien_5 + alien_6
             alien_00b = list(set(alien_00a))
             alien_all_final = sorted(alien_00b)
-            mu.write_home_set_to_file(alien_all_final, logger, 'alien')
+            self.write_home_set_to_file(alien_all_final, logger, 'alien')
             logger.info("just did write_home_set_to_file")
 
         except BaseException as e:
@@ -176,27 +181,11 @@ class LinkCheck(object):
 
         return home_all_final, alien_all_final
 
-    #     #############---------------------------------------- end of def
-    #
-    # def geterrs(self, home_all_final, alien_all_final):
-    #     try:
-    #         home_errs = self.make_error_list(home_all_final)  # ---make_error_list
-    #         alien_errs = self.make_error_list(alien_all_final)  # ---make_error_list
-    #
-    #         home_errs_b = list(set(home_errs))
-    #         alien_errs_b = list(set(alien_errs))
-    #
-    #         mu.write_error_file(home_errs_b, logger, 'home')
-    #         mu.write_error_file(alien_errs_b, logger, 'alien')
-    #
-    #     except (UnexpectedAlertPresentException, TimeoutException, BaseException) as e:
-    #         logger.debug(str(e), exc_info=True)
-    #         pass
-
 
     #############---------------------------------------- end of def
     # begin:
     def main(self):
+        super
         global logger
         home_0 = []
         alien_0 = []
@@ -206,7 +195,7 @@ class LinkCheck(object):
         driver.implicitly_wait(10)
         driver.get(address)
 
-        logger = mu.setuplogger()
+        logger = self.setuplogger()
         logger.debug('In main() Getting first address: {}'.format(address))
 
         try:
@@ -227,70 +216,17 @@ class LinkCheck(object):
 
     def __init__(self):
         print('Init: ' + __name__)
-        global mu
-        mu = linkckutil()  # instantiate class which sets up logger, etc.
+                    # global mu
+                    # mu = linkckutil()  # instantiate class which sets up logger, etc.
         self.main()
 
 if __name__ == "__main__":  ## if loaded and called by something else, go fish
     None
 
-LinkCheck()  ## run this file
+linkcheck()  ## run this file
 
 
 
 
 
 
-
-
-
-# try:
-# home_1, alien_1 = self.GET_MORE_LINKS(home_0)
-# home_xtras_1 = [item for item in home_1 if item not in home_0]  ## get the new diffs
-# home_all_1 = list(set(home_1 + home_xtras_1))  ## add them to base set
-#
-# # ------------------------------------------------------------------------------------
-# home_2, alien_2 = self.GET_MORE_LINKS(home_xtras_1)
-#
-# home_xtras_2 = [item for item in home_2 if item not in home_all_1]
-#
-# home_all_2 = list(set(home_all_1 + home_xtras_2))
-#
-# # ------------------------------------------------------------------------------------
-#
-# home_3, alien_3 = self.GET_MORE_LINKS(home_xtras_2)
-#
-# home_xtras_3 = [item for item in home_3 if item not in home_all_2]
-#
-# home_all_3 = list(set(home_all_2 + home_xtras_3))
-#
-# # ------------------------------------------------------------------------------------
-# home_4, alien_4 = self.GET_MORE_LINKS(home_xtras_3)
-#
-# home_xtras_4 = [item for item in home_4 if item not in home_all_3]
-#
-# home_all_4 = list(set(home_all_3 + home_xtras_4))
-#
-# # ------------------------------------------------------------------------------------
-# home_5, alien_5 = self.GET_MORE_LINKS(home_xtras_4)
-#
-# home_xtras_5 = [item for item in home_5 if item not in home_all_4]
-#
-# home_all_5 = list(set(home_all_4 + home_xtras_5))
-#
-# # ------------------------------------------------------------------------------------
-# home_6, alien_6 = self.GET_MORE_LINKS(home_xtras_5)
-#
-# home_xtras_6 = [item for item in home_6 if item not in home_all_5]
-#
-# home_all_6 = list(set(home_all_5 + home_xtras_6))
-#
-# #  WRITE!!       # ------------------------------------------------------------------------------------
-# home_all_final = sorted(home_all_6)
-# mu.write_home_set_to_file(home_all_final, logger, 'home')
-#
-# # ------------------------------------------------------------------------------------
-# alien_00a = alien_0 + alien_1 + alien_2 + alien_3 + alien_4 + alien_5 + alien_6
-# alien_00b = list(set(alien_00a))
-# alien_00final = sorted(alien_00b)
-# mu.write_home_set_to_file(alien_00final, logger, 'alien')
