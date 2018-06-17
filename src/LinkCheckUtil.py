@@ -2,12 +2,13 @@
 
 from datetime import datetime
 import sys
-from requests import *
+from requests import get, head
 from src.config import *
 from selenium.common.exceptions import UnexpectedAlertPresentException
 #from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
 from selenium import webdriver
+import logging
 
     #############---------------------------------------- end of def
 
@@ -64,19 +65,24 @@ class linkckutil(object):
                 elink = elinktup[0]
                 theparent = elinktup[1]
                 # loggr.info('Inside Loop:' + lnfeed)
-                resp = str(head(elink, data=None, timeout=30))
+                resp = str(head(elink, data=None, timeout=20))
                 # loggr.info('resp: ' + resp)
                 err_resp = resp[11:14]
-                responstr = 'checked: ' + elink + ' -resp: ' + err_resp + lnfeed
+                responstr = 'checked using head only: ' + elink + ' -resp: ' + err_resp + lnfeed
                 loggr.info(responstr)
 
                 if int(err_resp) in ercodes:
-                    errorString = gerrstr + '{} in: {} from parent: {}'.format(err_resp, elink, theparent)
-                    loggr.info(errorString)
-                    errorlist.append(errorString)
-                    loggr.info(errorString + lnfeed)
+
+                    resp2 = str(get(elink, data=None, timeout=20))
+                    err_resp2 = resp2[11:14]
+                    responstr2 = 'checked2: ' + elink + ' -resp2: ' + err_resp2 + lnfeed
+
+                    errorString2 = gerrstr + '{} in: {} from parent: {}'.format(err_resp2, elink, theparent)
+                    loggr.info(errorString2)
+                    errorlist.append(errorString2)
+                    loggr.info(errorString2 + lnfeed)
                 else:
-                    loggr.info('status code: ' + err_resp)
+                    loggr.info('status code on second get: ' + err_resp)
 
         except BaseException as e:
             loggr.debug('Exception in: ')
