@@ -13,16 +13,17 @@ from selenium.common.exceptions import TimeoutException
 
 class linkcheck(linkckutil):
 
-    def logalert(self, ee, child):
+    def alert_exception_handler(self, ee, child):
         logger.debug('ALERT! -- on: {}'.format(child))
         logger.debug(str(ee), exc_info=True)
         try:
             alert = driver.switch_to.alert
             driver.switch_to.alert.dismiss()
-        except:
+        except BaseException as e:
             self.restartdrvr(driver, logger)
             pass
 
+    #############---------------------------------------- def
 
     def GET_HOME_LINKS(self, locElements, parent):
         home_links = []
@@ -59,6 +60,7 @@ class linkcheck(linkckutil):
     def GET_ALIEN_LINKS(self, locElements, parent):
         alien_links = []
         global driver
+        hrefw = ''
 
         try:
             for webelem in locElements:
@@ -70,7 +72,7 @@ class linkcheck(linkckutil):
                         badchecks = [hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:',emlen < 7]
                         if self.remcruft(hrefw, badlist) == 'bad': 0
                         elif any(badchecks): 0
-                        elif (hrefw.find(home_1) + hrefw.find(home_1)) == 0:  ## now home links found
+                        elif (hrefw.find(home_1) + hrefw.find(home_1)) == 0:  ## no home links found
                             alien_links.append((hrefw, parent))  # tuple - put pdfs, txt, mid, jpg etc here \
 
         except StaleElementReferenceException as s:
@@ -78,7 +80,7 @@ class linkcheck(linkckutil):
             pass
 
         except (UnexpectedAlertPresentException) as e:
-            self.logalert(self, e, hrefw)
+            self.alert_exception_handler(e, hrefw)
             pass
 
         except BaseException as e:
@@ -125,12 +127,14 @@ class linkcheck(linkckutil):
                 logger.debug('Restarted driver')
                 pass
             except (UnexpectedAlertPresentException) as e:
-                self.logalert(self, e, tchild)
+                self.alert_exception_handler(e, tchild)
                 pass
 
             homelinks_all = list(set(homelinks_all + homelinksSetList))
 
         return sorted(list(set(homelinks_all)))
+
+    #############---------------------------------------- end of def
 
     def GET_MORE_LINKS_alien(self, loc_elems=[]):
         global driver
@@ -139,8 +143,7 @@ class linkcheck(linkckutil):
         alienlinks_all = []
 
         for each_tuple in loc_elems:
-            tchild, tparent = each_tuple  # get a page from a link on the home page
-                                                    #  tparent = each_tuple[1]
+            tchild, tparent = each_tuple    #  tparent = each_tuple[1]
             logger.info("child: {}".tchild)
             driver.get(tchild)
             child_elements = driver.find_elements_by_xpath('.//a')
@@ -166,16 +169,17 @@ class linkcheck(linkckutil):
                 logger.debug('Restarted driver')
                 pass
             except (UnexpectedAlertPresentException) as e:
-                self.logalert(self, e, tchild)
+                self.alert_exception_handler(e, tchild)
                 pass
 
-            alienlinks_all = sorted(list(set(alienlinks_all + alienlinksSetList)))
-
+            alienlinks_a = alienlinks_all + alienlinksSetList
+            alienlinks_all = sorted(list(set(alienlinks_a)))
         return alienlinks_all
 
     # ------------------------------------------------------------------------------------
     def scoop_new_links(self, myhome, home_all):
-        homenew, aliennew = self.GET_MORE_LINKS(myhome)
+        homenew = self.GET_MORE_LINKS_home(myhome)
+        aliennew = self.GET_MORE_LINKS_alien(myhome)
         scoop = [i for i in homenew if i not in myhome]  ## get the new diffs
         home_all = list(set(home_all + scoop))
         return homenew, list(set(aliennew)), home_all
@@ -203,12 +207,12 @@ class linkcheck(linkckutil):
             logger.info("just did write_home_set_to_file")
 
         except (UnexpectedAlertPresentException) as e:
-            self.logalert(self, e, 'e')
+            self.alert_exception_handler(e, 'unknown')
             pass
 
         except BaseException as e:
             logger.debug(str(e), exc_info=True)
-            driver = self.restartdrvr(driver, logger)
+            #driver = self.restartdrvr(driver, logger)
             pass
 
         return home_all_final, alien_all_final
@@ -251,7 +255,8 @@ class linkcheck(linkckutil):
             pass
 
     def __init__(self):
-        print('In: ' + __name__)
+        super().__init__()
+        print('In: __init__')
         self.main()
 
 if __name__ == "__main__":  ## if loaded and called by something else, go fish
