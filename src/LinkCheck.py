@@ -13,8 +13,15 @@ from selenium.common.exceptions import TimeoutException
 
 class linkcheck(linkckutil):
 
+    def restartdrvr(self,drver):
+        drver.quit()
+        logger.debug('ALERT! quit driver from restartdrvr')
+        drver = webdriver.Firefox()
+        logger.debug('Restarted driver from restartdrvr')
+        return drver
+
     #############---------------------------------------- def
-    def check_file_extension(hrefw=''): # chk for appropriate exts for homelinks only
+    def check_file_extension(self,hrefw=''): # chk for appropriate exts for homelinks only
         html4 = hrefw[-4:]  # html
         htm3 = hrefw[-3:]  # htm
         php = hrefw[-3:]  # htm
@@ -31,6 +38,7 @@ class linkcheck(linkckutil):
         home_links = []
         alien_links = []
         remcruft = self.remcruft
+        global driver
 
         try:
             for webelem in locElements:
@@ -69,6 +77,7 @@ class linkcheck(linkckutil):
 
         except BaseException as e:
             logger.debug(str(e), exc_info=True)
+            driver = self.restartdrvr(driver)
             pass
 
         alien_linksSort = list(set(alien_links))  ## sort and delete dupes
@@ -107,10 +116,18 @@ class linkcheck(linkckutil):
             except (UnexpectedAlertPresentException) as e:
                 logger.debug('ALERT! -- on: {}'.format(tchild))
                 logger.debug(str(e), exc_info=True)
-                alert = driver.switch_to.alert
-                driver.switch_to.alert.dismiss()
-                pass
 
+                try:
+                    alert = driver.switch_to.alert
+                    driver.switch_to.alert.dismiss()
+                except:
+                    driver.quit()
+                    logger.debug('ALERT! quit driver')
+                    driver = webdriver.Firefox()
+                    logger.debug('Restarted driver')
+                    pass
+
+                pass
 
             except (TimeoutException) as e:
                 logger.debug('ALERT! Timeout: {}'.format(tchild))
@@ -124,6 +141,10 @@ class linkcheck(linkckutil):
             except BaseException as e:
                 logger.debug('ALERT! --BaseException: {}'.format(tchild))
                 logger.debug(str(e), exc_info=True)
+                driver.quit()
+                logger.debug('ALERT! quit driver')
+                driver = webdriver.Firefox()
+                logger.debug('Restarted driver')
                 pass
 
             homelinks_all += homelinksSetList
@@ -136,6 +157,7 @@ class linkcheck(linkckutil):
 
     # ------------------------------------------------------------------------------------
     def homeset(self, home_0, alien_0):
+        global driver
         home_all_final = []
         alien_all_final = []
 
@@ -177,6 +199,7 @@ class linkcheck(linkckutil):
 
         except BaseException as e:
             logger.debug(str(e), exc_info=True)
+            driver = self.restartdrvr(driver)
             pass
 
         return home_all_final, alien_all_final
@@ -205,13 +228,14 @@ class linkcheck(linkckutil):
 
             home_all_final, alien_all_final = self.homeset(home_0, alien_0)
 
-            self.geterrs(home_all_final, alien_all_final)
+            self.geterrs(home_all_final, alien_all_final, logger)
             logger.info('Done with main()')
             driver.close()
             logger.info('Done close driver. Bye.')
 
         except BaseException as e:
             logger.debug(str(e), exc_info=True)
+            driver = self.restartdrvr(driver)
             pass
 
     def __init__(self):
