@@ -279,8 +279,8 @@ class linkcheck(linkckutil):
             pass
 
     def __init__(self):
+        print('In linkcheck: __init__')
         super().__init__()
-        print('In: __init__')
         self.main()
 
 if __name__ == "__main__":  ## if loaded and called by something else, go fish
