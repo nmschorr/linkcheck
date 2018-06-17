@@ -42,34 +42,29 @@ class linkcheck(linkckutil):
 
         try:
             for webelem in locElements:
-                if webelem.tag_name == 'a':
-                    if type(webelem) is not 'NoneType':
-                        if webelem is not None:
-                            hrefw = webelem.get_attribute('href')
+                if webelem.tag_name == 'a' and type(webelem) is not 'NoneType' and webelem is not None:
+                    hrefw = webelem.get_attribute('href')
 
-                            if type(hrefw) is str:
-                                emlen = len(hrefw)
-                                badchecks = [hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:',
-                                             emlen < 7]
-                                                            # if hrefw == 'http://www.repercussions.com/contact.htm':
-                                if remcruft(hrefw, badlist) == 'bad': 0
+                    if type(hrefw) is str:
+                        emlen = len(hrefw)
+                        badchecks = [hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:',emlen < 7]
+                        if remcruft(hrefw, badlist) == 'bad': 0
+                        elif any(badchecks): 0
+                                            #logger.info('Found bad attr: ' + hrefw)
+                        else:
+                            if talien == False:  #don't get alien links
+                                ans1 = hrefw.find(home_1)  ## is the home_ in there?
+                                ans2 = hrefw.find(home_2)  ## is the home_ in there?
 
-                                elif any(badchecks): 0
-                                                    #logger.info('Found bad attr: ' + hrefw)
+                                if self.check_file_extension(hrefw): # chk for appropriate exts for homelinks only
+
+                                    if (ans1 + ans2) > 0 :  # if either are there
+                                        home_links.append((hrefw, parent))  # add to main home list
                                 else:
-                                    if talien == False:  #don't get alien links
-                                        ans1 = hrefw.find(home_1)  ## is the home_ in there?
-                                        ans2 = hrefw.find(home_2)  ## is the home_ in there?
-
-                                        if self.check_file_extension(hrefw): # chk for appropriate exts for homelinks only
-
-                                            if (ans1 + ans2) > 0 :  # if either are there
-                                                home_links.append((hrefw, parent))  # add to main home list
-                                        else:
-                                            alien_links.append((hrefw, parent))    # tuple - put pdfs here \
-                                    else: #if talien == true
-                                                                #  since they won't be searched for links
-                                        alien_links.append((hrefw, parent))  # tuple - put pdfs, txt, mid, jpg etc here \
+                                    alien_links.append((hrefw, parent))    # tuple - put pdfs here \
+                            else: #if talien == true
+                                                        #  since they won't be searched for links
+                                alien_links.append((hrefw, parent))  # tuple - put pdfs, txt, mid, jpg etc here \
 
         except StaleElementReferenceException as s:
             logger.debug(str(s), exc_info=True)
@@ -184,7 +179,7 @@ class linkcheck(linkckutil):
 
             home_6, alien_6 = self.GET_MORE_LINKS(home_xtras_5)
             home_xtras_6 = [item for item in home_6 if item not in home_all_5]
-            home_all_6 = list(set(home_all_5 + home_xtras_6))
+            home_all_6 = list(set(home_all_5 + home_xtras_6 + home_0))   ## home_0 was never added
 
             #  WRITE!!       # ------------------------------------------------------------------------------------
             home_all_final = sorted(home_all_6)

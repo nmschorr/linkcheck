@@ -32,7 +32,7 @@ class linkckutil(object):
 
         #############---------------------------------------- end of def
 
-    def make_error_list(locnewlist, loggr):
+    def make_error_list(self, locnewlist, loggr):
         loggr.info('Starting make_errorList ')
         errorlist = []
 
