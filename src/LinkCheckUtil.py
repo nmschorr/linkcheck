@@ -10,8 +10,6 @@ from selenium.common.exceptions import TimeoutException
 from selenium import webdriver
 import logging
 
-    #############---------------------------------------- end of def
-
 
 class linkckutil(object):
 
@@ -52,7 +50,6 @@ class linkckutil(object):
         except (UnexpectedAlertPresentException, TimeoutException, BaseException) as e:
             logr.debug(str(e), exc_info=True)
             pass
-
 
         #############---------------------------------------- end of def
 
@@ -103,7 +100,6 @@ class linkckutil(object):
 
     #############---------------------------------------- end of def
 
-
     def write_home_set_to_file(self, firstSetLinks, logger, ttype):
         logger.info('In write_home_set_to_file to file.')
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
@@ -126,14 +122,12 @@ class linkckutil(object):
         bigerr_h.close()
         logger.info('Done with write_error_file - timenow')
 
-
     #############---------------------------------------- end of def
     def setuplogger(self):
 
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
             #logging.basicConfig(format='\n%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
         logger1 = logging.getLogger('mainlogger')
-
         formatter = logging.Formatter('%(asctime)s-%(levelname)s: Msg: %(message)s: Function: %(funcName)s',
                                       datefmt='%m%d%y-%H.%M%S')
         fname = 'E:\\pylogs\\Logger-' + timestp + '.log'
@@ -147,18 +141,11 @@ class linkckutil(object):
 
         logger1.setLevel(level=logging.DEBUG)
         logger1.addHandler(filehandle)
-        logger1.addHandler(console)
-                                                ##logging.getLogger('').addHandler(console)  # add to root
-
+        logger1.addHandler(console)                       ##logging.getLogger('').addHandler(console)  # add to root
         lev = logging.getLogger().getEffectiveLevel()
         logger1.info('Completed configuring logger. Logging level is: '+ str(lev))
         return logger1
 
     def __init__(self):
+        print("In linkckutil super() __init__")
         None
-        #self.__dict__.update(adict)   #globals
-
-
-
-
-
