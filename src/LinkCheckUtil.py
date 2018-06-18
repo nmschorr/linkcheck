@@ -13,8 +13,9 @@ from urllib3.exceptions import ConnectTimeoutError, MaxRetryError, RequestError,
 
 
 class linkckutil(object):
+    global driver
 
-        #############---------------------------------------- end of def
+    #############---------------------------------------- end of def
     def restartdrvr(self, drver, logr):
         drver.quit()
         logr.debug('\n-------------->ALERT! quit driver from restartdrvr')

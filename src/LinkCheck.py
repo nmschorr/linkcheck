@@ -14,6 +14,7 @@ import src.setuplog as setuplog
 #############---------------------------------------- def
 
 class linkcheck(linkckutil):
+    global driver
 
     @staticmethod
     def alert_exception_handler(ee, child=''):
@@ -24,15 +25,11 @@ class linkcheck(linkckutil):
         mmsg = 'ALERT! -- on:' + child
         logger.debug(mmsg)
         logger.debug(str(ee), exc_info=True)
+        sleep(1)
         try:
-            alert = driver.switch_to.alert
-            sleep(1)
-            txt = alert.text
-            print("alert text: " + txt)
             driver.switch_to.alert.dismiss()
             sleep(1)
             driver.switch_to.alert.accept()
-            sleep(1)
 
         except Exception as e:
             logger.debug("Dismissing alert didn\'t work")
