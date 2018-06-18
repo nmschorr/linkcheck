@@ -65,18 +65,35 @@ class linkcheck(linkckutil):
 
         try:
             for webelem in locElements:
-                if webelem.tag_name == 'a' and type(webelem) is not 'NoneType' and webelem is not None:
-                    hrefw = webelem.get_attribute('href')
+                if webelem.tag_name == 'a':
+                    if  type(webelem) is not 'NoneType' and webelem is not None:
+                        hrefw = webelem.get_attribute('href')
 
-                    if type(hrefw) is str:
-                        emlen = len(hrefw)
-                        badchecks = [hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:', emlen < 7]
-                        if self.remcruft(hrefw, badlist) == 'bad':   0
-                        elif any(badchecks):  0
-                        else:
-                            if self.check_file_extension(hrefw):  # chk for appropriate exts for homelinks only
+                        if type(hrefw) is str:
+                            emlen = len(hrefw)
+                            badchecks = [hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:', emlen < 7]
+
+                            if 'oz' in hrefw:
+                                print('\n\n----------------------------------- current hrefw:' + hrefw)
+                                logger.debug('found oz in ...')
+                                logger.debug(hrefw)
+
+                            if self.remcruft(hrefw, badlist) == 'bad':
+                                msg2 = "discarded HOME link remcruft: {}".format(hrefw)
+                                logger.info(msg2)
+
+                            elif any(badchecks):
+                                msg3 = "discarded HOME link badchecks: {}".format(hrefw)
+                                logger.info(msg3)
+
+                            elif self.check_file_extension(hrefw):  # chk for appropriate exts for homelinks only
                                 if (hrefw.find(home1) + hrefw.find(home1)) > 0:  # if either are there
+                                    msg4 = "adding HOME link: {}".format(hrefw)
+                                    logger.info(msg4)
                                     home_links.append((hrefw, parent))  # add to main home list\
+                            else:
+                                msg5 = "discarded HOME link for check_file_extension or home-link-within : {}".format(hrefw)
+                                logger.info(msg5)
 
         except StaleElementReferenceException as s:
             logger.debug(str(s), exc_info=True)
@@ -168,18 +185,20 @@ class linkcheck(linkckutil):
                     logger.debug('ALERT! Timeout: {}'.format(tchild))
                     logger.debug(str(e), exc_info=True)
                     driver = self.restartdrvr(driver, logger)
+                    next(ctr, None)   ## get on to next item
                     pass
 
                 except UnexpectedAlertPresentException as e:
                     self.alert_exception_handler(e, tchild)
                     driver = self.restartdrvr(driver, logger)
+                    next(ctr, None)
                     pass
 
                 except BaseException as e:
                     self.alert_exception_handler(e, ' ')
+                    next(ctr, None)
                     pass
 
-                next(ctr, None)
                 #i += 1
 
             homelinks_all = list(set(homelinks_all + homelinksSetList))
@@ -243,14 +262,17 @@ class linkcheck(linkckutil):
         logger.info("\n-------------------------------------->Starting scoop_new_links.")
 
         home_more = self.GET_MORE_LINKS_home(myhome)
-        newly_found_links = [i for i in home_more if i not in home_all_passed_in]
+        #newly_found_links = [i for i in home_more if i not in home_all_passed_in]
+        newly_found_links = [i for i in home_more]
 
         home_glued_together = home_all_passed_in + newly_found_links
         alien_more = list(set(self.GET_MORE_LINKS_alien(newly_found_links)))
 
         home_glued_together_setlist = list(set(home_glued_together))
         logger.info("\nDone with scoop_new_links.")
-        return list(set(newly_found_links)), alien_more, home_glued_together_setlist
+
+        newly_found_links_fin = list(set(newly_found_links))
+        return newly_found_links_fin, alien_more, home_glued_together_setlist
 
     # ------------------------------------------------------------------------------------
     def homeset(self, home_0, alien_0):
@@ -261,7 +283,7 @@ class linkcheck(linkckutil):
 
         try:
             logger.info("\n-------------------------in homeset. doing new set1 now")
-            newly_found_links, alien_more, home_all_1 = self.scoop_new_links(home_0, home_all_0)
+            newly_found_links, alien_1, home_all_1 = self.scoop_new_links(home_0, home_all_0)
             logger.info("\n-------------------------in homeset. doing new set2 now")
             newly_found_links2, alien_2, home_all_2 = self.scoop_new_links(newly_found_links, home_all_1)
             logger.info("\n-------------------------in homeset. doing new set3 now")
@@ -272,10 +294,10 @@ class linkcheck(linkckutil):
             newly_found_links6, alien_6, home_all_6 = self.scoop_new_links(newly_found_links5, home_all_5)
             logger.info("done with new set")
 
-            alien_all = sorted(list(set(alien_more + alien_2 + alien_3 + alien_4 + alien_5 + alien_6 )))
+            alien_all2 = sorted(list(set(alien_all + alien_1 + alien_2 + alien_3 + alien_4 + alien_5 + alien_6 )))
             #alien_all = sorted(list(set(alien_0 + alien_1 + alien_2 + alien_3 + alien_4 + alien_5 + alien_6)))
             self.write_home_set_to_file(sorted(home_all_6), logger, 'home')
-            self.write_home_set_to_file(alien_all, logger, 'alien')
+            self.write_home_set_to_file(alien_all2, logger, 'alien')
             logger.info("just did write_home_set_to_file")
 
         except UnexpectedAlertPresentException as e:
