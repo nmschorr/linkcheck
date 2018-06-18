@@ -7,7 +7,6 @@ from src.config import *
 from selenium.common.exceptions import UnexpectedAlertPresentException
 from selenium.common.exceptions import TimeoutException
 from selenium import webdriver
-#from src.setuplog import setuplogger
 
 
 class linkckutil(object):
@@ -38,7 +37,9 @@ class linkckutil(object):
     def geterrs(self, home_all_final, alien_all_final, logr):
         logr.info("Starting geterrs.")
         try:
+            logr.info("Starting geterrs for home_all_final.")
             home_errs = self.make_error_list(home_all_final, logr)  # ---make_error_list
+            logr.info("Starting geterrs for alien_all_final.")
             alien_errs = self.make_error_list(alien_all_final, logr)  # ---make_error_list
 
             home_errs_b = list(set(home_errs))
@@ -60,6 +61,7 @@ class linkckutil(object):
 
         try:  # check head
             for elinktup in locnewlist:
+                loggr.info('Restarting loop in make_error_list with: ' +str(elinktup))
                 elink = elinktup[0]
                 theparent = elinktup[1]
                 # loggr.info('Inside Loop:' + lnfeed)

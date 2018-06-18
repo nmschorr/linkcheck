@@ -91,9 +91,9 @@ class linkcheck(linkckutil):
                     hrefw = webelem.get_attribute('href')
 
                     if type(hrefw) is str:
-                        xx = hrefw.find(home1)
-                        yy = hrefw.find(home2)
-                        sumit = xx + yy
+                        homx = hrefw.find(home1)
+                        homy = hrefw.find(home2)
+                        sumit = homx + homy
                         emlen = len(hrefw)
                         badchecks = [hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:',emlen < 7]
 
@@ -162,7 +162,7 @@ class linkcheck(linkckutil):
 
                 homelinks_all = list(set(homelinks_all + homelinksSetList))
         else:
-            logger("loc elems empty in GET_MORE_LINKS_alien")
+            logger.info("loc elems empty in GET_MORE_LINKS_alien")
 
         logger.info("Done with GET_MORE_LINKS_home.")
         return sorted(list(set(homelinks_all)))
@@ -211,7 +211,7 @@ class linkcheck(linkckutil):
                 alienlinks_all = sorted(list(set(alienlinks_a)))
 
         else:
-            logger("loc elems empty in GET_MORE_LINKS_alien")
+            logger.info("loc elems empty in GET_MORE_LINKS_alien")
 
         logger.info("Done with GET_MORE_LINKS_alien.")
         return alienlinks_all
