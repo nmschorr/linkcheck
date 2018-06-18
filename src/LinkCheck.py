@@ -208,14 +208,20 @@ class linkcheck(linkckutil):
         return alienlinks_all
 
     # ------------------------------------------------------------------------------------
-    def scoop_new_links(self, myhome, home_all):
+    def scoop_new_links(self, myhome, home_all_0):
+        home_more = None
+        home_all_new = None
         logger.info("Starting scoop_new_links.")
-        homenew = self.GET_MORE_LINKS_home(myhome)
-        aliennew = self.GET_MORE_LINKS_alien(myhome)
-        scoop = [i for i in homenew if i not in myhome]  ## get the new diffs
-        home_all = list(set(home_all + scoop))
+                
+        home_more = self.GET_MORE_LINKS_home(myhome)
+        newlinks_home = [i for i in home_more if i not in home_all_0]
+
+        home_all_1 = home_all_0 + newlinks_home
+        alien_more = list(set(self.GET_MORE_LINKS_alien(myhome)))
+
+        home_all_2 = list(set(home_all_1))
         logger.info("Done with scoop_new_links.")
-        return homenew, list(set(aliennew)), home_all
+        return newlinks_home, alien_more, home_all_2
 
     # ------------------------------------------------------------------------------------
     def homeset(self, home_0, alien_0):
