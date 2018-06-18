@@ -17,9 +17,9 @@ class linkckutil(object):
         #############---------------------------------------- end of def
     def restartdrvr(self, drver, logr):
         drver.quit()
-        logr.debug('\n--------------ALERT! quit driver from restartdrvr')
+        logr.debug('\n-------------->ALERT! quit driver from restartdrvr')
         drver = webdriver.Firefox()
-        logr.debug('Restarted driver from restartdrvr')
+        logr.debug('\n-----------------> Restarted driver from restartdrvr')
         return drver
 
         #############---------------------------------------- end of def

@@ -131,36 +131,40 @@ class linkcheck(linkckutil):
         logger.info("\n-------------------------------------->Starting GET_MORE_LINKS_home.")
 
         if loc_elems:
-            for each_tuple in loc_elems:
+            myiter = iter(range(len(loc_elems)))
+            for i in myiter:
+            #for each_tuple in loc_elems:
+                each_tuple = loc_elems[myiter]
                 tchild, tparent = each_tuple  # get a page from a link on the home page
                                                         #  tparent = each_tuple[1]
                 print("child: " +  tchild)
                 logger.info(str(tchild))
-                driver.get(tchild)
-                child_elements = driver.find_elements_by_xpath('.//a')
+            ## put new code here : put an iter like the other loop
 
                 try:                              ### get only alien links here
+                    driver.get(tchild)
+                    child_elements = driver.find_elements_by_xpath('.//a')
                     homelinks = self.GET_HOME_LINKS(child_elements, tparent)
                     homelinksSetList = list(set(homelinks))
 
                 except TimeoutException as e:
                     logger.debug('ALERT! Timeout: {}'.format(tchild))
                     logger.debug(str(e), exc_info=True)
-                    driver.quit()
-                    logger.debug('ALERT! quit driver')
-                    driver = webdriver.Firefox()
-                    logger.debug('\n-------------------------------------->Restarted driver')
+                    driver = self.restartdrvr(driver, logger)
                     pass
 
                 except UnexpectedAlertPresentException as e:
                     self.alert_exception_handler(e, tchild)
+                    driver = self.restartdrvr(driver, logger)
                     pass
 
                 except BaseException as e:
-                    self.alert_exception_handler(e, hrefw)
+                    self.alert_exception_handler(e, ' ')
                     pass
 
-                homelinks_all = list(set(homelinks_all + homelinksSetList))
+            next(myiter, None)
+
+            homelinks_all = list(set(homelinks_all + homelinksSetList))
         else:
             logger.info("loc elems empty in GET_MORE_LINKS_alien")
 
