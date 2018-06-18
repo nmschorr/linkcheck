@@ -1,6 +1,6 @@
 # python 3
 
-from colorama import Fore
+#from colorama import Fore
 
 #home1 = 'astrology1234.com'
 #home2 = 'astrologistblog.blogspot.com'

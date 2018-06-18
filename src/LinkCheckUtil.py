@@ -1,7 +1,7 @@
 # python 3
 
 from datetime import datetime
-import sys
+#import sys
 #from requests import get, head,
 import requests
 from src.config import *
@@ -9,7 +9,7 @@ from selenium.common.exceptions import UnexpectedAlertPresentException
 from selenium.common.exceptions import TimeoutException
 from selenium import webdriver
 from urllib3.exceptions import ConnectTimeoutError, MaxRetryError,RequestError, NewConnectionError
-import urllib3
+#import urllib3
 
 
 class linkckutil(object):
@@ -17,14 +17,15 @@ class linkckutil(object):
         #############---------------------------------------- end of def
     def restartdrvr(self, drver, logr):
         drver.quit()
-        logr.debug('ALERT! quit driver from restartdrvr')
+        logr.debug('\n--------------ALERT! quit driver from restartdrvr')
         drver = webdriver.Firefox()
         logr.debug('Restarted driver from restartdrvr')
         return drver
 
         #############---------------------------------------- end of def
 
-    def check_file_extension(self, hrefw=''):  # chk for appropriate exts for homelinks only
+    @staticmethod
+    def check_file_extension(hrefw=''):  # chk for appropriate exts for homelinks only
         html4 = hrefw[-4:]  # html
         htm3 = hrefw[-3:]  # htm
         php = hrefw[-3:]  # htm
@@ -38,11 +39,11 @@ class linkckutil(object):
         #############---------------------------------------- end of def
 
     def geterrs(self, home_all_final, alien_all_final, logr):
-        logr.info("Starting geterrs.")
+        logr.info("\nStarting geterrs.")
         try:
-            logr.info("Starting geterrs for home_all_final.")
+            logr.info("\nStarting geterrs for home_all_final.")
             home_errs = self.make_error_list(home_all_final, logr)  # ---make_error_list
-            logr.info("Starting geterrs for alien_all_final.")
+            logr.info("\nStarting geterrs for alien_all_final.")
             alien_errs = self.make_error_list(alien_all_final, logr)  # ---make_error_list
 
             home_errs_b = list(set(home_errs))
@@ -58,26 +59,27 @@ class linkckutil(object):
 
         #############---------------------------------------- end of def
 
-    def make_error_list(self, locnewlist, loggr):
-        http_pm = urllib3.PoolManager()
-        loggr.info('Starting make_errorList.')
+    @staticmethod
+    def make_error_list(locnewlist, loggr):
+                                            #http_pm = urllib3.PoolManager()
+        loggr.info('\nStarting make_errorList.')
         errorlist = []
         myiter = iter(range(len(locnewlist)))
 
         for i in myiter:
             print('iterator in loop: ' + str(i))
 
-            try:  # check head
+            try:
                 for elinktup in locnewlist:
                     try:  # check head
-                        loggr.info('Restarting loop in make_error_list with: ' +str(elinktup))
+                        loggr.info('\nRestarting loop in make_error_list with: ' +str(elinktup))
                         elink = elinktup[0]
                         theparent = elinktup[1]
                                                 #resp = http_pm.request('HEAD', elink)
 
                                                 # loggr.info('Inside Loop:' + lnfeed)
                         resp = str(requests.head(elink, data=None, timeout=10))
-                        mmsg = 'resp: for HEAD from ' + elink + ': ' + + str(resp)
+                        mmsg = 'resp: for HEAD from ' + elink + ': ' + str(resp)
                         loggr.info(mmsg)
                         err_resp = str(resp[11:14])
                                                                         #err_resp = str(resp.status)
@@ -105,20 +107,24 @@ class linkckutil(object):
                         else:
                             loggr.info('status code on second get: ' + err_resp)
 
-                    except (ConnectTimeoutError, MaxRetryError,RequestError, NewConnectionError) as e:
+                    except (ConnectTimeoutError, MaxRetryError, RequestError, NewConnectionError) as e:
                         print("----------------in new except now!!!------------------------------")
                         loggr.debug(str(e), exc_info=True)
                         requests.session().close()
 
                     except BaseException as e:
+                        print("----------------in Base except now!!!------------------------------")
                         loggr.debug(str(e), exc_info=True)
                         requests.session().close()
                         pass
+
                     next(myiter, None)
 
             except BaseException as e:
+                print("----------------in OUTER Base except now!!!------------------------------")
                 loggr.debug(str(e), exc_info=True)
                 next(myiter, None)
+                requests.session().close()
                 pass
 
         loggr.info("Done with geterrs.")
@@ -126,7 +132,8 @@ class linkckutil(object):
 
     #############---------------------------------------- end of def
 
-    def remcruft(self, localink, mlist):
+    @staticmethod
+    def remcruft(localink, mlist):
         res = 'good'
         for i in mlist:
             if i in localink:
@@ -136,7 +143,8 @@ class linkckutil(object):
 
     #############---------------------------------------- end of def
 
-    def write_home_set_to_file(self, firstSetLinks, logger, ttype):
+    @staticmethod
+    def write_home_set_to_file(firstSetLinks, logger, ttype):
         logger.info('In write_home_set_to_file to file.')
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
         basefile = 'E:\\pylogs\\Links_'+ ttype + timestp + '.txt'
@@ -148,7 +156,8 @@ class linkckutil(object):
 
         #############---------------------------------------- end of def
 
-    def write_error_file(self, big_err_list_final, logger, ttype):
+    @staticmethod
+    def write_error_file(big_err_list_final, logger, ttype):
         timenow = format(datetime.now(), '%Y%m%d.%H.%M%S')
         logger.info('In write_error_file - timenow')
         bigerr_file = 'E:\\pylogs\\ERRORS.' + ttype + timenow + '.log'

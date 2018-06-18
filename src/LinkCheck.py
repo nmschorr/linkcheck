@@ -112,7 +112,7 @@ class linkcheck(linkckutil):
             self.alert_exception_handler(e, hrefw)
             pass
 
-        except:
+        except BaseException as e:
             print("Unexpected error:", exc_info()[0])
             pass
             # raise
@@ -128,7 +128,7 @@ class linkcheck(linkckutil):
         homelinks = []
         homelinksSetList = []
         homelinks_all = []
-        logger.info("Starting GET_MORE_LINKS_home.")
+        logger.info("\nStarting GET_MORE_LINKS_home.")
 
         if loc_elems:
             for each_tuple in loc_elems:
@@ -149,14 +149,14 @@ class linkcheck(linkckutil):
                     driver.quit()
                     logger.debug('ALERT! quit driver')
                     driver = webdriver.Firefox()
-                    logger.debug('Restarted driver')
+                    logger.debug('\nRestarted driver')
                     pass
 
                 except UnexpectedAlertPresentException as e:
                     self.alert_exception_handler(e, tchild)
                     pass
 
-                except:
+                except BaseException as e:
                     print("Unexpected error:", exc_info()[0])
                     pass
 
@@ -164,7 +164,7 @@ class linkcheck(linkckutil):
         else:
             logger.info("loc elems empty in GET_MORE_LINKS_alien")
 
-        logger.info("Done with GET_MORE_LINKS_home.")
+        logger.info("\nDone with GET_MORE_LINKS_home.")
         return sorted(list(set(homelinks_all)))
 
     #############---------------------------------------- end of def
@@ -177,7 +177,7 @@ class linkcheck(linkckutil):
         alienlinks_all = []
         tchild =''
 
-        logger.info("Starting GET_MORE_LINKS_alien.")
+        logger.info("\nStarting GET_MORE_LINKS_alien.")
 
         if loc_elems:
             for each_tuple in loc_elems:
@@ -192,7 +192,7 @@ class linkcheck(linkckutil):
                     alienlinksSetList = list(set(alienlinks))
 
                 except TimeoutException as e:
-                    logger.debug('ALERT! Timeout in GET_MORE_LINKS_alien for: {}'.format(tchild))
+                    logger.debug('\nALERT! Timeout in GET_MORE_LINKS_alien for: {}'.format(tchild))
                     logger.debug(str(e), exc_info=True)
                     driver = self.restartdrvr(driver, logger)
                     pass
@@ -201,11 +201,9 @@ class linkcheck(linkckutil):
                     self.alert_exception_handler(e, tchild)
                     pass
 
-                except Exception as e:
+                except BaseException as e:
                     logger.debug(str(e), exc_info=True)
                     pass
-
-                except: pass
 
                 alienlinks_a = alienlinks_all + alienlinksSetList
                 alienlinks_all = sorted(list(set(alienlinks_a)))
@@ -213,14 +211,14 @@ class linkcheck(linkckutil):
         else:
             logger.info("loc elems empty in GET_MORE_LINKS_alien")
 
-        logger.info("Done with GET_MORE_LINKS_alien.")
+        logger.info("\nDone with GET_MORE_LINKS_alien.")
         return alienlinks_all
 
     # ------------------------------------------------------------------------------------
     def scoop_new_links(self, myhome, home_all_0):
         home_more = None
         home_all_new = None
-        logger.info("Starting scoop_new_links.")
+        logger.info("\nStarting scoop_new_links.")
 
         home_more = self.GET_MORE_LINKS_home(myhome)
         newlinks_home = [i for i in home_more if i not in home_all_0]
@@ -229,7 +227,7 @@ class linkcheck(linkckutil):
         alien_more = list(set(self.GET_MORE_LINKS_alien(myhome)))
 
         home_all_2 = list(set(home_all_1))
-        logger.info("Done with scoop_new_links.")
+        logger.info("\nDone with scoop_new_links.")
         return newlinks_home, alien_more, home_all_2
 
     # ------------------------------------------------------------------------------------
@@ -240,13 +238,13 @@ class linkcheck(linkckutil):
         home_all = [i for i in home_0]
 
         try:
-            logger.info("in homeset. doing new set1 now")
+            logger.info("\n-------------------------in homeset. doing new set1 now")
             home_1, alien_1, home_all = self.scoop_new_links(home_0, home_all)
-            logger.info("in homeset. doing new set2 now")
+            logger.info("\n-------------------------in homeset. doing new set2 now")
             home_2, alien_2, home_all = self.scoop_new_links(home_1, home_all)
-            logger.info("in homeset. doing new set3 now")
+            logger.info("\n-------------------------in homeset. doing new set3 now")
             home_3, alien_3, home_all = self.scoop_new_links(home_2, home_all)
-            logger.info("in homeset. doing new set4 now")
+            logger.info("\n-------------------------in homeset. doing new set4 now")
             home_4, alien_4, home_all = self.scoop_new_links(home_3, home_all)
             #home_5, alien_5, home_all = self.scoop_new_links(home_4, home_all)
             #home_6, alien_6, home_all = self.scoop_new_links(home_5, home_all)
