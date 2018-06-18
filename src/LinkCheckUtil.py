@@ -38,13 +38,14 @@ class linkckutil(object):
 
         #############---------------------------------------- end of def
 
-    def geterrs(self, home_all_final, alien_all_final, logr):
+    def geterrs(self, home_all_final, alien_all_final, logr, driver):
+
         logr.info("\n--------------------------------------> Starting geterrs.")
         try:
             logr.info("\n-------------------------------------->Starting geterrs for home_all_final.")
-            home_errs = self.make_error_list(home_all_final, logr)  # ---make_error_list
+            home_errs = self.make_error_list(home_all_final, logr, driver )  # ---make_error_list
             logr.info("\n-------------------------------------->Starting geterrs for alien_all_final.")
-            alien_errs = self.make_error_list(alien_all_final, logr)  # ---make_error_list
+            alien_errs = self.make_error_list(alien_all_final, logr, driver)  # ---make_error_list
 
             home_errs_b = list(set(home_errs))
             alien_errs_b = list(set(alien_errs))
@@ -54,17 +55,19 @@ class linkckutil(object):
 
         except (UnexpectedAlertPresentException, TimeoutException, BaseException) as e:
             logr.debug(str(e), exc_info=True)
+            self.restartdrvr(driver, logr)
             pass
         logr.info("Done with geterrs.")
 
         #############---------------------------------------- end of def
 
     @staticmethod
-    def make_error_list(locnewlist, loggr):
+    def make_error_list(locnewlist, loggr, drv):
                                             #http_pm = urllib3.PoolManager()
         loggr.info('\n-------------------------------------->Starting make_errorList.')
         errorlist = []
         myiter = iter(range(len(locnewlist)))
+        gerrstr = 'ERROR ---- ! ---Result code: '
 
         for i in myiter:
             print('iterator in loop: ' + str(i))
@@ -83,27 +86,27 @@ class linkckutil(object):
                         loggr.info(mmsg)
                         err_resp = str(resp[11:14])
                                                                         #err_resp = str(resp.status)
-                        responstr = 'checked using HEAD only: ' + elink + ' -resp: ' + err_resp + lnfeed
+                        responstr = 'Checked using HEAD only: ' + elink + ' -resp: ' + err_resp + lnfeed
                         loggr.info(responstr)
-
-                        if int(err_resp) in ercodes:
-                            loggr.info('Got an error. Retrying with a GET.' + elink)
+                        err_int = int(err_resp)
+                        if err_int in ercodes:
+                            loggr.info('------------------------------!!! > Got an error. Retrying with a GET.' + elink)
                             resp2 = str(requests.get(elink, data=None, timeout=10))
 
                             #resp2 = http.request('GET', elink)
                             err_resp2 = str(resp2[11:14])
-                                                                        #err_resp2 = str(resp2.status)
-                            responstr2 = 'checked2: ' + elink + ' -resp2: ' + err_resp2 + lnfeed
+                            responstr2 = '----- Checked using Get only: ' + elink + ' -resp: ' + err_resp2 + lnfeed
+                            loggr.debug(responstr2)
+                            err_int2 = int(err_resp2)
 
-                            errorString2 = gerrstr + '{} in: {} from parent: {}'.format(err_resp2, elink, theparent)
-                            loggr.info(errorString2)
-                            loggr.info(responstr2)
+                            if err_int2 in ercodes:
+                                errorString2 = lnfeed + '------------------------------!!! >GET response: {} in: {} from parent: {}'.format(err_resp2, elink, theparent)
+                                loggr.info(errorString2)
 
-                            errorlist.append(errorString2)
-                            loggr.info(errorString2 + lnfeed)
-                            #http_pm.clear()
-                            #urllib3.connectionpool.HTTPConnectionPool.close()
-                            requests.session().close()
+                                errorlist.append(errorString2)
+                                loggr.info(errorString2 + lnfeed)
+
+                            requests.session().close()             #urllib3.connectionpool.HTTPConnectionPool.close()
                         else:
                             loggr.info('status code on second get: ' + err_resp)
 
@@ -127,7 +130,7 @@ class linkckutil(object):
                 requests.session().close()
                 pass
 
-        loggr.info("Done with geterrs.")
+        loggr.info("Done with make_error_list.")
         return errorlist
 
     #############---------------------------------------- end of def

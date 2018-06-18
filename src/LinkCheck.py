@@ -35,9 +35,9 @@ class linkcheck(linkckutil):
             sleep(1)
 
         except Exception as e:
-            logger.debug("dismissing alert didn\'t work")
+            logger.debug("Dismissing alert didn\'t work")
             logger.debug(str(e), exc_info=True)
-            #self.restartdrvr(driver, logger)
+            linkckutil.restartdrvr(driver, logger)
             pass
 
         logger.info("Done with alert_exception_handler.")
@@ -70,8 +70,8 @@ class linkcheck(linkckutil):
             logger.debug(str(s), exc_info=True)
             pass
 
-        except:
-            print("Unexpected error:", exc_info()[0])
+        except BaseException as e:
+            logger.debug(str(e), exc_info=True)
             raise
         logger.info("Done with GET_HOME_LINKS.")
         return sorted(list(set(home_links)))
@@ -135,7 +135,8 @@ class linkcheck(linkckutil):
                                                     #myiter = iter(range(len(loc_elems)))
                                                     #myiter.__getattribute__
                                                     #for i in range(len(loc_elems)):
-            for i in range(len(loc_elems)):
+            ctr = enumerate(range(len(loc_elems)))
+            for i,y in ctr:
 
                             #for each_tuple in loc_elems:
                 each_tuple = loc_elems[i]
@@ -166,8 +167,8 @@ class linkcheck(linkckutil):
                     self.alert_exception_handler(e, ' ')
                     pass
 
-                #next(value, None)
-                i += 1
+                next(ctr, None)
+                #i += 1
 
             homelinks_all = list(set(homelinks_all + homelinksSetList))
         else:
@@ -302,7 +303,7 @@ class linkcheck(linkckutil):
             logger.info("Step Two")
             home_all_final, alien_all_final = self.homeset(home_0, alien_0)
 
-            self.geterrs(home_all_final, alien_all_final, logger)
+            self.geterrs(home_all_final, alien_all_final, logger, driver)
             logger.info('Done with main()')
             driver.close()
             logger.info('Done close driver. Bye.')
