@@ -16,8 +16,8 @@ import src.setuplog as setuplog
 class linkcheck(linkckutil):
     global driver
 
-    @staticmethod
-    def alert_exception_handler(ee, child=''):
+    #@staticmethod
+    def alert_exception_handler(self, ee, child=''):
         global logger
         global driver
 
@@ -26,10 +26,25 @@ class linkcheck(linkckutil):
         logger.debug(mmsg)
         logger.debug(str(ee), exc_info=True)
         sleep(1)
+
         try:
             driver.switch_to.alert.dismiss()
-            sleep(1)
+        except BaseException as e:
+            pass
+
+        try:
             driver.switch_to.alert.accept()
+
+        except BaseException as e:
+            logger.debug("Dismissing alert.")
+            pass
+
+        try:
+            driver.switch_to.alert.cancel()
+
+        except BaseException as e:
+            logger.debug("Dismissing alert.")
+            pass
 
         except Exception as e:
             logger.debug("Dismissing alert didn\'t work")
@@ -222,44 +237,44 @@ class linkcheck(linkckutil):
         return alienlinks_all
 
     # ------------------------------------------------------------------------------------
-    def scoop_new_links(self, myhome, home_all_0):
+    def scoop_new_links(self, myhome, home_all_passed_in):
         home_more = None
         home_all_new = None
         logger.info("\n-------------------------------------->Starting scoop_new_links.")
 
         home_more = self.GET_MORE_LINKS_home(myhome)
-        newlinks_home = [i for i in home_more if i not in home_all_0]
+        newly_found_links = [i for i in home_more if i not in home_all_passed_in]
 
-        home_all_1 = home_all_0 + newlinks_home
-        alien_more = list(set(self.GET_MORE_LINKS_alien(myhome)))
+        home_glued_together = home_all_passed_in + newly_found_links
+        alien_more = list(set(self.GET_MORE_LINKS_alien(newly_found_links)))
 
-        home_all_2 = list(set(home_all_1))
+        home_glued_together_setlist = list(set(home_glued_together))
         logger.info("\nDone with scoop_new_links.")
-        return newlinks_home, alien_more, home_all_2
+        return list(set(newly_found_links)), alien_more, home_glued_together_setlist
 
     # ------------------------------------------------------------------------------------
     def homeset(self, home_0, alien_0):
         global driver
         global logger
         alien_all = [i for i in alien_0]
-        home_all = [i for i in home_0]
+        home_all_0 = [i for i in home_0]
 
         try:
             logger.info("\n-------------------------in homeset. doing new set1 now")
-            home_1, alien_1, home_all = self.scoop_new_links(home_0, home_all)
+            newly_found_links, alien_more, home_all_1 = self.scoop_new_links(home_0, home_all_0)
             logger.info("\n-------------------------in homeset. doing new set2 now")
-            home_2, alien_2, home_all = self.scoop_new_links(home_1, home_all)
+            newly_found_links2, alien_2, home_all_2 = self.scoop_new_links(newly_found_links, home_all_1)
             logger.info("\n-------------------------in homeset. doing new set3 now")
-            home_3, alien_3, home_all = self.scoop_new_links(home_2, home_all)
+            newly_found_links3, alien_3, home_all_3 = self.scoop_new_links(newly_found_links2, home_all_2)
             logger.info("\n-------------------------in homeset. doing new set4 now")
-            home_4, alien_4, home_all = self.scoop_new_links(home_3, home_all)
-            #home_5, alien_5, home_all = self.scoop_new_links(home_4, home_all)
-            #home_6, alien_6, home_all = self.scoop_new_links(home_5, home_all)
+            newly_found_links4, alien_4, home_all_4 = self.scoop_new_links(newly_found_links3, home_all_3)
+            newly_found_links5, alien_5, home_all_5 = self.scoop_new_links(newly_found_links4, home_all_4)
+            newly_found_links6, alien_6, home_all_6 = self.scoop_new_links(newly_found_links5, home_all_5)
             logger.info("done with new set")
 
-            alien_all = sorted(list(set(alien_1 + alien_2 + alien_3 + alien_4  )))
+            alien_all = sorted(list(set(alien_more + alien_2 + alien_3 + alien_4 + alien_5 + alien_6 )))
             #alien_all = sorted(list(set(alien_0 + alien_1 + alien_2 + alien_3 + alien_4 + alien_5 + alien_6)))
-            self.write_home_set_to_file(sorted(home_all), logger, 'home')
+            self.write_home_set_to_file(sorted(home_all_6), logger, 'home')
             self.write_home_set_to_file(alien_all, logger, 'alien')
             logger.info("just did write_home_set_to_file")
 
@@ -271,8 +286,9 @@ class linkcheck(linkckutil):
             logger.debug(str(e), exc_info=True)
             #driver = self.restartdrvr(driver, logger)
             pass
-
-        return home_all, alien_all
+        for i in home_all_6:
+            print(i)
+        return home_all_6, alien_all
 
 
     #############---------------------------------------- end of def

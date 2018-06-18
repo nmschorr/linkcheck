@@ -23,7 +23,7 @@ home2 = 'repercussions.com'
 
 address ='http://' + home1
 lnfeed = '\n'
-ercodes = [301, 400, 404, 408, 409, 501, 502, 503]
+ercodes = [400, 404, 408, 409, 501, 502, 503]
 #ercodes = [400, 404, 408, 409, 501, 502, 503]
 badlist = ['#','com/#', '?', 'blogger.com', '/search', 'javascript:void(0)', 'widgetType','mailto:']
 #gerrstr = 'ERROR ---- ! ---Result code: '

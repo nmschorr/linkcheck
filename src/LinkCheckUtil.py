@@ -27,15 +27,17 @@ class linkckutil(object):
 
     @staticmethod
     def check_file_extension(hrefw=''):  # chk for appropriate exts for homelinks only
-        html4 = hrefw[-4:]  # html
-        htm3 = hrefw[-3:]  # htm
-        php = hrefw[-3:]  # htm
-        phpx = hrefw[-3:-1]  # phpx
-        lastchar = hrefw[-1:]
-        if any([html4 == 'html', htm3 == 'htm', lastchar == '/', php == 'php', phpx == 'php']):
-            return True
-        else:
-            return False
+        # html4 = hrefw[-4:]  # html
+        # htm3 = hrefw[-3:]  # htm
+        # php = hrefw[-3:]  # htm
+        # phpx = hrefw[-3:-1]  # phpx
+        # lastchar = hrefw[-1:]
+        # if any([html4 == 'html', htm3 == 'htm', lastchar == '/', php == 'php', phpx == 'php']):
+        #     return True
+        # else:
+        #     return False
+        # bad exts: mid, pdf, css, xml,
+        return True
 
         #############---------------------------------------- end of def
 
