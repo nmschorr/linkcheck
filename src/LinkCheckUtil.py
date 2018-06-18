@@ -2,11 +2,14 @@
 
 from datetime import datetime
 import sys
-from requests import get, head
+#from requests import get, head,
+import requests
 from src.config import *
 from selenium.common.exceptions import UnexpectedAlertPresentException
 from selenium.common.exceptions import TimeoutException
 from selenium import webdriver
+from urllib3.exceptions import ConnectTimeoutError, MaxRetryError,RequestError, NewConnectionError
+import urllib3
 
 
 class linkckutil(object):
@@ -56,40 +59,67 @@ class linkckutil(object):
         #############---------------------------------------- end of def
 
     def make_error_list(self, locnewlist, loggr):
+        http_pm = urllib3.PoolManager()
         loggr.info('Starting make_errorList.')
         errorlist = []
+        myiter = iter(range(len(locnewlist)))
 
-        try:  # check head
-            for elinktup in locnewlist:
-                loggr.info('Restarting loop in make_error_list with: ' +str(elinktup))
-                elink = elinktup[0]
-                theparent = elinktup[1]
-                # loggr.info('Inside Loop:' + lnfeed)
-                resp = str(head(elink, data=None, timeout=20))
-                loggr.info('resp: ' + resp)
-                err_resp = resp[11:14]
-                responstr = 'checked using head only: ' + elink + ' -resp: ' + err_resp + lnfeed
-                loggr.info(responstr)
+        for i in myiter:
+            print('iterator in loop: ' + str(i))
 
-                if int(err_resp) in ercodes:
+            try:  # check head
+                for elinktup in locnewlist:
+                    try:  # check head
+                        loggr.info('Restarting loop in make_error_list with: ' +str(elinktup))
+                        elink = elinktup[0]
+                        theparent = elinktup[1]
+                                                #resp = http_pm.request('HEAD', elink)
 
-                    resp2 = str(get(elink, data=None, timeout=20))
-                    err_resp2 = resp2[11:14]
-                    responstr2 = 'checked2: ' + elink + ' -resp2: ' + err_resp2 + lnfeed
+                                                # loggr.info('Inside Loop:' + lnfeed)
+                        resp = str(requests.head(elink, data=None, timeout=10))
+                        mmsg = 'resp: for HEAD from ' + elink + ': ' + + str(resp)
+                        loggr.info(mmsg)
+                        err_resp = str(resp[11:14])
+                                                                        #err_resp = str(resp.status)
+                        responstr = 'checked using HEAD only: ' + elink + ' -resp: ' + err_resp + lnfeed
+                        loggr.info(responstr)
 
-                    errorString2 = gerrstr + '{} in: {} from parent: {}'.format(err_resp2, elink, theparent)
-                    loggr.info(errorString2)
-                    loggr.info(responstr2)
+                        if int(err_resp) in ercodes:
+                            loggr.info('Got an error. Retrying with a GET.' + elink)
+                            resp2 = str(requests.get(elink, data=None, timeout=10))
 
-                    errorlist.append(errorString2)
-                    loggr.info(errorString2 + lnfeed)
-                else:
-                    loggr.info('status code on second get: ' + err_resp)
+                            #resp2 = http.request('GET', elink)
+                            err_resp2 = str(resp2[11:14])
+                                                                        #err_resp2 = str(resp2.status)
+                            responstr2 = 'checked2: ' + elink + ' -resp2: ' + err_resp2 + lnfeed
 
-        except BaseException as e:
-            loggr.debug('Exception in: ')
-            loggr.debug(str(e), exc_info=True)
-            pass
+                            errorString2 = gerrstr + '{} in: {} from parent: {}'.format(err_resp2, elink, theparent)
+                            loggr.info(errorString2)
+                            loggr.info(responstr2)
+
+                            errorlist.append(errorString2)
+                            loggr.info(errorString2 + lnfeed)
+                            #http_pm.clear()
+                            #urllib3.connectionpool.HTTPConnectionPool.close()
+                            requests.session().close()
+                        else:
+                            loggr.info('status code on second get: ' + err_resp)
+
+                    except (ConnectTimeoutError, MaxRetryError,RequestError, NewConnectionError) as e:
+                        print("----------------in new except now!!!------------------------------")
+                        loggr.debug(str(e), exc_info=True)
+                        requests.session().close()
+
+                    except BaseException as e:
+                        loggr.debug(str(e), exc_info=True)
+                        requests.session().close()
+                        pass
+                    next(myiter, None)
+
+            except BaseException as e:
+                loggr.debug(str(e), exc_info=True)
+                next(myiter, None)
+                pass
 
         loggr.info("Done with geterrs.")
         return errorlist

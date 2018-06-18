@@ -16,9 +16,10 @@ from colorama import Fore
 #home1   = 'alexforecast.blogspot.com'
 #home2   = 'alexforecast.blogspot.com'
 
-home1   = 'cosmictoys.blogspot.com'
-home2   = 'cosmictoys.blogspot.com'
-
+#home1   = 'cosmictoys.blogspot.com'
+#home2   = 'cosmictoys.blogspot.com'
+home1   = 'schorrmedia.com'
+home2   = 'schorrmedia.com'
 
 address ='http://' + home1
 lnfeed = '\n'
