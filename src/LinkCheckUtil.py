@@ -12,7 +12,6 @@ import logging
 
 
 class linkckutil(object):
-
         #############---------------------------------------- end of def
     def restartdrvr(self, drver, logr):
         drver.quit()
@@ -37,6 +36,7 @@ class linkckutil(object):
         #############---------------------------------------- end of def
 
     def geterrs(self, home_all_final, alien_all_final, logr):
+        logr.info("Starting geterrs.")
         try:
             home_errs = self.make_error_list(home_all_final, logr)  # ---make_error_list
             alien_errs = self.make_error_list(alien_all_final, logr)  # ---make_error_list
@@ -50,6 +50,7 @@ class linkckutil(object):
         except (UnexpectedAlertPresentException, TimeoutException, BaseException) as e:
             logr.debug(str(e), exc_info=True)
             pass
+        logr.info("Done with geterrs.")
 
         #############---------------------------------------- end of def
 
@@ -63,7 +64,7 @@ class linkckutil(object):
                 theparent = elinktup[1]
                 # loggr.info('Inside Loop:' + lnfeed)
                 resp = str(head(elink, data=None, timeout=20))
-                # loggr.info('resp: ' + resp)
+                loggr.info('resp: ' + resp)
                 err_resp = resp[11:14]
                 responstr = 'checked using head only: ' + elink + ' -resp: ' + err_resp + lnfeed
                 loggr.info(responstr)
@@ -76,6 +77,8 @@ class linkckutil(object):
 
                     errorString2 = gerrstr + '{} in: {} from parent: {}'.format(err_resp2, elink, theparent)
                     loggr.info(errorString2)
+                    loggr.info(responstr2)
+
                     errorlist.append(errorString2)
                     loggr.info(errorString2 + lnfeed)
                 else:
@@ -86,6 +89,7 @@ class linkckutil(object):
             loggr.debug(str(e), exc_info=True)
             pass
 
+        loggr.info("Done with geterrs.")
         return errorlist
 
     #############---------------------------------------- end of def

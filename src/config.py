@@ -11,8 +11,13 @@ from colorama import Fore
 #base2 = 'astrologistblog.blogspot.com'
 #home1 = 'www.repercussions.com'
 #home2 = 'repercussions.com'
-home1   = 'www.clarinetinstitute.com'
-home2 = 'clarinetinstitute.com'
+#home1   = 'www.clarinetinstitute.com'
+#home2 = 'clarinetinstitute.com'
+#home1   = 'alexforecast.blogspot.com'
+#home2   = 'alexforecast.blogspot.com'
+
+home1   = 'cosmictoys.blogspot.com'
+home2   = 'cosmictoys.blogspot.com'
 
 
 address ='http://' + home1
