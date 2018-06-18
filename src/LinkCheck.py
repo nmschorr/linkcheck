@@ -9,6 +9,7 @@ from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
 from time import sleep
 from sys import exc_info
+import src.setuplog as setuplog
 
 #############---------------------------------------- def
 
@@ -16,6 +17,9 @@ class linkcheck(linkckutil):
 
     @staticmethod
     def alert_exception_handler(ee, child=''):
+        global logger
+        global driver
+
         logger.info("Starting alert_exception_handler.")
         mmsg = 'ALERT! -- on:' + child
         logger.debug(mmsg)
@@ -44,6 +48,7 @@ class linkcheck(linkckutil):
     def GET_HOME_LINKS(self, locElements, parent):
         home_links = []
         global driver
+        global logger
         logger.info("Starting GET_HOME_LINKS.")
 
         try:
@@ -76,6 +81,7 @@ class linkcheck(linkckutil):
     def GET_ALIEN_LINKS(self, locElements, parent):
         alien_links = []
         global driver
+        global logger
         hrefw = ''
         logger.info("Starting GET_ALIEN_LINKS.")
 
@@ -118,6 +124,7 @@ class linkcheck(linkckutil):
 
     def GET_MORE_LINKS_home(self, loc_elems):
         global driver
+        global logger
         homelinks = []
         homelinksSetList = []
         homelinks_all = []
@@ -164,10 +171,12 @@ class linkcheck(linkckutil):
 
     def GET_MORE_LINKS_alien(self, loc_elems):
         global driver
+        global logger
         alienlinks = []
         alienlinksSetList = []
         alienlinks_all = []
         tchild =''
+
         logger.info("Starting GET_MORE_LINKS_alien.")
 
         if loc_elems:
@@ -212,7 +221,7 @@ class linkcheck(linkckutil):
         home_more = None
         home_all_new = None
         logger.info("Starting scoop_new_links.")
-                
+
         home_more = self.GET_MORE_LINKS_home(myhome)
         newlinks_home = [i for i in home_more if i not in home_all_0]
 
@@ -226,6 +235,7 @@ class linkcheck(linkckutil):
     # ------------------------------------------------------------------------------------
     def homeset(self, home_0, alien_0):
         global driver
+        global logger
         alien_all = [i for i in alien_0]
         home_all = [i for i in home_0]
 
@@ -263,17 +273,15 @@ class linkcheck(linkckutil):
     #############---------------------------------------- end of def
     # begin:
     def main(self):
-        super
+        global driver
         global logger
         home_0 = []
         alien_0 = []
         parent = address
-        global driver
         driver = webdriver.Firefox()
         driver.implicitly_wait(10)
         driver.get(address)
 
-        logger = self.setuplogger()
         logger.debug('In main() Getting first address: {}'.format(address))
 
         try:
@@ -298,10 +306,11 @@ class linkcheck(linkckutil):
             pass
 
     def __init__(self):
+        global logger
+        global driver
         print('In linkcheck: __init__')
         super().__init__()
-        global driver
-        global logger
+        logger = setuplog.makelogger.setup_logger()
         self.main()
 
 

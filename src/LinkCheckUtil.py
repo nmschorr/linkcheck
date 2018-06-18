@@ -5,13 +5,13 @@ import sys
 from requests import get, head
 from src.config import *
 from selenium.common.exceptions import UnexpectedAlertPresentException
-#from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
 from selenium import webdriver
-import logging
+#from src.setuplog import setuplogger
 
 
 class linkckutil(object):
+
         #############---------------------------------------- end of def
     def restartdrvr(self, drver, logr):
         drver.quit()
@@ -127,29 +127,6 @@ class linkckutil(object):
         logger.info('Done with write_error_file - timenow')
 
     #############---------------------------------------- end of def
-    def setuplogger(self):
-
-        timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
-            #logging.basicConfig(format='\n%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-        logger1 = logging.getLogger('mainlogger')
-        formatter = logging.Formatter('%(asctime)s-%(levelname)s: Msg: %(message)s: Function: %(funcName)s',
-                                      datefmt='%m%d%y-%H.%M%S')
-        fname = 'E:\\pylogs\\Logger-' + timestp + '.log'
-        filehandle = logging.FileHandler(fname)
-        filehandle.setFormatter(formatter)
-        filehandle.setLevel(level=logging.DEBUG)
-
-        console = logging.StreamHandler(sys.stdout)
-        console.setFormatter(formatter)
-        console.setLevel(level=logging.DEBUG)
-
-        logger1.setLevel(level=logging.DEBUG)
-        logger1.addHandler(filehandle)
-        logger1.addHandler(console)                       ##logging.getLogger('').addHandler(console)  # add to root
-        lev = logging.getLogger().getEffectiveLevel()
-        logger1.info('Completed configuring logger. Logging level is: '+ str(lev))
-        return logger1
 
     def __init__(self):
         print("In linkckutil super() __init__")
-        None
