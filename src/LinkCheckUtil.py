@@ -8,7 +8,7 @@ from src.config import *
 from selenium.common.exceptions import UnexpectedAlertPresentException
 from selenium.common.exceptions import TimeoutException
 from selenium import webdriver
-from urllib3.exceptions import ConnectTimeoutError, MaxRetryError,RequestError, NewConnectionError
+from urllib3.exceptions import ConnectTimeoutError, MaxRetryError, RequestError, NewConnectionError
 #import urllib3
 
 
@@ -39,11 +39,11 @@ class linkckutil(object):
         #############---------------------------------------- end of def
 
     def geterrs(self, home_all_final, alien_all_final, logr):
-        logr.info("\nStarting geterrs.")
+        logr.info("\n--------------------------------------> Starting geterrs.")
         try:
-            logr.info("\nStarting geterrs for home_all_final.")
+            logr.info("\n-------------------------------------->Starting geterrs for home_all_final.")
             home_errs = self.make_error_list(home_all_final, logr)  # ---make_error_list
-            logr.info("\nStarting geterrs for alien_all_final.")
+            logr.info("\n-------------------------------------->Starting geterrs for alien_all_final.")
             alien_errs = self.make_error_list(alien_all_final, logr)  # ---make_error_list
 
             home_errs_b = list(set(home_errs))
@@ -62,7 +62,7 @@ class linkckutil(object):
     @staticmethod
     def make_error_list(locnewlist, loggr):
                                             #http_pm = urllib3.PoolManager()
-        loggr.info('\nStarting make_errorList.')
+        loggr.info('\n-------------------------------------->Starting make_errorList.')
         errorlist = []
         myiter = iter(range(len(locnewlist)))
 
@@ -72,7 +72,7 @@ class linkckutil(object):
             try:
                 for elinktup in locnewlist:
                     try:  # check head
-                        loggr.info('\nRestarting loop in make_error_list with: ' +str(elinktup))
+                        loggr.info('\n-------------------------------------->Restarting loop in make_error_list with: ' +str(elinktup))
                         elink = elinktup[0]
                         theparent = elinktup[1]
                                                 #resp = http_pm.request('HEAD', elink)

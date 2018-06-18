@@ -20,7 +20,7 @@ class linkcheck(linkckutil):
         global logger
         global driver
 
-        logger.info("Starting alert_exception_handler.")
+        logger.info("-------------------------------------->Starting alert_exception_handler.")
         mmsg = 'ALERT! -- on:' + child
         logger.debug(mmsg)
         logger.debug(str(ee), exc_info=True)
@@ -49,7 +49,7 @@ class linkcheck(linkckutil):
         home_links = []
         global driver
         global logger
-        logger.info("Starting GET_HOME_LINKS.")
+        logger.info("-------------------------------------->Starting GET_HOME_LINKS.")
 
         try:
             for webelem in locElements:
@@ -83,7 +83,7 @@ class linkcheck(linkckutil):
         global driver
         global logger
         hrefw = ''
-        logger.info("Starting GET_ALIEN_LINKS.")
+        logger.info("-------------------------------------->Starting GET_ALIEN_LINKS.")
 
         try:
             for webelem in locElements:
@@ -113,7 +113,7 @@ class linkcheck(linkckutil):
             pass
 
         except BaseException as e:
-            print("Unexpected error:", exc_info()[0])
+            self.alert_exception_handler(e, hrefw)
             pass
             # raise
 
@@ -128,7 +128,7 @@ class linkcheck(linkckutil):
         homelinks = []
         homelinksSetList = []
         homelinks_all = []
-        logger.info("\nStarting GET_MORE_LINKS_home.")
+        logger.info("\n-------------------------------------->Starting GET_MORE_LINKS_home.")
 
         if loc_elems:
             for each_tuple in loc_elems:
@@ -149,7 +149,7 @@ class linkcheck(linkckutil):
                     driver.quit()
                     logger.debug('ALERT! quit driver')
                     driver = webdriver.Firefox()
-                    logger.debug('\nRestarted driver')
+                    logger.debug('\n-------------------------------------->Restarted driver')
                     pass
 
                 except UnexpectedAlertPresentException as e:
@@ -157,7 +157,7 @@ class linkcheck(linkckutil):
                     pass
 
                 except BaseException as e:
-                    print("Unexpected error:", exc_info()[0])
+                    self.alert_exception_handler(e, hrefw)
                     pass
 
                 homelinks_all = list(set(homelinks_all + homelinksSetList))
@@ -177,7 +177,7 @@ class linkcheck(linkckutil):
         alienlinks_all = []
         tchild =''
 
-        logger.info("\nStarting GET_MORE_LINKS_alien.")
+        logger.info("\n-------------------------------------->Starting GET_MORE_LINKS_alien.")
 
         if loc_elems:
             for each_tuple in loc_elems:
@@ -218,7 +218,7 @@ class linkcheck(linkckutil):
     def scoop_new_links(self, myhome, home_all_0):
         home_more = None
         home_all_new = None
-        logger.info("\nStarting scoop_new_links.")
+        logger.info("\n-------------------------------------->Starting scoop_new_links.")
 
         home_more = self.GET_MORE_LINKS_home(myhome)
         newlinks_home = [i for i in home_more if i not in home_all_0]
