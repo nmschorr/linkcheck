@@ -131,15 +131,19 @@ class linkcheck(linkckutil):
         logger.info("\n-------------------------------------->Starting GET_MORE_LINKS_home.")
 
         if loc_elems:
-            myiter = iter(range(len(loc_elems)))
-            for i in myiter:
-            #for each_tuple in loc_elems:
-                each_tuple = loc_elems[myiter]
+                                                    #for i, value in enumerate(len(loc_elems), start=0):
+                                                    #myiter = iter(range(len(loc_elems)))
+                                                    #myiter.__getattribute__
+                                                    #for i in range(len(loc_elems)):
+            for i in range(len(loc_elems)):
+
+                            #for each_tuple in loc_elems:
+                each_tuple = loc_elems[i]
                 tchild, tparent = each_tuple  # get a page from a link on the home page
                                                         #  tparent = each_tuple[1]
                 print("child: " +  tchild)
                 logger.info(str(tchild))
-            ## put new code here : put an iter like the other loop
+                                    ## put new code here : put an iter like the other loop
 
                 try:                              ### get only alien links here
                     driver.get(tchild)
@@ -162,7 +166,8 @@ class linkcheck(linkckutil):
                     self.alert_exception_handler(e, ' ')
                     pass
 
-            next(myiter, None)
+                #next(value, None)
+                i += 1
 
             homelinks_all = list(set(homelinks_all + homelinksSetList))
         else:
