@@ -6,9 +6,7 @@ from selenium import webdriver
 
 class makelogger(object):
 
-    @staticmethod
-    def setup_logger():
-
+    def setup_logger(self):
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
             #logging.basicConfig(format='\n%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
         logger1 = logging.getLogger('mainlogger')
@@ -31,7 +29,7 @@ class makelogger(object):
         return logger1
 
     @staticmethod
-    def rdriver():
+    def start_driver():
         driver = webdriver.Firefox()
         driver.implicitly_wait(10)
         return driver

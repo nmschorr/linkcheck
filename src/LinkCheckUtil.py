@@ -12,6 +12,7 @@ from urllib3.exceptions import ConnectTimeoutError, MaxRetryError, RequestError,
 #import urllib3
 import logging
 from selenium import webdriver
+import src.setuplog as setuplog
 
 
 class linkckutil(object):
@@ -25,12 +26,12 @@ class linkckutil(object):
         logger.debug('\n-------------->ALERT! quit driver from restartdrvr')
         driver_r = webdriver.Firefox()
         logger.debug('\n-----------------> Restarted driver from restartdrvr')
+        driver_r.get(address)
         return driver_r
 
         #############---------------------------------------- end of def
 
-    @staticmethod
-    def check_file_extension(hrefw=''):  # chk for appropriate exts for homelinks only
+    def check_file_extension(self, hrefw=''):  # chk for appropriate exts for homelinks only
         # html4 = hrefw[-4:]  # html  # htm3 = hrefw[-3:]   php = hrefw[-3:]  # htm  # phpx = hrefw[-3:-1]  # phpx
         # if any([html4 == 'html', htm3 == 'htm', lastchar == '/', php == 'php', phpx == 'php']):
         # bad exts: mid, pdf, css, xml,
@@ -50,15 +51,15 @@ class linkckutil(object):
 
         except (UnexpectedAlertPresentException, TimeoutException, BaseException) as e:
             logger.debug(str(e), exc_info=True)
-            self.restartdrvr(driver)
+            driver.quit()
+            driver = setuplog.makelogger.start_driver()
             pass
 
         logger.info("Done with geterrs.")
 
         #############---------------------------------------- end of def
 
-    @staticmethod
-    def make_error_list(locnewlist, drv):
+    def make_error_list(self, locnewlist, drv):
         global logger
         logger.info('\n-------------------------------------->Starting make_errorList.')
         errorlist = []
@@ -106,12 +107,18 @@ class linkckutil(object):
                     except (ConnectTimeoutError, MaxRetryError, RequestError, NewConnectionError) as e:
                         print("----------------in new except now!!!------------------------------")
                         logger.debug(str(e), exc_info=True)
-                        requests.session().close()
+                        driver.quit()
+                        driver = setuplog.makelogger.start_driver()
+
+                        #requests.session().close()
 
                     except BaseException as e:
                         print("----------------in Base except now!!!------------------------------")
                         logger.debug(str(e), exc_info=True)
-                        requests.session().close()
+                        driver.quit()
+                        driver = setuplog.makelogger.start_driver()
+
+                        #requests.session().close()
                         pass
 
                     next(myiter, None)
@@ -128,8 +135,7 @@ class linkckutil(object):
 
     #############---------------------------------------- end of def
 
-    @staticmethod
-    def remcruft(localink, mlist):
+    def remcruft(self, localink, mlist):
         res = 'good'
         for i in mlist:
             if i in localink:
@@ -151,8 +157,7 @@ class linkckutil(object):
         filen1_h.close()
         logger.info('Done with write_home_set_to_file to file.')
 
-    @staticmethod
-    def write_home_set_to_file(firstSetLinks, ttype='none'):
+    def write_home_set_to_file(self, firstSetLinks, ttype='none'):
         global logger
         logger = logging.getLogger('mainlogger')
         logger.info('In write_home_set_to_file to file.')
@@ -166,8 +171,7 @@ class linkckutil(object):
 
         #############---------------------------------------- end of def
 
-    @staticmethod
-    def write_error_file(big_err_list_final, ttype):
+    def write_error_file(self, big_err_list_final, ttype):
         global logger
         logger = logging.getLogger('mainlogger')
         timenow = format(datetime.now(), '%Y%m%d.%H.%M%S')
