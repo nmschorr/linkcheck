@@ -10,6 +10,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium import webdriver
 from urllib3.exceptions import ConnectTimeoutError, MaxRetryError, RequestError, NewConnectionError
 #import urllib3
+import logging
 
 
 class linkckutil(object):
@@ -150,14 +151,13 @@ class linkckutil(object):
     #############---------------------------------------- end of def
 
     def write_list_to_file(self, firstSetLinks, ttype):
-        global logger
-
+        logger = logging.getLogger('mainlogger')
         logger.info('In write_home_set_to_file to file.')
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
         basefile = 'E:\\pylogs\\Links_'+ ttype + timestp + '.txt'
         filen1_h = open(basefile, 'w')  #
         for b in firstSetLinks:
-            filen1_h.write(b[0] + lnfeed)
+            filen1_h.write("-> child: " + b[0] + lnfeed + " ----- parent: " + b[1] + lnfeed )
         filen1_h.close()
         logger.info('Done with write_home_set_to_file to file.')
 

@@ -14,12 +14,11 @@ import src.setuplog as setuplog
 #############---------------------------------------- def
 
 class linkcheck(linkckutil):
-    global driver
+    global driver, logger
 
     #@staticmethod
     def alert_exception_handler(self, ee, child=''):
-        global logger
-        global driver
+        global driver, logger
 
         logger.info("-------------------------------------->Starting alert_exception_handler.")
         mmsg = 'ALERT! -- on:' + child
@@ -57,11 +56,10 @@ class linkcheck(linkckutil):
     #############---------------------------------------- def
 
     # noinspection PyStatementEffect
-    def GET_HOME_LINKS(self, locElements, parent):
+    def href_finder_hm(self, locElements, parent):
         home_links = []
-        global driver
-        global logger
-        logger.info("-------------------------------------->Starting GET_HOME_LINKS.")
+        global driver, logger
+        logger.info("-------------------------------------->Starting href_finder_hm.")
 
         try:
             for webelem in locElements:
@@ -70,12 +68,14 @@ class linkcheck(linkckutil):
                         hrefw = webelem.get_attribute('href')
 
                         if type(hrefw) is str:
+                            print('-----------------!!!!  here is link in home: ' + hrefw)
                             emlen = len(hrefw)
+
                             badchecks = [hrefw[0:6] == 'javasc', hrefw[0:1] == '/', hrefw[0:7] == 'mailto:', emlen < 7]
 
                             if 'oz' in hrefw:
                                 print('\n\n----------------------------------- current hrefw:' + hrefw)
-                                logger.debug('found oz in ...')
+                                logger.debug('found oz in ...href_finder_hm ')
                                 logger.debug(hrefw)
 
                             if self.remcruft(hrefw, badlist) == 'bad':
@@ -102,15 +102,16 @@ class linkcheck(linkckutil):
         except BaseException as e:
             logger.debug(str(e), exc_info=True)
             raise
-        logger.info("Done with GET_HOME_LINKS.")
-        return sorted(list(set(home_links)))
+        logger.info("Done with href_finder_hm.")
+        newset = list(set(home_links))
+        newset2 = sorted(newset)
+        return newset2
 
     #############---------------------------------------- def
     #@staticmethod
     def GET_ALIEN_LINKS(self, locElements, parent):
         alien_links = []
-        global driver
-        global logger
+        global driver, logger
         hrefw = ''
         logger.info("-------------------------------------->Starting GET_ALIEN_LINKS.")
 
@@ -118,6 +119,7 @@ class linkcheck(linkckutil):
             for webelem in locElements:
                 if webelem.tag_name == 'a' and type(webelem) is not 'NoneType' and webelem is not None:
                     hrefw = webelem.get_attribute('href')
+                    print('-----------------!!!!  here is link in alien: ' + hrefw)
 
                     if type(hrefw) is str:
                         homx = hrefw.find(home1)
@@ -132,6 +134,8 @@ class linkcheck(linkckutil):
 
                         elif sumit <= 0:  ## no home links found
                             alien_links.append((hrefw, parent))  # tuple - put pdfs, txt, mid, jpg etc here \
+
+                self.write_list_to_file(alien_links, 'GET_MORE_LINKS_home')
 
         except StaleElementReferenceException as s:
             logger.debug(str(s), exc_info=True)
@@ -152,21 +156,13 @@ class linkcheck(linkckutil):
     #############---------------------------------------- end of def
 
     def GET_MORE_LINKS_home(self, loc_elems):
-        global driver
-        global logger
-        homelinks = []
-        homelinksSetList = []
-        homelinks_all = []
-        logger.info("\n-------------------------------------->Starting GET_MORE_LINKS_home.")
+        global driver, logger
+        homelinks = [] ; homelinksSetList = [] ; homelinks_all = []
 
+        logger.info("\n-------------------------------------->Starting GET_MORE_LINKS_home.")
         if loc_elems:
-                                                    #for i, value in enumerate(len(loc_elems), start=0):
-                                                    #myiter = iter(range(len(loc_elems)))
-                                                    #myiter.__getattribute__
-                                                    #for i in range(len(loc_elems)):
             ctr = enumerate(range(len(loc_elems)))
             for i,y in ctr:
-
                             #for each_tuple in loc_elems:
                 each_tuple = loc_elems[i]
                 tchild, tparent = each_tuple  # get a page from a link on the home page
@@ -178,7 +174,7 @@ class linkcheck(linkckutil):
                 try:                              ### get only alien links here
                     driver.get(tchild)
                     child_elements = driver.find_elements_by_xpath('.//a')
-                    homelinks = self.GET_HOME_LINKS(child_elements, tparent)
+                    homelinks = self.href_finder_hm(child_elements, tparent)
                     homelinksSetList = list(set(homelinks))
 
                 except TimeoutException as e:
@@ -199,9 +195,9 @@ class linkcheck(linkckutil):
                     next(ctr, None)
                     pass
 
-                #i += 1
-
             homelinks_all = list(set(homelinks_all + homelinksSetList))
+            self.write_list_to_file(homelinks_all, 'GET_MORE_LINKS_home')
+
         else:
             logger.info("loc elems empty in GET_MORE_LINKS_alien")
 
@@ -211,13 +207,8 @@ class linkcheck(linkckutil):
     #############---------------------------------------- end of def
 
     def GET_MORE_LINKS_alien(self, loc_elems):
-        global driver
-        global logger
-        alienlinks = []
-        alienlinksSetList = []
-        alienlinks_all = []
-        tchild =''
-
+        global driver, logger
+        alienlinks = [];  alienlinksSetList = []; alienlinks_all = []; tchild =''
         logger.info("\n-------------------------------------->Starting GET_MORE_LINKS_alien.")
 
         if loc_elems:
@@ -252,6 +243,7 @@ class linkcheck(linkckutil):
         else:
             logger.info("loc elems empty in GET_MORE_LINKS_alien")
 
+        self.write_list_to_file(alienlinks_all, 'GET_MORE_LINKS_alien')
         logger.info("\nDone with GET_MORE_LINKS_alien.")
         return alienlinks_all
 
@@ -359,7 +351,7 @@ class linkcheck(linkckutil):
                  ##first time:  HOME PAGE ONLY  ##first time:
 
             logger.info("Step One")
-            home_0 = self.GET_HOME_LINKS(home_elements, parent) #false: get all # list, str
+            home_0 = self.href_finder_hm(home_elements, parent) #false: get all # list, str
             alien_0 = self.GET_ALIEN_LINKS(home_elements, parent) #false: get all # list, str
 
             logger.info("Step Two")
