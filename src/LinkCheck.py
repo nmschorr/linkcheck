@@ -278,18 +278,45 @@ class linkcheck(linkckutil):
     def homeset(self, home_0, alien_0):
         global driver
         global logger
+        self.write_list_to_file(home_0, 'homeset0_home_0')
+        self.write_list_to_file(alien_0, 'homeset0_alien_0')
+
+
         alien_all = [i for i in alien_0]
         home_all_0 = [i for i in home_0]
+        self.write_list_to_file(alien_0, 'homeset0_home_all_0')
 
         try:
             logger.info("\n-------------------------in homeset. doing new set1 now")
-            newly_found_links, alien_1, home_all_1 = self.scoop_new_links(home_0, home_all_0)
+            self.write_list_to_file(home_0, 'homeset0-hm')
+            self.write_list_to_file(alien_0, 'homeset0-aln')
+
+            newly_found_links1, alien_1, home_all_1 = self.scoop_new_links(home_0, home_all_0)
+            self.write_list_to_file(newly_found_links1, 'homeset1_newly_found_links1')
+            self.write_list_to_file(alien_1,            'homeset1_aln_alien_1')
+            self.write_list_to_file(home_all_1,            'homeset1_home_all_1')
+
+
             logger.info("\n-------------------------in homeset. doing new set2 now")
-            newly_found_links2, alien_2, home_all_2 = self.scoop_new_links(newly_found_links, home_all_1)
+
+            newly_found_links2, alien_2, home_all_2 = self.scoop_new_links(newly_found_links1, home_all_1)
+            self.write_list_to_file(newly_found_links2, 'homeset2_newly_found_links2')
+            self.write_list_to_file(alien_2, 'homeset2_aln_alien_2')
+            self.write_list_to_file(home_all_2, 'homeset1_home_all_2')
+
             logger.info("\n-------------------------in homeset. doing new set3 now")
             newly_found_links3, alien_3, home_all_3 = self.scoop_new_links(newly_found_links2, home_all_2)
+            self.write_list_to_file(newly_found_links3, 'homeset3_newly_found_links3')
+            self.write_list_to_file(alien_3, 'homeset3_aln_alien_3')
+            self.write_list_to_file(home_all_3, 'homeset1_home_all_3')
+
+
             logger.info("\n-------------------------in homeset. doing new set4 now")
             newly_found_links4, alien_4, home_all_4 = self.scoop_new_links(newly_found_links3, home_all_3)
+            self.write_list_to_file(newly_found_links4, 'homeset4_newly_found_links4')
+            self.write_list_to_file(alien_4, 'homeset4_aln_alien_4')
+            self.write_list_to_file(home_all_4, 'homeset1_home_all_4')
+
             newly_found_links5, alien_5, home_all_5 = self.scoop_new_links(newly_found_links4, home_all_4)
             newly_found_links6, alien_6, home_all_6 = self.scoop_new_links(newly_found_links5, home_all_5)
             logger.info("done with new set")

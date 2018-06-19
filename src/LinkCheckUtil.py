@@ -149,6 +149,18 @@ class linkckutil(object):
 
     #############---------------------------------------- end of def
 
+    def write_list_to_file(self, firstSetLinks, ttype):
+        global logger
+
+        logger.info('In write_home_set_to_file to file.')
+        timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
+        basefile = 'E:\\pylogs\\Links_'+ ttype + timestp + '.txt'
+        filen1_h = open(basefile, 'w')  #
+        for b in firstSetLinks:
+            filen1_h.write(b[0] + lnfeed)
+        filen1_h.close()
+        logger.info('Done with write_home_set_to_file to file.')
+
     @staticmethod
     def write_home_set_to_file(firstSetLinks, logger, ttype):
         logger.info('In write_home_set_to_file to file.')
