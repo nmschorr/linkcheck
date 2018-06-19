@@ -1,51 +1,31 @@
 # python 3
 
 #from requests import *
-from selenium import webdriver
+#from selenium import webdriver
 from src.config import *
 from src.LinkCheckUtil import linkckutil
 from selenium.common.exceptions import UnexpectedAlertPresentException
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
 from time import sleep
-from sys import exc_info
+#from sys import exc_info
 import src.setuplog as setuplog
 import logging
 
 #############---------------------------------------- def
 
+# noinspection PyRedeclaration
 class linkcheck(linkckutil):
     global logger
     logger = logging.getLogger('mainlogger')
 
-    def alert_exception_handler(self, ee, child):
-        global driver
-        logger.info("-------------------------------------->Starting alert_exception_handler.")
-        mmsg = 'ALERT! -- on:' + child
-        logger.debug(mmsg)
-        logger.debug(str(ee), exc_info=True)
 
-        try:
-            driver.switch_to.alert.dismiss()
-            sleep(1)
-            driver.switch_to.alert.accept()
-            sleep(1)
-            driver.switch_to.alert.cancel()
-            sleep(1)
-
-        except Exception as e:
-            logger.debug("Dismissing alert didn\'t work. Restarting driver/browser.")
-            logger.debug(str(e), exc_info=True)
-            driver.quit()
-            driver = setuplog.makelogger.start_driver()
-            pass
-
-        logger.info("Done with alert_exception_handler.")
 
     #############---------------------------------------- def
 
     # noinspection PyStatementEffect
-    def HREF_finder(self, locElements, parent, driver):
+    def HREF_finder(self, locElements, parent):
+        driver = setuplog.makelogger.start_driver()
         loc_links = []
         logger.info("-------------------------------------->Starting HREF_finder.")
         try:
@@ -85,13 +65,15 @@ class linkcheck(linkckutil):
         logger.info("Done with HREF_finder.")
         loc_links_a = list(set(loc_links))
         loc_links_b = sorted(loc_links_a)
+        driver.quit()
         return loc_links_b
 
     #############---------------------------------------- def
 
 
     def GET_MORE_LINKS_home(self, loc_elems):
-        global driver, logger
+        driver = setuplog.makelogger.start_driver()
+        global logger
         homelinks = [] ; homelinksSetList = [] ; homelinks_all = []
 
         logger.info("\n-------------------------------------->Starting GET_MORE_LINKS_home.")
@@ -104,11 +86,11 @@ class linkcheck(linkckutil):
                 try:                              ### get only alien links here
                     driver.get(tchild)
                     child_elements = driver.find_elements_by_xpath('.//a')
-                    homelinks = self.HREF_finder(child_elements, tparent, driver)
+                    homelinks = self.HREF_finder(child_elements, tparent)
                     homelinksSetList = list(set(homelinks))
 
                 except (TimeoutException, UnexpectedAlertPresentException, Exception) as e:
-                    self.alert_exception_handler(e, tchild)
+                    logger.debug(str(e), exc_info=True)
                     driver.quit()
                     driver = setuplog.makelogger.start_driver()
                     next(ctr, None)
@@ -121,9 +103,11 @@ class linkcheck(linkckutil):
             logger.info("loc elems empty in GET_MORE_LINKS_alien")
 
         logger.info("\nDone with GET_MORE_LINKS_home.")
+        driver.quit()
         return sorted(list(set(homelinks_all)))
 
     def scoop_new_links(self, myhome_arg, home_group_arg):
+        driver = setuplog.makelogger.start_driver()
         home_more = None;  home_all_new = None
         logger.info("\n-------------------------------------->Starting scoop_new_links.")
 
@@ -132,6 +116,7 @@ class linkcheck(linkckutil):
         home_grp_a = home_group_arg + new_home_links
         home_grp = list(set(home_grp_a))
         newly_found_links_fin = list(set(new_home_links))
+        driver.quit()
 
         return newly_found_links_fin, home_grp
         ### return new, alien, all
@@ -140,10 +125,11 @@ class linkcheck(linkckutil):
     # begin:
     def main(self):
         global logger
-        home_0 = []; alien_0 = []
+        home_0 = []; alien_0 = []; homelist=[]
         parent = address
         main_driver = setuplog.makelogger.start_driver()
         main_driver.get(address)
+        main_driver.minimize_window()
 
         logger.debug('In main() Getting first address: {}'.format(address))
 
@@ -152,12 +138,16 @@ class linkcheck(linkckutil):
                  ##first time:  HOME PAGE ONLY  ##first time:
 
             logger.info("Step One")
-            base_links = self.HREF_finder(home_elements, parent, driver) #false: get all # list, str
+            base_links = self.HREF_finder(home_elements, parent) #false: get all # list, str
 
             logger.info("Step Two")
+            main_driver.quit()
             newly_found_links1, home_all_1 = self.scoop_new_links(base_links, [])
+            for x in newly_found_links1:
+                if home2 in x[0]:
+                    homelist.append(x)
 
-            newly_found_links2, home_all_2 = self.scoop_new_links(newly_found_links1, home_all_1)
+            newly_found_links2, home_all_2 = self.scoop_new_links(newly_found_links1, homelist)
 
             newly_found_links3, home_all_3 = self.scoop_new_links(newly_found_links2, home_all_2)
 
@@ -174,11 +164,10 @@ class linkcheck(linkckutil):
 
             self.geterrs(home_all_4, logger)
             logger.info('Done with main()')
-            main_driver.close()
             logger.info('Done close driver. Bye.')
 
         except UnexpectedAlertPresentException as e:
-            self.alert_exception_handler(e, 'unknown')
+            logger.debug(str(e), exc_info=True)
             main_driver.quit()
             main_driver = setuplog.makelogger.start_driver()
             pass
@@ -190,11 +179,9 @@ class linkcheck(linkckutil):
             pass
 
     def __init__(self):
-        global logger, driver
+        global logger
         print('In linkcheck: __init__')
         super().__init__()
-        #logger = setuplog.makelogger.setup_logger()
-        #driver = setuplog.makelogger.start_driver()
         self.main()
 
 
