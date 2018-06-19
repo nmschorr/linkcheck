@@ -28,10 +28,10 @@ class makelogger(object):
         logger1.info('Completed configuring logger. Logging level is: '+ str(lev))
         return logger1
 
-    @staticmethod
-    def start_driver():
+    def start_driver(self):
         driver = webdriver.Firefox()
         driver.implicitly_wait(10)
+        driver.set_window_size(400, 400)
         return driver
 
     def __init__(self):

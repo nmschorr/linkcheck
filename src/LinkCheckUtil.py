@@ -7,27 +7,14 @@ import requests
 from src.config import *
 from selenium.common.exceptions import UnexpectedAlertPresentException
 from selenium.common.exceptions import TimeoutException
-from selenium import webdriver
 from urllib3.exceptions import ConnectTimeoutError, MaxRetryError, RequestError, NewConnectionError
-#import urllib3
 import logging
-from selenium import webdriver
 import src.setuplog as setuplog
-
+from selenium import webdriver
 
 class linkckutil(object):
     global logger
     logger = logging.getLogger('mainlogger')
-
-    #############---------------------------------------- end of def
-    def restartdrvr(self, driver_r):
-        global logger
-        driver_r.quit()
-        logger.debug('\n-------------->ALERT! quit driver from restartdrvr')
-        driver_r = webdriver.Firefox()
-        logger.debug('\n-----------------> Restarted driver from restartdrvr')
-        driver_r.get(address)
-        return driver_r
 
         #############---------------------------------------- end of def
 
@@ -39,10 +26,11 @@ class linkckutil(object):
 
         #############---------------------------------------- end of def
 
-    def geterrs(self, home_all_final, driver):
+    def GET_ERRORS(self, home_all_final):
+        driver = webdriver.Firefox()
         global logger
 
-        logger.info("\n--------------------------------------> Starting geterrs.")
+        logger.info("\n--------------------------------------> Starting GET_ERRORS.")
         try:
             home_errs = self.make_error_list(home_all_final, logger)  # ---make_error_list
 
@@ -52,14 +40,16 @@ class linkckutil(object):
         except (UnexpectedAlertPresentException, TimeoutException, BaseException) as e:
             logger.debug(str(e), exc_info=True)
             driver.quit()
-            driver = setuplog.makelogger.start_driver()
+            driver = webdriver.Firefox()
             pass
 
-        logger.info("Done with geterrs.")
+        driver.quit()
+        logger.info("Done with GET_ERRORS.")
 
         #############---------------------------------------- end of def
 
     def make_error_list(self, locnewlist, drv):
+        driver = webdriver.Firefox()
         global logger
         logger.info('\n-------------------------------------->Starting make_errorList.')
         errorlist = []
@@ -108,7 +98,7 @@ class linkckutil(object):
                         print("----------------in new except now!!!------------------------------")
                         logger.debug(str(e), exc_info=True)
                         driver.quit()
-                        driver = setuplog.makelogger.start_driver()
+                        driver = webdriver.Firefox()
 
                         #requests.session().close()
 
@@ -116,7 +106,7 @@ class linkckutil(object):
                         print("----------------in Base except now!!!------------------------------")
                         logger.debug(str(e), exc_info=True)
                         driver.quit()
-                        driver = setuplog.makelogger.start_driver()
+                        driver = webdriver.Firefox()
 
                         #requests.session().close()
                         pass
@@ -130,6 +120,7 @@ class linkckutil(object):
                 requests.session().close()
                 pass
 
+        driver.quit()
         logger.info("Done with make_error_list.")
         return errorlist
 
