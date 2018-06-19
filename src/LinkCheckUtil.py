@@ -31,47 +31,34 @@ class linkckutil(object):
 
     @staticmethod
     def check_file_extension(hrefw=''):  # chk for appropriate exts for homelinks only
-        # html4 = hrefw[-4:]  # html
-        # htm3 = hrefw[-3:]  # htm
-        # php = hrefw[-3:]  # htm
-        # phpx = hrefw[-3:-1]  # phpx
-        # lastchar = hrefw[-1:]
+        # html4 = hrefw[-4:]  # html  # htm3 = hrefw[-3:]   php = hrefw[-3:]  # htm  # phpx = hrefw[-3:-1]  # phpx
         # if any([html4 == 'html', htm3 == 'htm', lastchar == '/', php == 'php', phpx == 'php']):
-        #     return True
-        # else:
-        #     return False
         # bad exts: mid, pdf, css, xml,
         return True
 
         #############---------------------------------------- end of def
 
-    def geterrs(self, home_all_final, alien_all_final, driver):
+    def geterrs(self, home_all_final, driver):
         global logger
 
         logger.info("\n--------------------------------------> Starting geterrs.")
         try:
-            logger.info("\n-------------------------------------->Starting geterrs for home_all_final.")
             home_errs = self.make_error_list(home_all_final, logger)  # ---make_error_list
-            logger.info("\n-------------------------------------->Starting geterrs for alien_all_final.")
-            alien_errs = self.make_error_list(alien_all_final, driver)  # ---make_error_list
 
             home_errs_b = list(set(home_errs))
-            alien_errs_b = list(set(alien_errs))
-
-            self.write_error_file(sorted(home_errs_b), 'home')
-            self.write_error_file(sorted(alien_errs_b), 'alien')
+            self.write_error_file(sorted(home_errs_b), 'all')
 
         except (UnexpectedAlertPresentException, TimeoutException, BaseException) as e:
             logger.debug(str(e), exc_info=True)
             self.restartdrvr(driver)
             pass
+
         logger.info("Done with geterrs.")
 
         #############---------------------------------------- end of def
 
     @staticmethod
     def make_error_list(locnewlist, drv):
-                                            #http_pm = urllib3.PoolManager()
         global logger
         logger.info('\n-------------------------------------->Starting make_errorList.')
         errorlist = []
@@ -87,14 +74,12 @@ class linkckutil(object):
                         logger.info('\n-------------------------------------->Restarting loop in make_error_list with: ' +str(elinktup))
                         elink = elinktup[0]
                         theparent = elinktup[1]
-                                                #resp = http_pm.request('HEAD', elink)
 
-                                                # logger.info('Inside Loop:' + lnfeed)
                         resp = str(requests.head(elink, data=None, timeout=10))
                         mmsg = 'resp: for HEAD from ' + elink + ': ' + str(resp)
                         logger.info(mmsg)
                         err_resp = str(resp[11:14])
-                                                                        #err_resp = str(resp.status)
+
                         responstr = 'Checked using HEAD only: ' + elink + ' -resp: ' + err_resp + lnfeed
                         logger.info(responstr)
                         err_int = int(err_resp)
@@ -102,7 +87,6 @@ class linkckutil(object):
                             logger.info('------------------------------!!! > Got an error. Retrying with a GET.' + elink)
                             resp2 = str(requests.get(elink, data=None, timeout=10))
 
-                            #resp2 = http.request('GET', elink)
                             err_resp2 = str(resp2[11:14])
                             responstr2 = '----- Checked using Get only: ' + elink + ' -resp: ' + err_resp2 + lnfeed
                             logger.debug(responstr2)
