@@ -11,18 +11,21 @@ from selenium import webdriver
 from urllib3.exceptions import ConnectTimeoutError, MaxRetryError, RequestError, NewConnectionError
 #import urllib3
 import logging
+from selenium import webdriver
 
 
 class linkckutil(object):
-    global driver
+    global logger
+    logger = logging.getLogger('mainlogger')
 
     #############---------------------------------------- end of def
-    def restartdrvr(self, drver, logr):
-        drver.quit()
-        logr.debug('\n-------------->ALERT! quit driver from restartdrvr')
-        drver = webdriver.Firefox()
-        logr.debug('\n-----------------> Restarted driver from restartdrvr')
-        return drver
+    def restartdrvr(self, driver_r):
+        global logger
+        driver_r.quit()
+        logger.debug('\n-------------->ALERT! quit driver from restartdrvr')
+        driver_r = webdriver.Firefox()
+        logger.debug('\n-----------------> Restarted driver from restartdrvr')
+        return driver_r
 
         #############---------------------------------------- end of def
 
@@ -42,33 +45,35 @@ class linkckutil(object):
 
         #############---------------------------------------- end of def
 
-    def geterrs(self, home_all_final, alien_all_final, logr, driver):
+    def geterrs(self, home_all_final, alien_all_final, driver):
+        global logger
 
-        logr.info("\n--------------------------------------> Starting geterrs.")
+        logger.info("\n--------------------------------------> Starting geterrs.")
         try:
-            logr.info("\n-------------------------------------->Starting geterrs for home_all_final.")
-            home_errs = self.make_error_list(home_all_final, logr, driver )  # ---make_error_list
-            logr.info("\n-------------------------------------->Starting geterrs for alien_all_final.")
-            alien_errs = self.make_error_list(alien_all_final, logr, driver)  # ---make_error_list
+            logger.info("\n-------------------------------------->Starting geterrs for home_all_final.")
+            home_errs = self.make_error_list(home_all_final, logger)  # ---make_error_list
+            logger.info("\n-------------------------------------->Starting geterrs for alien_all_final.")
+            alien_errs = self.make_error_list(alien_all_final, driver)  # ---make_error_list
 
             home_errs_b = list(set(home_errs))
             alien_errs_b = list(set(alien_errs))
 
-            self.write_error_file(sorted(home_errs_b), logr, 'home')
-            self.write_error_file(sorted(alien_errs_b), logr, 'alien')
+            self.write_error_file(sorted(home_errs_b), 'home')
+            self.write_error_file(sorted(alien_errs_b), 'alien')
 
         except (UnexpectedAlertPresentException, TimeoutException, BaseException) as e:
-            logr.debug(str(e), exc_info=True)
-            self.restartdrvr(driver, logr)
+            logger.debug(str(e), exc_info=True)
+            self.restartdrvr(driver)
             pass
-        logr.info("Done with geterrs.")
+        logger.info("Done with geterrs.")
 
         #############---------------------------------------- end of def
 
     @staticmethod
-    def make_error_list(locnewlist, loggr, drv):
+    def make_error_list(locnewlist, drv):
                                             #http_pm = urllib3.PoolManager()
-        loggr.info('\n-------------------------------------->Starting make_errorList.')
+        global logger
+        logger.info('\n-------------------------------------->Starting make_errorList.')
         errorlist = []
         myiter = iter(range(len(locnewlist)))
         gerrstr = 'ERROR ---- ! ---Result code: '
@@ -79,49 +84,49 @@ class linkckutil(object):
             try:
                 for elinktup in locnewlist:
                     try:  # check head
-                        loggr.info('\n-------------------------------------->Restarting loop in make_error_list with: ' +str(elinktup))
+                        logger.info('\n-------------------------------------->Restarting loop in make_error_list with: ' +str(elinktup))
                         elink = elinktup[0]
                         theparent = elinktup[1]
                                                 #resp = http_pm.request('HEAD', elink)
 
-                                                # loggr.info('Inside Loop:' + lnfeed)
+                                                # logger.info('Inside Loop:' + lnfeed)
                         resp = str(requests.head(elink, data=None, timeout=10))
                         mmsg = 'resp: for HEAD from ' + elink + ': ' + str(resp)
-                        loggr.info(mmsg)
+                        logger.info(mmsg)
                         err_resp = str(resp[11:14])
                                                                         #err_resp = str(resp.status)
                         responstr = 'Checked using HEAD only: ' + elink + ' -resp: ' + err_resp + lnfeed
-                        loggr.info(responstr)
+                        logger.info(responstr)
                         err_int = int(err_resp)
                         if err_int in ercodes:
-                            loggr.info('------------------------------!!! > Got an error. Retrying with a GET.' + elink)
+                            logger.info('------------------------------!!! > Got an error. Retrying with a GET.' + elink)
                             resp2 = str(requests.get(elink, data=None, timeout=10))
 
                             #resp2 = http.request('GET', elink)
                             err_resp2 = str(resp2[11:14])
                             responstr2 = '----- Checked using Get only: ' + elink + ' -resp: ' + err_resp2 + lnfeed
-                            loggr.debug(responstr2)
+                            logger.debug(responstr2)
                             err_int2 = int(err_resp2)
 
                             if err_int2 in ercodes:
                                 errorString2 = lnfeed + '------------------------------!!! >GET response: {} in: {} from parent: {}'.format(err_resp2, elink, theparent)
-                                loggr.info(errorString2)
+                                logger.info(errorString2)
 
                                 errorlist.append(errorString2)
-                                loggr.info(errorString2 + lnfeed)
+                                logger.info(errorString2 + lnfeed)
 
                             requests.session().close()             #urllib3.connectionpool.HTTPConnectionPool.close()
                         else:
-                            loggr.info('status code on second get: ' + err_resp)
+                            logger.info('status code on second get: ' + err_resp)
 
                     except (ConnectTimeoutError, MaxRetryError, RequestError, NewConnectionError) as e:
                         print("----------------in new except now!!!------------------------------")
-                        loggr.debug(str(e), exc_info=True)
+                        logger.debug(str(e), exc_info=True)
                         requests.session().close()
 
                     except BaseException as e:
                         print("----------------in Base except now!!!------------------------------")
-                        loggr.debug(str(e), exc_info=True)
+                        logger.debug(str(e), exc_info=True)
                         requests.session().close()
                         pass
 
@@ -129,12 +134,12 @@ class linkckutil(object):
 
             except BaseException as e:
                 print("----------------in OUTER Base except now!!!------------------------------")
-                loggr.debug(str(e), exc_info=True)
+                logger.debug(str(e), exc_info=True)
                 next(myiter, None)
                 requests.session().close()
                 pass
 
-        loggr.info("Done with make_error_list.")
+        logger.info("Done with make_error_list.")
         return errorlist
 
     #############---------------------------------------- end of def
@@ -150,7 +155,8 @@ class linkckutil(object):
 
     #############---------------------------------------- end of def
 
-    def write_list_to_file(self, firstSetLinks, ttype):
+    def wr2f(self, firstSetLinks, ttype):
+        global logger
         logger = logging.getLogger('mainlogger')
         logger.info('In write_home_set_to_file to file.')
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
@@ -162,7 +168,9 @@ class linkckutil(object):
         logger.info('Done with write_home_set_to_file to file.')
 
     @staticmethod
-    def write_home_set_to_file(firstSetLinks, logger, ttype):
+    def write_home_set_to_file(firstSetLinks, ttype='none'):
+        global logger
+        logger = logging.getLogger('mainlogger')
         logger.info('In write_home_set_to_file to file.')
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
         basefile = 'E:\\pylogs\\Links_'+ ttype + timestp + '.txt'
@@ -175,7 +183,9 @@ class linkckutil(object):
         #############---------------------------------------- end of def
 
     @staticmethod
-    def write_error_file(big_err_list_final, logger, ttype):
+    def write_error_file(big_err_list_final, ttype):
+        global logger
+        logger = logging.getLogger('mainlogger')
         timenow = format(datetime.now(), '%Y%m%d.%H.%M%S')
         logger.info('In write_error_file - timenow')
         bigerr_file = 'E:\\pylogs\\ERRORS.' + ttype + timenow + '.log'

@@ -2,6 +2,7 @@
 from datetime import datetime
 import logging
 import sys
+from selenium import webdriver
 
 class makelogger(object):
 
@@ -28,6 +29,12 @@ class makelogger(object):
         lev = logging.getLogger().getEffectiveLevel()
         logger1.info('Completed configuring logger. Logging level is: '+ str(lev))
         return logger1
+
+    @staticmethod
+    def rdriver():
+        driver = webdriver.Firefox()
+        driver.implicitly_wait(10)
+        return driver
 
     def __init__(self):
         None
