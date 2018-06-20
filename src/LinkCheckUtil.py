@@ -25,7 +25,7 @@ class linkckutil(object):
         #############---------------------------------------- end of def
 
     def GET_ERRORS(self, home_all_final):
-        driver = self.driver
+        #driver = self.driver
 
         logger.info("\n--------------------------------------> Starting GET_ERRORS.")
         try:
@@ -37,21 +37,19 @@ class linkckutil(object):
         except (UnexpectedAlertPresentException, TimeoutException, BaseException) as e:
             logger.debug(str(e), exc_info=True)
             driver.quit()
-            driver = webdriver.Firefox()
+            self.driver = start_driver()
             pass
 
-        #driver.quit()
         logger.info("Done with GET_ERRORS.")
 
         #############---------------------------------------- end of def
 
     def make_error_list(self, locnewlist, drv):
-        driver = webdriver.Firefox()
-        
         logger.info('\n-------------------------------------->Starting make_errorList.')
         errorlist = []
         myiter = iter(range(len(locnewlist)))
         gerrstr = 'ERROR ---- ! ---Result code: '
+        driver = self.driver
 
         for i in myiter:
             print('iterator in loop: ' + str(i))
@@ -117,7 +115,6 @@ class linkckutil(object):
                 requests.session().close()
                 pass
 
-        #driver.quit()
         logger.info("Done with make_error_list.")
         return errorlist
 
@@ -135,7 +132,6 @@ class linkckutil(object):
 
     def wr2f(self, firstSetLinks, ttype):
         
-        logger = logging.getLogger('mainlogger')
         logger.info('In write_home_set_to_file to file.')
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
         basefile = 'E:\\pylogs\\Links_'+ ttype + timestp + '.txt'
@@ -147,7 +143,6 @@ class linkckutil(object):
 
     def write_home_set_to_file(self, firstSetLinks, ttype='none'):
         
-        logger = logging.getLogger('mainlogger')
         logger.info('In write_home_set_to_file to file.')
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
         basefile = 'E:\\pylogs\\Links_'+ ttype + timestp + '.txt'
@@ -161,7 +156,6 @@ class linkckutil(object):
 
     def write_error_file(self, big_err_list_final, ttype):
         
-        logger = logging.getLogger('mainlogger')
         timenow = format(datetime.now(), '%Y%m%d.%H.%M%S')
         logger.info('In write_error_file - timenow')
         bigerr_file = 'E:\\pylogs\\ERRORS.' + ttype + timenow + '.log'
@@ -175,5 +169,6 @@ class linkckutil(object):
 
     def __init__(self):
         self.driver = start_driver()
+        driver = self.driver
 
         print("In linkckutil (super()) __init__")
