@@ -1,6 +1,5 @@
 # python 3
 
-from selenium import webdriver
 from src.LinkCheckUtil import linkckutil
 from selenium.common.exceptions import UnexpectedAlertPresentException, StaleElementReferenceException, TimeoutException
 from src import home1, home2, lnfeed, ercodes, badlist, start_driver, address, driver
@@ -14,7 +13,6 @@ class linkcheck(linkckutil):
 
     # noinspection PyStatementEffect
     def HREF_finder(self, locElements, parent):
-        #driver = webdriver.Firefox()
         driver = self.driver
         loc_links = []
         logger.info("-------------------------------------->Starting HREF_finder.")
@@ -52,10 +50,9 @@ class linkcheck(linkckutil):
             driver = start_driver()
             pass
 
-        logger.info("Done with HREF_finder.")
         loc_links_a = list(set(loc_links))
         loc_links_b = sorted(loc_links_a)
-        #driver.quit()
+        logger.debug('Leaving ' + classmethod.__name__ )
         return loc_links_b
 
     #############---------------------------------------- def
@@ -71,7 +68,7 @@ class linkcheck(linkckutil):
                 tchild, tparent = loc_elems[i]
                 logger.info(str(tchild))
 
-                try:                              ### get only alien links here
+                try:
                     driver.get(tchild)
                     child_elements = driver.find_elements_by_xpath('.//a')
                     homelinks = self.HREF_finder(child_elements, tparent)
@@ -88,50 +85,41 @@ class linkcheck(linkckutil):
             self.wr2f(homelinks_all, 'GET_MORE_LINKS')
 
         else:
-            logger.info("loc elems empty in GET_MORE_LINKS_alien")
+            logger.info("loc elems empty in " + classmethod.__name__)
 
-        logger.info("\nDone with GET_MORE_LINKS.")
-        #driver.quit()
+        logger.debug('Leaving ' + classmethod.__name__ )
         return sorted(list(set(homelinks_all)))
 
+    #############---------------------------------------- def
+
     def scoop_new_links(self, myhome_arg):
-        #driver = webdriver.Firefox()
         home_more = None;  home_all_new = None
-        logger.info("\n-------------------------------------->Starting scoop_new_links.")
-
+        logger.info("\n-------------------------------------->Starting: "  + classmethod.__name__)
         home_grp_a = self.GET_MORE_LINKS(myhome_arg)
-
         home_grp = list(set(home_grp_a))
         newly_found_links_fin = list(set(home_grp))
-        #driver.quit()
-
+        logger.debug('Leaving ' + classmethod.__name__ )
         return newly_found_links_fin
-        ### return new, alien, all
     # ------------------------------------------------------------------------------------
        #############---------------------------------------- end of def
     # begin:
     def main(self):
-        home_0 = []; alien_0 = []; homelist=[]; homelist2 = []; homelist3 = []; homelist4= [];
+        home_0 = []; homelist=[]; homelist2 = []; homelist3 = []; homelist4= [];
         parent = address
-        #'driver = webdriver.Firefox()
         driver = self.driver
-
         driver.get(address)
-        driver.minimize_window()
+        driver.set_window_size(200,200)
 
         logger.debug('In main() Getting first address: {}'.format(address))
         big_pile = []
         try:
+            logger.info("Step One")   ##first time:  HOME PAGE ONLY  ##first time
             home_elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
-                 ##first time:  HOME PAGE ONLY  ##first time:
 
-            logger.info("Step One")
             base_links = self.HREF_finder(home_elements, parent) #false: get all # list, str
             big_pile.append(base_links)
 
             logger.info("Step Two")
-
-            #driver.quit()
 
             base_links2= self.scoop_new_links(base_links)
 
@@ -145,23 +133,33 @@ class linkcheck(linkckutil):
                 if home2 in x[0]:
                     homelist3.append(x)
 
-            base_links4 = self.scoop_new_links(homelist3)
-            for x in base_links4:
-                if home2 in x[0]:
-                    homelist4.append(x)
+            # base_links4 = self.scoop_new_links(homelist3)
+            # for x in base_links4:
+            #     if home2 in x[0]:
+            #         homelist4.append(x)
+            #
+            # base_links5 = self.scoop_new_links(homelist4)
 
-            base_links5 = self.scoop_new_links(homelist4)
-            big_pile.append(base_links2,base_links3,base_links4,base_links5 )
-            big_pile_set = list(set(big_pile))
-            big_pile_sort = sorted(big_pile_set)
+           # biglist = [base_links2, base_links3, base_links4, base_links5]
+            big_pile_of_list_tups=[]
+
+            big_list_of_tups = [base_links2, base_links3 ]
+
+            for bt in big_list_of_tups:
+                big_pile_of_list_tups.append(bt)
+
+            bigpile_onelist = sum(big_pile, [])
+            bt2 = list(set(bigpile_onelist))
+
+            self.GET_ERRORS(bt2)
 
             logger.info("!! Done with new set")
 
-            self.write_home_set_to_file(big_pile_sort, ttype='all')
+            #self.write_home_set_to_file(big_pile_sort, ttype='all')
             logger.info("just did write_home_set_to_file")
 
-            self.GET_ERRORS(big_pile_sort, logger)
-            logger.info('Done with main(). Done close driver. Bye.')
+            driver.quit()
+            logger.info('Done with main(). Done closing driver. Bye.')
 
         except UnexpectedAlertPresentException as e:
             logger.debug(str(e), exc_info=True)
@@ -176,7 +174,6 @@ class linkcheck(linkckutil):
             pass
 
     def __init__(self):
-        driver = self.driver
         print('In linkcheck: __init__')
         super().__init__()
         self.main()

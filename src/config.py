@@ -1,2 +1,20 @@
 # python 3
 
+#home1 = 'astrology1234.com'
+#home2 = 'astrologistblog.blogspot.com'
+# # thebase = '//astrologistblog.blogspot.com'
+# # address = 'http://www.repercussions.com'
+# # thebase = '//www.repercussions.com'
+#base1 = 'astrology1234.com'
+#base2 = 'astrologistblog.blogspot.com'
+#home1 = 'www.repercussions.com'
+#home2 = 'repercussions.com'
+#home1   = 'www.clarinetinstitute.com'
+#home2 = 'clarinetinstitute.com'
+#home1   = 'alexforecast.blogspot.com'
+#home2   = 'alexforecast.blogspot.com'
+
+#home1   = 'cosmictoys.blogspot.com'
+#home2   = 'cosmictoys.blogspot.com'
+# home1   = 'schorrmedia.com'
+# home2   = 'schorrmedia.com'
