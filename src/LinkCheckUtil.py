@@ -1,20 +1,18 @@
 # python 3
 
-from datetime import datetime
-#import sys
-#from requests import get, head,
 import requests
-from src.config import *
+import logging
+from src import home1, home2, lnfeed, ercodes, badlist, start_driver, address, driver
+from src import the_logger as logger
+from datetime import datetime
+
 from selenium.common.exceptions import UnexpectedAlertPresentException
 from selenium.common.exceptions import TimeoutException
 from urllib3.exceptions import ConnectTimeoutError, MaxRetryError, RequestError, NewConnectionError
-import logging
-import src.setuplog as setuplog
 from selenium import webdriver
 
 class linkckutil(object):
-    global logger
-    logger = logging.getLogger('mainlogger')
+
 
         #############---------------------------------------- end of def
 
@@ -27,8 +25,7 @@ class linkckutil(object):
         #############---------------------------------------- end of def
 
     def GET_ERRORS(self, home_all_final):
-        driver = webdriver.Firefox()
-        global logger
+        driver = self.driver
 
         logger.info("\n--------------------------------------> Starting GET_ERRORS.")
         try:
@@ -43,14 +40,14 @@ class linkckutil(object):
             driver = webdriver.Firefox()
             pass
 
-        driver.quit()
+        #driver.quit()
         logger.info("Done with GET_ERRORS.")
 
         #############---------------------------------------- end of def
 
     def make_error_list(self, locnewlist, drv):
         driver = webdriver.Firefox()
-        global logger
+        
         logger.info('\n-------------------------------------->Starting make_errorList.')
         errorlist = []
         myiter = iter(range(len(locnewlist)))
@@ -98,7 +95,7 @@ class linkckutil(object):
                         print("----------------in new except now!!!------------------------------")
                         logger.debug(str(e), exc_info=True)
                         driver.quit()
-                        driver = webdriver.Firefox()
+                        driver = start_driver()
 
                         #requests.session().close()
 
@@ -106,7 +103,7 @@ class linkckutil(object):
                         print("----------------in Base except now!!!------------------------------")
                         logger.debug(str(e), exc_info=True)
                         driver.quit()
-                        driver = webdriver.Firefox()
+                        driver = start_driver()
 
                         #requests.session().close()
                         pass
@@ -120,7 +117,7 @@ class linkckutil(object):
                 requests.session().close()
                 pass
 
-        driver.quit()
+        #driver.quit()
         logger.info("Done with make_error_list.")
         return errorlist
 
@@ -137,7 +134,7 @@ class linkckutil(object):
     #############---------------------------------------- end of def
 
     def wr2f(self, firstSetLinks, ttype):
-        global logger
+        
         logger = logging.getLogger('mainlogger')
         logger.info('In write_home_set_to_file to file.')
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
@@ -149,7 +146,7 @@ class linkckutil(object):
         logger.info('Done with write_home_set_to_file to file.')
 
     def write_home_set_to_file(self, firstSetLinks, ttype='none'):
-        global logger
+        
         logger = logging.getLogger('mainlogger')
         logger.info('In write_home_set_to_file to file.')
         timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
@@ -163,7 +160,7 @@ class linkckutil(object):
         #############---------------------------------------- end of def
 
     def write_error_file(self, big_err_list_final, ttype):
-        global logger
+        
         logger = logging.getLogger('mainlogger')
         timenow = format(datetime.now(), '%Y%m%d.%H.%M%S')
         logger.info('In write_error_file - timenow')
@@ -177,4 +174,6 @@ class linkckutil(object):
     #############---------------------------------------- end of def
 
     def __init__(self):
-        print("In linkckutil super() __init__")
+        self.driver = start_driver()
+
+        print("In linkckutil (super()) __init__")
