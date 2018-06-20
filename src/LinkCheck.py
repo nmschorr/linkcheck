@@ -1,31 +1,21 @@
 # python 3
 
-#from requests import *
 from selenium import webdriver
-from src.config import *
 from src.LinkCheckUtil import linkckutil
-from selenium.common.exceptions import UnexpectedAlertPresentException
-from selenium.common.exceptions import StaleElementReferenceException
-from selenium.common.exceptions import TimeoutException
-from time import sleep
-#from sys import exc_info
-import src.setuplog as setuplog
-import logging
+from selenium.common.exceptions import UnexpectedAlertPresentException, StaleElementReferenceException, TimeoutException
+from src import home1, home2, lnfeed, ercodes, badlist, start_driver, address, driver
+from src import the_logger as logger
 
 #############---------------------------------------- def
-
 # noinspection PyRedeclaration
 class linkcheck(linkckutil):
-    global logger
-    logger = logging.getLogger('mainlogger')
-
-
 
     #############---------------------------------------- def
 
     # noinspection PyStatementEffect
     def HREF_finder(self, locElements, parent):
-        driver = webdriver.Firefox()
+        #driver = webdriver.Firefox()
+        driver = self.driver
         loc_links = []
         logger.info("-------------------------------------->Starting HREF_finder.")
         try:
@@ -53,27 +43,25 @@ class linkcheck(linkckutil):
         except StaleElementReferenceException as e:
             logger.debug(str(e), exc_info=True)
             driver.quit()
-            driver = webdriver.Firefox()
+            driver = start_driver()
             pass
 
         except (UnexpectedAlertPresentException, TimeoutException, Exception) as e:
             logger.debug(str(e), exc_info=True)
             driver.quit()
-            driver = webdriver.Firefox()
+            driver = start_driver()
             pass
 
         logger.info("Done with HREF_finder.")
         loc_links_a = list(set(loc_links))
         loc_links_b = sorted(loc_links_a)
-        driver.quit()
+        #driver.quit()
         return loc_links_b
 
     #############---------------------------------------- def
 
-
     def GET_MORE_LINKS(self, loc_elems):
-        driver = webdriver.Firefox()
-        global logger
+        driver = self.driver
         homelinks = [] ; homelinksSetList = [] ; homelinks_all = []
 
         logger.info("\n-------------------------------------->Starting GET_MORE_LINKS.")
@@ -92,7 +80,7 @@ class linkcheck(linkckutil):
                 except (TimeoutException, UnexpectedAlertPresentException, Exception) as e:
                     logger.debug(str(e), exc_info=True)
                     driver.quit()
-                    driver = webdriver.Firefox()
+                    driver = start_driver()
                     next(ctr, None)
                     pass
 
@@ -103,11 +91,11 @@ class linkcheck(linkckutil):
             logger.info("loc elems empty in GET_MORE_LINKS_alien")
 
         logger.info("\nDone with GET_MORE_LINKS.")
-        driver.quit()
+        #driver.quit()
         return sorted(list(set(homelinks_all)))
 
     def scoop_new_links(self, myhome_arg):
-        driver = webdriver.Firefox()
+        #driver = webdriver.Firefox()
         home_more = None;  home_all_new = None
         logger.info("\n-------------------------------------->Starting scoop_new_links.")
 
@@ -115,7 +103,7 @@ class linkcheck(linkckutil):
 
         home_grp = list(set(home_grp_a))
         newly_found_links_fin = list(set(home_grp))
-        driver.quit()
+        #driver.quit()
 
         return newly_found_links_fin
         ### return new, alien, all
@@ -123,18 +111,18 @@ class linkcheck(linkckutil):
        #############---------------------------------------- end of def
     # begin:
     def main(self):
-        global logger
         home_0 = []; alien_0 = []; homelist=[]; homelist2 = []; homelist3 = []; homelist4= [];
         parent = address
-        main_driver = webdriver.Firefox()
+        #'driver = webdriver.Firefox()
+        driver = self.driver
 
-        main_driver.get(address)
-        main_driver.minimize_window()
+        driver.get(address)
+        driver.minimize_window()
 
         logger.debug('In main() Getting first address: {}'.format(address))
         big_pile = []
         try:
-            home_elements = main_driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
+            home_elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
                  ##first time:  HOME PAGE ONLY  ##first time:
 
             logger.info("Step One")
@@ -143,7 +131,7 @@ class linkcheck(linkckutil):
 
             logger.info("Step Two")
 
-            main_driver.quit()
+            #driver.quit()
 
             base_links2= self.scoop_new_links(base_links)
 
@@ -177,18 +165,18 @@ class linkcheck(linkckutil):
 
         except UnexpectedAlertPresentException as e:
             logger.debug(str(e), exc_info=True)
-            main_driver.quit()
-            main_driver = webdriver.Firefox()
+            driver.quit()
+            driver = start_driver()
             pass
 
         except BaseException as e:
             logger.debug(str(e), exc_info=True)
-            main_driver.quit()
-            driver = webdriver.Firefox()
+            driver.quit()
+            driver = start_driver()
             pass
 
     def __init__(self):
-        global logger
+        driver = self.driver
         print('In linkcheck: __init__')
         super().__init__()
         self.main()
