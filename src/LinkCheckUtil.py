@@ -59,7 +59,7 @@ class linkckutil(object):
                     try:  # check head
                         logger.info('\n-------------------------------------->Restarting loop in make_error_list with: ' +str(elinktup))
                         elink = elinktup[0]
-                        theparent = elinktup[1]
+                        #theparent = elinktup[1]
 
                         resp = str(requests.head(elink, data=None, timeout=10))
                         mmsg = 'resp: for HEAD from ' + elink + ': ' + str(resp)
@@ -74,20 +74,19 @@ class linkckutil(object):
                             resp2 = str(requests.get(elink, data=None, timeout=10))
 
                             err_resp2 = str(resp2[11:14])
-                            responstr2 = '----- Checked using Get only: ' + elink + ' -resp: ' + err_resp2 + lnfeed
+                            responstr2 = '----- Checked using GET only: ' + elink + ' -resp: ' + err_resp2 + lnfeed
                             logger.debug(responstr2)
                             err_int2 = int(err_resp2)
 
                             if err_int2 in ercodes:
-                                errorString2 = lnfeed + '------------------------------!!! >GET response: {} in: {} from parent: {}'.format(err_resp2, elink, theparent)
+                                errorString2 = lnfeed + '------------------------------!!! >2nd try: GET response: {} in: {} from parent: {}'.format(err_resp2, elink, theparent)
                                 logger.info(errorString2)
-
                                 errorlist.append(errorString2)
                                 logger.info(errorString2 + lnfeed)
 
                             requests.session().close()             #urllib3.connectionpool.HTTPConnectionPool.close()
                         else:
-                            logger.info('status code on second get: ' + err_resp)
+                            logger.info('status code on first get: ' + err_resp)
 
                     except (ConnectTimeoutError, MaxRetryError, RequestError, NewConnectionError) as e:
                         print("----------------in new except now!!!------------------------------")
