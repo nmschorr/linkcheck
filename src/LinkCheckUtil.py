@@ -159,15 +159,13 @@ class linkckutil(object):
         logger.info('In write_error_file - timenow')
         bigerr_file = 'E:\\pylogs\\ERRORS.' + ttype + timenow + '.log'
         bigerr_h = open(bigerr_file, 'w')  #
-        for b in big_err_list_final:
-            bigerr_h.write(b + lnfeed)
+        for err in big_err_list_final:
+            bigerr_h.write(err + lnfeed)
         bigerr_h.close()
         logger.info('Done with write_error_file - timenow')
 
     #############---------------------------------------- end of def
 
     def __init__(self):
-        self.driver = start_driver()
-        driver = self.driver
-
+        #self.driver = start_driver()
         print("In linkckutil (super()) __init__")
