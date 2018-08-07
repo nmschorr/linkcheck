@@ -59,7 +59,7 @@ class linkcheck(linkckutil):
 
     def GET_MORE_LINKS(self, loc_elems):
         driver = self.driver
-        homelinks = [] ; homelinksSetList = [] ; homelinks_all = []
+        homelinks, homelinksSetList, homelinks_all = [],[],[]
 
         logger.info("\n-------------------------------------->Starting GET_MORE_LINKS.")
         if loc_elems:
@@ -101,27 +101,59 @@ class linkcheck(linkckutil):
         logger.debug('Leaving ' + classmethod.__name__ )
         return newly_found_links_fin
     # ------------------------------------------------------------------------------------
+    def get_home_links(self, home1):
+        from urllib.parse import urlsplit
+        from requests_html import HTMLSession
+
+        parent = 'http://schorrmedia.com/'
+        thebase_part = (urlsplit(parent))[1]
+
+        links = []
+        homelinks = []
+        session = HTMLSession()
+        response = session.get(parent)
+
+        for page in response.html.absolute_links:
+            each_ses = session.get(page)
+            theurl = each_ses.url
+            if '?' in theurl:
+                theurl = (theurl.split('?'))[0]
+
+            links.append((theurl, parent))
+            if thebase_part in theurl:
+                homelinks.append((theurl, parent))
+
+        return links, homelinks
+
+
+
        #############---------------------------------------- end of def
     # begin:
     def main(self):
         home_0 = []; homelist=[]; homelist2 = []; homelist3 = []; homelist4= [];
         parent = address
-        driver = self.driver
-        driver.get(address)
-        driver.set_window_size(200,200)
+        #driver = self.driver
+        #driver.get(address)
+        #driver.set_window_size(200,200)
 
         logger.debug('In main() Getting first address: {}'.format(address))
         big_pile = []
         try:
-            logger.info("Step One")   ##first time:  HOME PAGE ONLY  ##first time
-            home_elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
+            new_links_main, parent_links_main = self.get_home_links(home1)
+            big_pile.append(new_links_main)
 
-            base_links = self.HREF_finder(home_elements, parent) #false: get all # list, str
-            big_pile.append(base_links)
+            logger.info("Step One Done")   ##first time:  HOME PAGE ONLY  ##first time
+                        #home_elements = driver.find_elements_by_xpath('.//a')  # elements = driver.find_elements_by_tag_name('a')
+                        #base_links = self.HREF_finder(home_elements, parent) #false: get all # list, str
 
             logger.info("Step Two")
 
-            base_links2= self.scoop_new_links(base_links)
+            for alink in parent_links_main:
+                new_links2, parent_links2 = self.get_home_links(alink)
+                big_pile.append(new_links2)
+                parent_links_main.append(parent_links2)
+
+           # base_links2= self.scoop_new_links(base_links)
 
             for x in base_links2:
                 if home2 in x[0]:
@@ -182,4 +214,4 @@ class linkcheck(linkckutil):
 if __name__ == "__main__":  ## if loaded and called by something else, go fish
     None
 
-linkcheck()  ## run this file
+linkcheck()  ## run this file/class
