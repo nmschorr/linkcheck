@@ -8,35 +8,42 @@ from src import the_logger as logger
 class linkcheck(linkckutil):
 
     #############---------------------------------------- def
-    def get_home_links(self, parent):
+    def get_home_links(self, parent_loc):
         from urllib.parse import urlsplit
         from requests_html import HTMLSession
-        any_link, home_links = [], []
+        any_link_loc, base_links_loc = [], []
 
-        thebase_part = (urlsplit(parent))[1]
+        thebase_part = (urlsplit(parent_loc))[1]
         session = HTMLSession()
-        response = session.get(parent)
+        response = session.get(parent_loc)
 
-        for page in response.html.absolute_links:
-            each_ses = session.get(page)
-            theurl = each_ses.url
-            if '?' in theurl:
-                theurl = (theurl.split('?'))[0]
+        for abs_link in response.html.absolute_links:
+            cond0 = abs_link not in self.done_links_glob
+            if cond0:
+                each_ses = session.get(abs_link)
 
-            cond1 = theurl not in any_link
-            cond2 = theurl not in self.main_list_links
-            if cond1 and cond2:
-                any_link.append((theurl, parent))
-                self.main_list_links.append((theurl, parent))
 
-            cond3 = thebase_part in theurl
-            cond4 = theurl not in home_links
-            if cond3 and cond4:
-                home_links.append((theurl, parent))
-                self.base_list_links.append((theurl, parent))
+                theurl = each_ses.url
+                if '?' in theurl:
+                    theurl = (theurl.split('?'))[0]
 
-        print("found these links: ", home_links)
-        return any_link, home_links
+                self.done_links_glob.append(theurl)
+            #############----------------------------------------
+
+                cond1 = theurl not in any_link_loc
+                cond2 = theurl not in self.any_link_glob
+                if cond1 and cond2:
+                    any_link_loc.append((theurl, parent_loc))
+                    self.any_link_glob.append((theurl, parent_loc))
+
+                cond3 = thebase_part in theurl
+                cond4 = theurl not in base_links_loc
+                if cond3 and cond4:
+                    base_links_loc.append((theurl, parent_loc))
+                    self.base_links_glob.append((theurl, parent_loc))
+
+        print("found these links: ", any_link_loc)
+        return any_link_loc, base_links_loc
 
 
 
@@ -44,22 +51,28 @@ class linkcheck(linkckutil):
     # begin:
     def main(self):
         driver = 0
-        self.main_list_links, self.base_list_links = [], []
 
         logger.debug('In main() Getting first address: {}'.format(full_addy))
         try:
-            new_links_main, parent_links_main = self.get_home_links(full_addy)
+            #############---------step ONE:
+
+            any_link_main_one, base_only_one = self.get_home_links(full_addy)
             logger.info("Step One Done")   ##first time:  HOME PAGE ONLY  ##first time
 
-            logger.info("Step Two")
+            #############---------step TWO:
 
-            for alink in parent_links_main:
-                new_links2, parent_links2 = self.get_home_links(alink[0])
+            for blink in base_only_one:
+                new_links2, base_only_two = self.get_home_links(blink[0])
+
+            logger.info("Step TwoDone")
 
             print('--------------big pile:')
 
-            finalproduct = sorted(list(set(self.main_list_links)))
-            for i in finalproduct:
+            fp = sorted(self.any_link_glob)
+            fp2 = list(set(fp))
+            fp3 = sorted(fp2)
+
+            for i in fp3:
                 print(i)
 
         except BaseException as e:
@@ -69,6 +82,8 @@ class linkcheck(linkckutil):
     def __init__(self):
         print('In linkcheck: __init__')
         super().__init__()
+        self.any_link_glob = []
+        self.base_links_glob, self.done_links_glob = [], []
         self.main()
 
 
