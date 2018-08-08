@@ -1,9 +1,9 @@
 # python 3
+#from selenium.common.exceptions import UnexpectedAlertPresentException, StaleElementReferenceException, TimeoutException
 
 from src.LinkCheckUtil import linkckutil
-#from selenium.common.exceptions import UnexpectedAlertPresentException, StaleElementReferenceException, TimeoutException
-#from src import home1, home2, lnfeed, ercodes, badlist, start_driver, full_addy, driver
-from src import full_addy
+from src import home1, lnfeed, ercodes, badlist, full_addy, any_link_glob, base_links_glob, done_links_glob
+from src import full_addy, err_links
 from src import the_logger as logger
 from time import perf_counter
 from urllib.parse import urlsplit
@@ -24,14 +24,28 @@ class linkcheck(linkckutil):
     def ck_status_code(self,t):
         err_codes = [400, 404, 408, 409, 501, 502, 503]
         if t in err_codes:
-            return False
+            return 1
         else:
-            return True    #ok
+            return 0    #ok
 
     def split_url(self, url):
         if '?' in url:
             url = (url.split('?'))[0]
         return url
+    #############---------------------------------------- def
+    def get_simple_response(self, local_url):
+        print("--------------------------------------------")
+        print("just got this link: ", local_url)
+
+        session = HTMLSession()
+        response = session.get(local_url)
+
+        try:
+            if self.ck_status_code(response.status_code) > 0:
+                self.err_links.append((response.url, response.status_code))
+                print("found error in link: ", local_url)
+        except Exception:
+            pass
 
     #############---------------------------------------- def
     def get_home_links(self, parent_local):
@@ -43,10 +57,13 @@ class linkcheck(linkckutil):
         response = session.get(parent_local)
 
         try:
-            if self.ck_status_code(self, response.status_code):
+            if self.ck_status_code(response.status_code) > 0:
+                self.err_links((response.url, response.status_code))
+
+            else:   #  not an err
                 for abs_link in response.html.absolute_links:
                     if self.ck_bad_data(abs_link):
-                        break
+                        pass
                     else:
                         cond0 = bool(abs_link in [i[0] for i in self.done_links_glob ])
 
@@ -56,7 +73,7 @@ class linkcheck(linkckutil):
                             theurl = self.split_url(turl)
 
                             if self.ck_bad_data(abs_link):
-                                break
+                                pass
                             else:
                                 self.done_links_glob.append(theurl)   ## add to main done list
                         #############----------------------------------------
@@ -101,7 +118,6 @@ class linkcheck(linkckutil):
         driver = 0
         tstart = perf_counter()
         print("started timer: ", tstart)
-
         logger.debug('In main() Getting first address: {}'.format(full_addy))
         try:
             #############---------step ONE:
@@ -116,9 +132,13 @@ class linkcheck(linkckutil):
             logger.info("Step One Done")   ##first time:  HOME PAGE ONLY  ##first time
 
             #############---------step TWO:
-
+            base_only_two, base_only_3 = [], []
             for base_one in base_only_one:
                 any_links2, base_only_two = self.get_home_links(base_one[0])
+
+            for base_two in base_only_two:
+                any_links3, base_only_3 = self.get_home_links(base_two[0])
+
 
             base_links_glob_final = sorted(list(set(self.base_links_glob)))
 
@@ -135,7 +155,14 @@ class linkcheck(linkckutil):
             fp3 = sorted(fp2)
 
             for i in fp3:
+                self.get_simple_response(i)
+
+
+            print()
+            print("here are the errors:-------------")
+            for i in self.err_links:
                 print(i)
+
 
 
             print("totalTime: ", perf_counter() - tstart)
@@ -147,8 +174,9 @@ class linkcheck(linkckutil):
     def __init__(self):
         print('In linkcheck: __init__')
         #super().__init__()
-        self.any_link_glob = []
-        self.base_links_glob, self.done_links_glob = [], []
+        #self.any_link_glob = []
+        #self.err_links = []
+        #self.base_links_glob, self.done_links_glob = [], []
         self.main()
 
 if __name__ == "__main__":  ## if loaded and called by something else, go fish
