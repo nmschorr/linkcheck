@@ -51,8 +51,6 @@ class linkcheck(object):
 
     def splitty(self, parent_local):
         thebase_part_local = None
-        #print("\ninside splitty-----------------")
-        #print("-------------------passed in: ", parent_local)
         try:
             thebase_part_local = (urlsplit(parent_local))[1]
         except Exception as e:
@@ -138,36 +136,40 @@ class linkcheck(object):
     def main(self):
         tstart = perf_counter()
         print("started timer: ", tstart)
-        logger.debug('In main() Getting first address: {}'.format(full_addy))
+        logger.debug('In main() Getting first address: {}'.format(self.full_addy))
+        b, new_large, base_only_plain_repeat_grand, agroup = [], [], [], []
+        u = 0
         try:
             #############---------step ONE:
-            base_only_plain_repeat = self.get_home_links(full_addy)  #first set of base
-            zzzz = []
-            zzzz = [(r,n) for r,n in enumerate(base_only_plain_repeat)]
+            base_only_plain_repeat = self.get_home_links(self.full_addy)  #first set of base
+            v = []
 
-
-
-            cond9 = 0
-            cond9 =  filter(lambda x: x[1]==full_addy, zzzz)
-            boo = bool(cond9)
-            for i in zzzz:
-                if i[1] == full_addy:
-                    del base_only_plain_repeat[i]
-            b = []
-            new_large = []
-            new_base_urls = []
-            base_only_plain_repeat_grand = []
-            for i in range(1):
+            while True and u < 14:
+                u += 1
+                print("u: ", u)
                 print("\n--------------------\n!!In main loop\n")
+                list1, list2 = zip(*base_links_glob)
                 for baselink in base_only_plain_repeat:
-                    new_base_urls = self.get_home_links(baselink)
-                    new_large.extend(new_base_urls)
-                    base_len = len(new_base_urls)
-                    new_base_urls = []
+
+                    baselink_list = []
+                    baselink_list.append(baselink)
+
+
+
+                    if not set(baselink_list).intersection(set(base_only_plain_repeat)):
+                        agroup = self.get_home_links(baselink)
+                        for agr in agroup:
+                            data1 = [i[0] for i in self.base_links_glob]
+                            condv = [name for name in data1 if name is agr]
+                            condw = agr  == self.full_addy
+                            if not condv and not condw:
+                                new_large.append(agr)
                 b = sorted(new_large)
                 new_large = []
                 if len(b):
-                    base_only_plain_repeat_grand = list(set(b))
+                    base_only_plain_repeat = list(set(b))
+                if not len(b):
+                    break
 
 
 
@@ -211,6 +213,7 @@ class linkcheck(object):
         self.base_links_glob = base_links_glob
         self.any_link_glob = any_link_glob
         self.err_links = []
+        self.full_addy = full_addy
         self.main()
 
 if __name__ == "__main__":  ## if loaded and called by something else, go fish
