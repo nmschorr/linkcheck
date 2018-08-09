@@ -1,29 +1,32 @@
 # python 3
 
-import src, sys
-from selenium import webdriver
 from datetime import datetime
 import logging
 import sys
 
-__all__ = ['home1', 'home2','address', 'lnfeed', 'ercodes', 'badlist', 'start_driver', 'driver', 'the_logger', 'driver']
+__all__ = ['home1', 'full_addy', 'lnfeed', 'ercodes', 'badlist',
+           'the_logger','any_link_glob', 'base_links_glob', 'done_links_glob', 'err_links' ]
 
-#home1   = 'cosmictoys.blogspot.com'
-#home2   = 'cosmictoys.blogspot.com'
-home1   = 'alexforecast.blogspot.com'
-home2   = 'alexforecast.blogspot.com'
-driver = object
-address ='http://' + home1
+home1   = 'clarinetinstitute.com/'
+#home2   = 'cosmictoys.blogspot.com/'
+#home1   = 'alexforecast.blogspot.com/'
+#home1   = 'schorrmedia.com/'
+
+#home1   = 'www.repercussions.com/'
+#driver = object
+full_addy = 'http://' + home1
+#full_addy   = 'http://alexforecast.blogspot.com/'
+
 lnfeed = '\n'
 ercodes = [400, 404, 408, 409, 501, 502, 503]
 badlist = ['#','com/#', '?', 'blogger.com', '/search', 'javascript:void(0)', 'widgetType','mailto:']
+any_link_glob, base_links_glob, done_links_glob, err_links   = [], [], [], []
 
-
-def start_driver():
-    tdriver = webdriver.Firefox()
-    print('Driver session id: ' + tdriver.session_id)
-    tdriver.implicitly_wait(10)
-    return tdriver
+# def start_driver():
+#     tdriver = webdriver.Firefox()
+#     print('Driver session id: ' + tdriver.session_id)
+#     tdriver.implicitly_wait(10)
+#     return tdriver
 
 def setup_logger():
     timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
@@ -50,3 +53,4 @@ def setup_logger():
 
 print("In " + str(super) + " __init__.py")
 the_logger = setup_logger()
+
