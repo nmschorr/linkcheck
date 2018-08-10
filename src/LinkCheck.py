@@ -22,7 +22,7 @@ class linkcheck(object):
     def ck_status_code(self,t):
         err_codes = [400, 404, 408, 409, 501, 502, 503]
         goodcodes = [200]
-        #if t in err_codes:
+
         if t not in goodcodes:
             return 1
         else:
@@ -34,7 +34,6 @@ class linkcheck(object):
         return url
     #############---------------------------------------- def
     def get_simple_response(self, tup):
-        #print("--------------------------------------------")
         print("Checking this link: ", tup[0])
 
         try:
@@ -77,36 +76,34 @@ class linkcheck(object):
                 new_links_local = [lin for lin in response.html.absolute_links]
 
                 for this_link in new_links_local:
-                    link_eq_parent = bool(this_link == parent_local)
+                    _IS_BASE = bool(thebase_part in this_link)
                     _IN_DONE_GLOB = bool(this_link in self.done_links_glob_singles)
+                    link_eq_parent = bool(this_link == parent_local)
+                    in_base_local = bool(this_link in [i for i in base_links_local])
+                    in_base_glob = bool(this_link in [i[0] for i in self.base_links_glob])
+                    in_any_local = bool(this_link in [i[0] for i in any_link_local])
+                    in_any_glob = bool(this_link in [i[0] for i in self.any_link_glob])
                     has_bad_data = self.ck_bad_data(this_link)
 
                     if link_eq_parent or has_bad_data:
                         pass
 
-                    if not _IN_DONE_GLOB:  # if not already done
+                    elif not _IN_DONE_GLOB:    #NOT done yet
                         self.done_links_glob_singles.append(this_link)  ## add to main done list
 
-                    _IS_BASE = bool(thebase_part in this_link)
-                    in_base_local = bool(this_link in [i for i in base_links_local])
-                    in_base_glob = bool(this_link in [i for i in self.base_links_glob])
-
-                    in_any_local = bool(this_link in [i[0] for i in any_link_local])
-                    in_any_glob = bool(this_link in [i[0] for i in self.any_link_glob])
-
-                    if not _IN_DONE_GLOB:
                         if _IS_BASE:                               # IS base type
                             if not in_base_local:                       #if not already in this
                                 base_links_local.append(this_link)
                             if not base_links_glob:                     #if not already in this
                                 self.base_links_glob.append((this_link, parent_local))
+
                                 print("Adding this base link to base glob: ", this_link)
 
-                            else:                   #if not a home based link
-                                if not in_any_local:
-                                    any_link_local.append((this_link, parent_local))
-                                if not in_any_glob:
-                                    self.any_link_glob.append((this_link, parent_local))
+                        else:                   #if not a home based link
+                            if not in_any_local:
+                                any_link_local.append((this_link, parent_local))
+                            if not in_any_glob:
+                                self.any_link_glob.append((this_link, parent_local))
 
 
 
@@ -117,8 +114,8 @@ class linkcheck(object):
             pass
 
         print("----end of cycle in get_home_links: ---------")
-       # print("found these links any_link_local: ", any_link_local)
-        #print("\n---------- found these links base_links_local: ", base_links_local)
+
+
         sorted_base = sorted(base_links_local)
         base_links_local = sorted(list(set(sorted_base)),key=lambda x: x[0])
         print("\n------------returning base links local: ", base_links_local)
