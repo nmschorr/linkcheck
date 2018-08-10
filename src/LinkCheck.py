@@ -2,7 +2,6 @@
 #from selenium.common.exceptions import UnexpectedAlertPresentException, StaleElementReferenceException, TimeoutException
 
 from src import home1, lnfeed, ercodes, badlist, full_addy, any_link_glob, base_links_glob, done_links_glob
-from src import full_addy
 from src import the_logger as logger
 from time import perf_counter
 from urllib.parse import urlsplit
@@ -36,12 +35,12 @@ class linkcheck(object):
     #############---------------------------------------- def
     def get_simple_response(self, tup):
         #print("--------------------------------------------")
-       # print("just got this link: ", tup[0])
-
-        session = HTMLSession()
-        response = session.get(tup[0])
+        print("Checking this link: ", tup[0])
 
         try:
+            session = HTMLSession()
+            response = session.get(tup[0])
+
             if self.ck_status_code(response.status_code) > 0:
                 self.err_links.append((response.url, response.status_code, tup[1]))
                 #print("\n----!! found error in link: ", response.url, response.status_code, tup[1])
@@ -53,18 +52,19 @@ class linkcheck(object):
         thebase_part_local = None
         try:
             thebase_part_local = (urlsplit(parent_local))[1]
+            if thebase_part_local[0:3]=='www':
+                thebase_part_local = thebase_part_local[4:]
         except Exception as e:
             print(e)
             pass
         return thebase_part_local
 
     #############---------------------------------------- def
-    def get_home_links(self, parent_local):
+    def get_links(self, parent_local):
         print("-starting-get_home_links - just got this link: ", parent_local)
         any_link_local, base_links_local = [], []
 
         thebase_part = self.splitty(parent_local)
-
 
         session = HTMLSession()
         response = session.get(parent_local)
@@ -74,44 +74,39 @@ class linkcheck(object):
                 self.err_links((response.url, response.status_code))
 
             else:   #  not an err
-                for abs_link in response.html.absolute_links:
-                    if abs_link == parent_local:
+                new_links_local = [lin for lin in response.html.absolute_links]
+
+                for this_link in new_links_local:
+                    link_eq_parent = bool(this_link == parent_local)
+                    _IN_DONE_GLOB = bool(this_link in self.done_links_glob_singles)
+                    has_bad_data = self.ck_bad_data(this_link)
+
+                    if link_eq_parent or has_bad_data:
                         pass
-                    elif self.ck_bad_data(abs_link):
-                        pass
-                    else:
-                        cond0 = bool(abs_link in [i[0] for i in self.done_links_glob ])
 
-                        if not cond0:   #if not already done
-                            html_resp_local = session.get(abs_link)
-                            turl = html_resp_local.url
-                            theurl = self.split_url(turl)
+                    if not _IN_DONE_GLOB:  # if not already done
+                        self.done_links_glob_singles.append(this_link)  ## add to main done list
 
-                            if self.ck_bad_data(abs_link):
-                                pass
-                            else:
-                                self.done_links_glob.append(theurl)   ## add to main done list
-                        #############----------------------------------------
+                    _IS_BASE = bool(thebase_part in this_link)
+                    in_base_local = bool(this_link in [i for i in base_links_local])
+                    in_base_glob = bool(this_link in [i for i in self.base_links_glob])
 
-                            cond1 = bool(thebase_part in theurl)
-                            cond2 = bool(theurl in [i for i in base_links_local])
-                            cond3 = bool(theurl in [i[0] for i in self.base_links_glob])
+                    in_any_local = bool(this_link in [i[0] for i in any_link_local])
+                    in_any_glob = bool(this_link in [i[0] for i in self.any_link_glob])
 
-                            if cond1:
-                                if not cond2:
-                                    base_links_local.append(theurl)
-                                if not cond3:
-                                    self.base_links_glob.append((theurl, parent_local))
+                    if not _IN_DONE_GLOB:
+                        if _IS_BASE:                               # IS base type
+                            if not in_base_local:                       #if not already in this
+                                base_links_local.append(this_link)
+                            if not base_links_glob:                     #if not already in this
+                                self.base_links_glob.append((this_link, parent_local))
+                                print("Adding this base link to base glob: ", this_link)
 
-                            else:
-                                #if not a home based link
-                                cond4 = bool(theurl in [i[0] for i in any_link_local])
-                                cond5 = bool(theurl in [i[0] for i in self.any_link_glob])
-
-                                if not cond4:
-                                    any_link_local.append((theurl, parent_local))
-                                if not cond5:
-                                    self.any_link_glob.append((theurl, parent_local))
+                            else:                   #if not a home based link
+                                if not in_any_local:
+                                    any_link_local.append((this_link, parent_local))
+                                if not in_any_glob:
+                                    self.any_link_glob.append((this_link, parent_local))
 
 
 
@@ -121,13 +116,13 @@ class linkcheck(object):
         except BaseException:
             pass
 
-        b = []
-        print("\n-----end of cycle in get_home_links: ---------")
+        print("----end of cycle in get_home_links: ---------")
        # print("found these links any_link_local: ", any_link_local)
         #print("\n---------- found these links base_links_local: ", base_links_local)
-        bb = sorted(base_links_local)
-        cc = sorted(list(set(bb)))
-        return cc
+        sorted_base = sorted(base_links_local)
+        base_links_local = sorted(list(set(sorted_base)),key=lambda x: x[0])
+        print("\n------------returning base links local: ", base_links_local)
+        return base_links_local
 
 
 
@@ -137,58 +132,35 @@ class linkcheck(object):
         tstart = perf_counter()
         print("started timer: ", tstart)
         logger.debug('In main() Getting first address: {}'.format(self.full_addy))
-        b, new_large, base_only_plain_repeat_grand, agroup = [], [], [], []
-        u = 0
+        b, new_sorted, base_only_plain_repeat_grand, agroup = [], [], [], []
+        repeats = 0
         try:
             #############---------step ONE:
-            base_only_plain_repeat = self.get_home_links(self.full_addy)  #first set of base
-            v = []
-
-            while True and u < 14:
-                u += 1
-                print("u: ", u)
-                print("\n--------------------\n!!In main loop\n")
-                list1, list2 = zip(*base_links_glob)
-                for baselink in base_only_plain_repeat:
-
-                    baselink_list = []
-                    baselink_list.append(baselink)
-
-
-
-                    if not set(baselink_list).intersection(set(base_only_plain_repeat)):
-                        agroup = self.get_home_links(baselink)
-                        for agr in agroup:
-                            data1 = [i[0] for i in self.base_links_glob]
-                            condv = [name for name in data1 if name is agr]
-                            condw = agr  == self.full_addy
-                            if not condv and not condw:
-                                new_large.append(agr)
-                b = sorted(new_large)
-                new_large = []
-                if len(b):
-                    base_only_plain_repeat = list(set(b))
-                if not len(b):
-                    break
-
-
-
-
-            print("\n-------------")
-            print("\n-----------\n   base_only_plain_repeat_grand: \n", base_only_plain_repeat_grand)
-
+            base_only_plain_repeat = self.get_links(self.full_addy)  #first set of base
             logger.info("Step One Done")   ##first time:  HOME PAGE ONLY  ##first time
 
+            the_len = len(base_only_plain_repeat)
+            v, new_base_links_two, new_sorted = [], [], []
+            new_base_links_one = base_only_plain_repeat
+
+            while the_len and repeats < 4:
+                repeats += 1
+                print("repeats: ", repeats, "-------------------!!In main loop")
+                for baselink in new_base_links_one:
+                    new_base_links_two = self.get_links(self.full_addy)  # first set of base
+
+                the_len = len(new_base_links_two)
+                if the_len:
+                    new_base_links_one = new_base_links_two
 
 
             logger.info("Step TwoDone")
 
+            any_link_glob2 = list(set(self.any_link_glob))
+            any_link_to_check = sorted(any_link_glob2, key=lambda x:x[0])
 
-            fp2 = list(set(sorted(self.any_link_glob)))
-            fp3 = sorted(fp2)
-
-            for i in fp3:
-                #print('checking this link: ', i)
+            for i in any_link_to_check:
+                print('checking this link: ', i)
                 self.get_simple_response(i)
 
 
@@ -209,7 +181,7 @@ class linkcheck(object):
     def __init__(self):
         #super().__init__()
         print('In linkcheck: __init__')
-        self.done_links_glob = done_links_glob
+        self.done_links_glob_singles = done_links_glob
         self.base_links_glob = base_links_glob
         self.any_link_glob = any_link_glob
         self.err_links = []
