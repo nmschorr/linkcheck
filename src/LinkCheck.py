@@ -29,7 +29,7 @@ class linkcheck(object):
 
     def ck_status_code(self, response, parent_local):
         err_codes = [400, 404, 408, 409, 501, 502, 503]
-        goodcodes = [200]
+        #goodcodes = [200]
 
         if response.status_code in err_codes:
             self.err_links.append((response.url, response.status_code, parent_local))
@@ -102,7 +102,7 @@ class linkcheck(object):
             errs = list(set(self.err_links))
             errs2 = sorted(errs, key=lambda x: x[0])
             for e in errs2:
-                print(e)
+                print("bad request page: ", e[0], " status code: ", e[1], " referring page: ", e[2])
 
     def reset_timer(self, name, tstart):
         print(name, perf_counter() - tstart)
