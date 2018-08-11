@@ -1,5 +1,7 @@
 # python 3
-#from selenium.common.exceptions import UnexpectedAlertPresentException, StaleElementReferenceException, TimeoutException
+# Nancy Schorr, 2018
+# this file is in active development
+
 
 from time import perf_counter
 from urllib.parse import urlsplit
@@ -11,7 +13,6 @@ from src import full_addy, any_link_glob, base_links_glob, done_links_glob
 from src import the_logger as logger
 
 
-#class linkcheck(linkckutil):
 class linkcheck(object):
 
     def ck_bad_data(self, link):
@@ -20,6 +21,10 @@ class linkcheck(object):
         for i in mylist:
             if i in link:
                 x += 1
+        # c1 = link[:-4] == '.jpg'
+        # c2 = link[:-5] == '.jpeg'
+        # if c1 or c2:
+        #     x += 1
         return x
 
     def my_print(self, the_line):
@@ -39,7 +44,7 @@ class linkcheck(object):
         if '?' in url:
             url = (url.split('?'))[0]
         return url
-    #############---------------------------------------- def
+
     def get_simple_response(self, tup):
         self.my_print(("Checking this link: ", tup[0]))
 
@@ -49,7 +54,7 @@ class linkcheck(object):
 
             if self.ck_status_code(response.status_code) > 0:
                 self.err_links.append((response.url, response.status_code, tup[1]))
-                #print("\n----!! found error in link: ", response.url, response.status_code, tup[1])
+
         except Exception:
             pass
 
@@ -77,50 +82,52 @@ class linkcheck(object):
         response = session.get(parent_local)
 
         response_html = response.html
-        ab_links = response_html.absolute_links
-
         try:
-            if self.ck_status_code(response.status_code) > 0:  ## if there's an error
-                self.err_links.append((response.url, response.status_code, parent_local))
+            ab_links = response_html.absolute_links
+        except BaseException:
+            print('not a link with links: ', parent_local)
 
-            else:   #  not an err
-                new_links_local = [ab_lin for ab_lin in ab_links]
+        else:
+            try:
+                if self.ck_status_code(response.status_code) > 0:  ## if there's an error
+                    self.err_links.append((response.url, response.status_code, parent_local))
 
-                for this_link in new_links_local:
-                    _IN_DONE_GLOB = bool(this_link in self.done_links_glob_singles)
-                    if not _IN_DONE_GLOB:    #NOT done yet
-                        self.done_links_glob_singles.append(this_link)  ## add to main done list
+                else:   #  not an err
+                    new_links_local = [ab_lin for ab_lin in ab_links]
 
-                        has_bad_data = self.ck_bad_data(this_link)
-                        link_eq_parent = bool(this_link == parent_local)
+                    for this_link in new_links_local:
+                        _IN_DONE_GLOB = bool(this_link in self.done_links_glob_singles)
+                        if not _IN_DONE_GLOB:    #NOT done yet
+                            self.done_links_glob_singles.append(this_link)  ## add to main done list
 
-                        if link_eq_parent or has_bad_data:
-                            pass
+                            has_bad_data = self.ck_bad_data(this_link)
+                            link_eq_parent = bool(this_link == parent_local)
 
-                        else:
-                            _IS_BASE = bool(thebase_part in this_link)
-                            _IN_BASE_GLOB = bool(this_link in [i[0] for i in self.base_links_glob])
-                            in_base_local = bool(this_link in [i for i in base_links_local])
+                            if link_eq_parent or has_bad_data:
+                                pass
 
-                            if _IS_BASE:  # IS base type
-                                if not in_base_local:  # if not already in this
-                                    base_links_local.append(this_link)
-                                if not _IN_BASE_GLOB:  # if not already in this
-                                    if mp: self.base_links_glob.append((this_link, parent_local))
+                            else:
+                                _IS_BASE = bool(thebase_part in this_link)
+                                _IN_BASE_GLOB = bool(this_link in [i[0] for i in self.base_links_glob])
+                                in_base_local = bool(this_link in [i for i in base_links_local])
 
-                                    if mp: self.my_print(("Adding this base link to base glob: ", this_link))
+                                if _IS_BASE:  # IS base type
+                                    if not in_base_local:  # if not already in this
+                                        base_links_local.append(this_link)
+                                    if not _IN_BASE_GLOB:  # if not already in this
+                                        if mp: self.base_links_glob.append((this_link, parent_local))
 
-                            else:                   #if not a home based link
+                                        if mp: self.my_print(("Adding this base link to base glob: ", this_link))
 
-                                in_any_local = bool(this_link in [i[0] for i in any_link_local])
-                                in_any_glob = bool(this_link in [i[0] for i in self.any_link_glob])
+                                else:                   #if not a home based link
 
-                                if not in_any_local:
-                                    any_link_local.append((this_link, parent_local))
-                                if not in_any_glob:
-                                    self.any_link_glob.append((this_link, parent_local))
+                                    in_any_local = bool(this_link in [i[0] for i in any_link_local])
+                                    in_any_glob = bool(this_link in [i[0] for i in self.any_link_glob])
 
-
+                                    if not in_any_local:
+                                        any_link_local.append((this_link, parent_local))
+                                    if not in_any_glob:
+                                        self.any_link_glob.append((this_link, parent_local))
 
 
         except etree.XMLSyntaxError:
@@ -131,12 +138,9 @@ class linkcheck(object):
         if mp: self.my_print("----end of cycle in get_home_links: ---------")
         if mp: self.my_print(("\n------------base_links_local: ", base_links_local))
 
-
         sorted_base = list(set(base_links_local))
         if mp: self.my_print(("\n------------returning base links local: ", base_links_local))
         return sorted_base
-
-
 
        #############---------------------------------------- end of def
     # begin:
@@ -160,7 +164,7 @@ class linkcheck(object):
                 repeats += 1
                 if mp: self.my_print(("repeats: ", repeats, "-------------------!!In main loop"))
                 for baselink in new_base_links_one:
-                    new_base_links_two = self.get_links(self.full_addy)  # first set of base
+                    new_base_links_two = self.get_links(baselink)  # first set of base
 
                 the_len = len(new_base_links_two)
                 if the_len > 0:
@@ -223,7 +227,7 @@ class linkcheck(object):
         self.any_link_glob = any_link_glob
         self.err_links = []
         self.full_addy = full_addy
-        self._MY_PRT = False
+        self._MY_PRT = True
         self.main()
 
 if __name__ == "__main__":  ## if loaded and called by something else, go fish
