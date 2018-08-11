@@ -80,7 +80,7 @@ class linkcheck(object):
                     _IN_DONE_GLOB = bool(this_link in self.done_links_glob_singles)
                     link_eq_parent = bool(this_link == parent_local)
                     in_base_local = bool(this_link in [i for i in base_links_local])
-                    in_base_glob = bool(this_link in [i[0] for i in self.base_links_glob])
+                    _IN_BASE_GLOB = bool(this_link in [i[0] for i in self.base_links_glob])
                     in_any_local = bool(this_link in [i[0] for i in any_link_local])
                     in_any_glob = bool(this_link in [i[0] for i in self.any_link_glob])
                     has_bad_data = self.ck_bad_data(this_link)
@@ -94,7 +94,7 @@ class linkcheck(object):
                         if _IS_BASE:                               # IS base type
                             if not in_base_local:                       #if not already in this
                                 base_links_local.append(this_link)
-                            if not base_links_glob:                     #if not already in this
+                            if not _IN_BASE_GLOB:                     #if not already in this
                                 self.base_links_glob.append((this_link, parent_local))
 
                                 print("Adding this base link to base glob: ", this_link)
@@ -114,12 +114,12 @@ class linkcheck(object):
             pass
 
         print("----end of cycle in get_home_links: ---------")
+        print("\n------------base_links_local: ", base_links_local)
 
 
-        sorted_base = sorted(base_links_local)
-        base_links_local = sorted(list(set(sorted_base)),key=lambda x: x[0])
+        sorted_base = sorted(list(set(base_links_local)))
         print("\n------------returning base links local: ", base_links_local)
-        return base_links_local
+        return sorted_base
 
 
 
@@ -145,14 +145,25 @@ class linkcheck(object):
                 print("repeats: ", repeats, "-------------------!!In main loop")
                 for baselink in new_base_links_one:
                     new_base_links_two = self.get_links(self.full_addy)  # first set of base
+                    the_len = len(new_base_links_two)
 
-                the_len = len(new_base_links_two)
-                if the_len:
+                if the_len > 0:
                     new_base_links_one = new_base_links_two
 
+            base_glob_now = self.base_links_glob
+            the_len_b = len(base_glob_now)
+            while the_len_b and repeats < 4:
+                repeats += 1
+                print("repeats: ", repeats, "-------------------!!In main loop")
+                for baselink in base_glob_now:
+                    base2 =  baselink[0]
+                    new_base_links_here = self.get_links(base2)  # first set of base
+                    the_len_b = len(new_base_links_here)
+
+                if the_len_b > 0:
+                    base_glob_now = new_base_links_here
 
             logger.info("Step TwoDone")
-
             any_link_glob2 = list(set(self.any_link_glob))
             any_link_to_check = sorted(any_link_glob2, key=lambda x:x[0])
 
@@ -160,6 +171,9 @@ class linkcheck(object):
                 print('checking this link: ', i)
                 self.get_simple_response(i)
 
+            for i in self.base_links_glob:
+                print('checking this link: ', i)
+                self.get_simple_response(i)
 
             print('check for errors--------------')
             if (self.err_links):
