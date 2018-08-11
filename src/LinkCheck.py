@@ -19,6 +19,10 @@ class linkcheck(object):
                 x += 1
         return x
 
+    def my_print(self, the_line):
+        if self._MY_PRT == True:
+            print(the_line)
+
     def ck_status_code(self,t):
         err_codes = [400, 404, 408, 409, 501, 502, 503]
         goodcodes = [200]
@@ -34,7 +38,7 @@ class linkcheck(object):
         return url
     #############---------------------------------------- def
     def get_simple_response(self, tup):
-        print("Checking this link: ", tup[0])
+        self.my_print(("Checking this link: ", tup[0]))
 
         try:
             session = HTMLSession()
@@ -60,7 +64,7 @@ class linkcheck(object):
 
     #############---------------------------------------- def
     def get_links(self, parent_local):
-        print("-starting-get_home_links - just got this link: ", parent_local)
+        self.my_print(("-starting-get_home_links - just got this link: ", parent_local))
         any_link_local, base_links_local = [], []
 
         thebase_part = self.splitty(parent_local)
@@ -76,34 +80,38 @@ class linkcheck(object):
                 new_links_local = [lin for lin in response.html.absolute_links]
 
                 for this_link in new_links_local:
-                    _IS_BASE = bool(thebase_part in this_link)
                     _IN_DONE_GLOB = bool(this_link in self.done_links_glob_singles)
-                    link_eq_parent = bool(this_link == parent_local)
-                    in_base_local = bool(this_link in [i for i in base_links_local])
-                    _IN_BASE_GLOB = bool(this_link in [i[0] for i in self.base_links_glob])
-                    in_any_local = bool(this_link in [i[0] for i in any_link_local])
-                    in_any_glob = bool(this_link in [i[0] for i in self.any_link_glob])
-                    has_bad_data = self.ck_bad_data(this_link)
-
-                    if link_eq_parent or has_bad_data:
-                        pass
-
-                    elif not _IN_DONE_GLOB:    #NOT done yet
+                    if not _IN_DONE_GLOB:    #NOT done yet
                         self.done_links_glob_singles.append(this_link)  ## add to main done list
 
-                        if _IS_BASE:                               # IS base type
-                            if not in_base_local:                       #if not already in this
-                                base_links_local.append(this_link)
-                            if not _IN_BASE_GLOB:                     #if not already in this
-                                self.base_links_glob.append((this_link, parent_local))
+                        has_bad_data = self.ck_bad_data(this_link)
+                        link_eq_parent = bool(this_link == parent_local)
 
-                                print("Adding this base link to base glob: ", this_link)
+                        if link_eq_parent or has_bad_data:
+                            pass
 
-                        else:                   #if not a home based link
-                            if not in_any_local:
-                                any_link_local.append((this_link, parent_local))
-                            if not in_any_glob:
-                                self.any_link_glob.append((this_link, parent_local))
+                        else:
+                            _IS_BASE = bool(thebase_part in this_link)
+                            _IN_BASE_GLOB = bool(this_link in [i[0] for i in self.base_links_glob])
+                            in_base_local = bool(this_link in [i for i in base_links_local])
+
+                            if _IS_BASE:  # IS base type
+                                if not in_base_local:  # if not already in this
+                                    base_links_local.append(this_link)
+                                if not _IN_BASE_GLOB:  # if not already in this
+                                    self.base_links_glob.append((this_link, parent_local))
+
+                                    self.my_print(("Adding this base link to base glob: ", this_link))
+
+                            else:                   #if not a home based link
+
+                                in_any_local = bool(this_link in [i[0] for i in any_link_local])
+                                in_any_glob = bool(this_link in [i[0] for i in self.any_link_glob])
+
+                                if not in_any_local:
+                                    any_link_local.append((this_link, parent_local))
+                                if not in_any_glob:
+                                    self.any_link_glob.append((this_link, parent_local))
 
 
 
@@ -113,12 +121,12 @@ class linkcheck(object):
         except BaseException:
             pass
 
-        print("----end of cycle in get_home_links: ---------")
-        print("\n------------base_links_local: ", base_links_local)
+        self.my_print(("----end of cycle in get_home_links: ---------"))
+        self.my_print(("\n------------base_links_local: ", base_links_local))
 
 
-        sorted_base = sorted(list(set(base_links_local)))
-        print("\n------------returning base links local: ", base_links_local)
+        sorted_base = list(set(base_links_local))
+        self.my_print(("\n------------returning base links local: ", base_links_local))
         return sorted_base
 
 
@@ -127,7 +135,7 @@ class linkcheck(object):
     # begin:
     def main(self):
         tstart = perf_counter()
-        print("started timer: ", tstart)
+        self.my_print((("started timer: ", tstart)))
         logger.debug('In main() Getting first address: {}'.format(self.full_addy))
         b, new_sorted, base_only_plain_repeat_grand, agroup = [], [], [], []
         repeats = 0
@@ -142,7 +150,7 @@ class linkcheck(object):
 
             while the_len and repeats < 4:
                 repeats += 1
-                print("repeats: ", repeats, "-------------------!!In main loop")
+                self.my_print(("repeats: ", repeats, "-------------------!!In main loop"))
                 for baselink in new_base_links_one:
                     new_base_links_two = self.get_links(self.full_addy)  # first set of base
                     the_len = len(new_base_links_two)
@@ -150,11 +158,14 @@ class linkcheck(object):
                 if the_len > 0:
                     new_base_links_one = new_base_links_two
 
+            print("totalTime1: ", perf_counter() - tstart)
+            tstart = perf_counter()
+
             base_glob_now = self.base_links_glob
             the_len_b = len(base_glob_now)
             while the_len_b and repeats < 4:
                 repeats += 1
-                print("repeats: ", repeats, "-------------------!!In main loop")
+                self.my_print(("repeats: ", repeats, "-------------------!!In main loop"))
                 for baselink in base_glob_now:
                     base2 =  baselink[0]
                     new_base_links_here = self.get_links(base2)  # first set of base
@@ -164,26 +175,31 @@ class linkcheck(object):
                     base_glob_now = new_base_links_here
 
             logger.info("Step TwoDone")
-            any_link_glob2 = list(set(self.any_link_glob))
-            any_link_to_check = sorted(any_link_glob2, key=lambda x:x[0])
+            any_link_to_check = list(set(self.any_link_glob))
+            #any_link_to_check = sorted(any_link_glob2, key=lambda x:x[0])
+            print("totalTime2: ", perf_counter() - tstart)
+            tstart = perf_counter()
 
             for i in any_link_to_check:
-                print('checking this link: ', i)
+                self.my_print(('checking this link: ', i))
                 self.get_simple_response(i)
-
+            print("totalTime3: ", perf_counter() - tstart)
+            tstart = perf_counter()
             for i in self.base_links_glob:
-                print('checking this link: ', i)
+                self.my_print(('checking this link: ', i))
                 self.get_simple_response(i)
+            print("totalTime4: ", perf_counter() - tstart)
+            tstart = perf_counter()
 
-            print('check for errors--------------')
+            self.my_print(('check for errors--------------'))
             if (self.err_links):
                 print("here are the errors:-------------")
                 for i in self.err_links:
                     print(i)
+            print("totalTime5: ", perf_counter() - tstart)
+            tstart = perf_counter()
 
-
-
-            print("totalTime: ", perf_counter() - tstart)
+            print("totalTime6: ", perf_counter() - tstart)
 
         except BaseException as e:
             logger.debug(str(e), exc_info=True)
@@ -197,6 +213,7 @@ class linkcheck(object):
         self.any_link_glob = any_link_glob
         self.err_links = []
         self.full_addy = full_addy
+        self._MY_PRT = False
         self.main()
 
 if __name__ == "__main__":  ## if loaded and called by something else, go fish
