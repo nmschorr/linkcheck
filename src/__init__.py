@@ -9,9 +9,10 @@ __all__ = ['home1', 'full_addy', 'lnfeed', 'ercodes', 'badlist',
 
 #home1   = 'cosmictoys.blogspot.com/'
 home1   = 'repercussions.com/'
-home1   = 'clarinetinstitute.com/'
 home1   = 'alexforecast.blogspot.com/'
 home1   = 'schorrmedia.com/'
+home1   = 'clarinetinstitute.com/'
+#http://www.azuresults.com/
 
 full_addy = 'http://' + home1
 
@@ -46,9 +47,3 @@ def setup_logger():
 print("In " + str(super) + " __init__.py")
 the_logger = setup_logger()
 
-
-#driver = object# def start_driver():
-#     tdriver = webdriver.Firefox()
-#     print('Driver session id: ' + tdriver.session_id)
-#     tdriver.implicitly_wait(10)
-#     return tdriver

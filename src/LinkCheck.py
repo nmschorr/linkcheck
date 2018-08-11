@@ -21,10 +21,6 @@ class linkcheck(object):
         for i in mylist:
             if i in link:
                 x += 1
-        # c1 = link[:-4] == '.jpg'
-        # c2 = link[:-5] == '.jpeg'
-        # if c1 or c2:
-        #     x += 1
         return x
 
     def my_print(self, the_line):
@@ -57,6 +53,16 @@ class linkcheck(object):
 
         except Exception:
             pass
+
+    def check_end(self, link):
+        x = 0
+        if link[:-4] == '.mp3':
+            x +=1
+        # c1 = link[:-4] == '.jpg'
+        # c2 = link[:-5] == '.jpeg'
+        # if c1 or c2:
+        #     x += 1
+        return x
 
 
     def splitty(self, parent_local):
@@ -102,8 +108,9 @@ class linkcheck(object):
 
                             has_bad_data = self.ck_bad_data(this_link)
                             link_eq_parent = bool(this_link == parent_local)
+                            bad_end = self.check_end(this_link)
 
-                            if link_eq_parent or has_bad_data:
+                            if link_eq_parent or has_bad_data or bad_end:
                                 pass
 
                             else:
@@ -128,12 +135,12 @@ class linkcheck(object):
                                         any_link_local.append((this_link, parent_local))
                                     if not in_any_glob:
                                         self.any_link_glob.append((this_link, parent_local))
+            ## later check bad ends
 
-
-        except etree.XMLSyntaxError:
-            pass
-        except BaseException:
-            pass
+            except etree.XMLSyntaxError:
+                pass
+            except BaseException:
+                pass
 
         if mp: self.my_print("----end of cycle in get_home_links: ---------")
         if mp: self.my_print(("\n------------base_links_local: ", base_links_local))
