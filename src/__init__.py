@@ -9,9 +9,9 @@ __all__ = ['home1', 'full_addy', 'lnfeed', 'ercodes', 'badlist',
 
 home1   = 'clarinetinstitute.com/'
 #home1   = 'cosmictoys.blogspot.com/'
-#home1   = 'alexforecast.blogspot.com/'
 home1   = 'schorrmedia.com/'
-home1   = 'www.repercussions.com/'
+home1   = 'repercussions.com/'
+home1   = 'alexforecast.blogspot.com/'
 
 full_addy = 'http://' + home1
 
