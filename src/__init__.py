@@ -7,11 +7,11 @@ import sys
 __all__ = ['home1', 'full_addy', 'lnfeed', 'ercodes', 'badlist',
            'the_logger','any_link_glob', 'base_links_glob', 'done_links_glob', 'err_links' ]
 
-home1   = 'clarinetinstitute.com/'
 #home1   = 'cosmictoys.blogspot.com/'
-home1   = 'schorrmedia.com/'
 home1   = 'repercussions.com/'
+home1   = 'clarinetinstitute.com/'
 home1   = 'alexforecast.blogspot.com/'
+home1   = 'schorrmedia.com/'
 
 full_addy = 'http://' + home1
 
