@@ -9,7 +9,7 @@ from urllib.parse import urlsplit
 from lxml import etree
 from requests_html import HTMLSession
 
-from src import full_addy, any_link_glob, base_links_glob, done_links_glob
+from src import full_addy, any_link_glob, base_links_glob, done_links_glob_singles
 from src import the_logger as logger
 
 
@@ -43,6 +43,7 @@ class linkcheck(object):
         return url
 
     def get_simple_response(self, tup):
+        self.link_count += 1
         self.my_print("Checking this link: " + tup[0])
 
         try:
@@ -55,11 +56,13 @@ class linkcheck(object):
             pass
 
     def has_correct_suffix(self, link):
-        a, b, c = 'html',  'htm',  '/'
-        c1, c2, c3 = link.endswith(a), link.endswith(b), link.endswith(c)
-        if (c1 or c2 or c3):
-            return True
-        else: return False
+
+        goods = ['html',  'htm',  '/', 'php', 'asp', 'pl', 'com', 'net', 'org', 'css', 'py', 'rb', 'js'
+            'jsp','shtml', 'cgi', 'txt']
+        for g in goods:
+            if link.endswith(g):
+                return True
+        return False
 
     def splitty(self, parent_local):
         thebase_part_local = None
@@ -112,9 +115,11 @@ class linkcheck(object):
     def get_links(self, parent_local):
         any_link_local, base_links_local, mp= [], [], self._MY_PRT
         if mp: self.my_print("-starting-get_home_links - just got this link: " + str(parent_local))
+        response = []
 
         session = HTMLSession()
         response = session.get(parent_local)
+        self.done_links_glob_singles.append(parent_local)  ## add to main done list
 
         try:
             if not self.ck_status_code(response, parent_local):  ## if there's an error
@@ -214,15 +219,17 @@ class linkcheck(object):
 
         self.print_errs()
         print("totalTime4: ", perf_counter() - tstart)
+        print("Links checked: ", self.link_count)
 
     def __init__(self):
         print('In linkcheck: __init__')
-        self.done_links_glob_singles = done_links_glob
+        self.done_links_glob_singles = done_links_glob_singles
         self.base_links_glob = base_links_glob
         self.any_link_glob = any_link_glob
         self.err_links = []
         self.full_addy = full_addy
         self._MY_PRT = True
+        self.link_count = 0
         self.main()
 
 if __name__ == "__main__":  ## if loaded and called by something else, go fish
