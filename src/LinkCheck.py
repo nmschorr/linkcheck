@@ -2,18 +2,26 @@
 # Nancy Schorr, 2018
 # this file is in active development
 
-
 from time import perf_counter
 from urllib.parse import urlsplit
-
-from lxml import etree
 from requests_html import HTMLSession
-
-from src import full_addy, any_link_glob, base_links_glob, done_links_glob_singles
+from src import any_link_glob, base_links_glob, done_links_glob_singles, lnfeed
 from src import the_logger as logger
-
+import sys
 
 class linkcheck(object):
+
+    def __init__(self):
+        print('In linkcheck: __init__')
+        self.done_links_glob_singles = done_links_glob_singles
+        self.base_links_glob = base_links_glob
+        self.any_link_glob = any_link_glob
+        self.err_links = []
+        self._MY_PRT = True
+        self.link_count = 0
+        home1 = sys.argv[1]
+        self.full_addy = 'http://' + home1
+        self.main()
 
     def ck_bad_data(self, link):
         end_val = 0
@@ -101,8 +109,10 @@ class linkcheck(object):
 
     def print_errs(self):
         if self.err_links:
-            print("here are the errors:-------------")
             errs = list(set(self.err_links))
+            er_len = len(errs)
+            print("\nTotal errors: ", er_len)
+            print("-------------- Here are the errors ------------- :")
             errs2 = sorted(errs, key=lambda x: x[0])
             for e in errs2:
                 print("bad request page: ", e[0], " status code: ", e[1], " referring page: ", e[2])
@@ -225,16 +235,7 @@ class linkcheck(object):
         tstart_main
         print("Links checked: ", self.link_count)
 
-    def __init__(self):
-        print('In linkcheck: __init__')
-        self.done_links_glob_singles = done_links_glob_singles
-        self.base_links_glob = base_links_glob
-        self.any_link_glob = any_link_glob
-        self.err_links = []
-        self.full_addy = full_addy
-        self._MY_PRT = True
-        self.link_count = 0
-        self.main()
+
 
 if __name__ == "__main__":  ## if loaded and called by something else, go fish
     None
