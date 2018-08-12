@@ -5,21 +5,22 @@ import logging
 import sys
 
 __all__ = ['home1', 'full_addy', 'lnfeed', 'ercodes', 'badlist',
-           'the_logger','any_link_glob', 'base_links_glob', 'done_links_glob', 'err_links' ]
+           'the_logger','any_link_glob', 'base_links_glob', 'done_links_glob_singles', 'err_links' ]
 
 #home1   = 'cosmictoys.blogspot.com/'
-home1   = 'repercussions.com/'
-home1   = 'alexforecast.blogspot.com/'
 home1   = 'schorrmedia.com/'
+home1   = 'alexforecast.blogspot.com/'
+home1   = 'azuresults.com/'
+home1   = 'promatch.org/'
 home1   = 'clarinetinstitute.com/'
-#http://www.azuresults.com/
+home1   = 'repercussions.com/'
 
 full_addy = 'http://' + home1
 
 lnfeed = '\n'
 ercodes = [400, 404, 408, 409, 501, 502, 503]
 badlist = ['#','com/#', '?', 'blogger.com', '/search', 'javascript:void(0)', 'widgetType','mailto:']
-any_link_glob, base_links_glob, done_links_glob, err_links   = [], [], [], []
+any_link_glob, base_links_glob, done_links_glob_singles, err_links   = [], [], [], []
 
 def setup_logger():
     timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')

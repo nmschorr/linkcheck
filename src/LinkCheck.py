@@ -110,6 +110,7 @@ class linkcheck(object):
     def reset_timer(self, name, tstart):
         print(name, perf_counter() - tstart)
         tstart = perf_counter()
+        return tstart
 
     #############---------------------------------------- def
     def get_links(self, parent_local):
@@ -169,8 +170,9 @@ class linkcheck(object):
 
     def main(self):
         mp = self._MY_PRT
-        tstart = perf_counter()
-        self.my_print("started timer: " + str(tstart))
+        tstart_main = perf_counter()
+        #tstart = perf_counter()
+        #self.my_print("started timer: " + str(tstart))
         logger.debug('In main() Getting first address: {}'.format(self.full_addy))
         new_sorted, base_only_plain_repeat_grand, repeats = [], [], 0
         try:
@@ -189,7 +191,7 @@ class linkcheck(object):
                 the_len = len(new_base_links_two)
                 new_base_links_one = new_base_links_two if the_len > 0 else None
 
-            self.reset_timer("Time1", tstart) #1
+            #tstart = self.reset_timer("Time1", tstart) #1
 
             base_glob_now = self.base_links_glob
             new_base_links_here, the_len_b = [], len(base_glob_now)
@@ -203,13 +205,13 @@ class linkcheck(object):
                 base_glob_now = new_base_links_here
 
             logger.info("Step Two Done")
-            self.reset_timer("Time2", tstart)
+            #tstart = self.reset_timer("Time2", tstart)
             any_link_to_check = list(set(self.any_link_glob))
 
             for tup in any_link_to_check:
                 self.get_simple_response(tup)
 
-            self.reset_timer("Time3", tstart) #1
+            #tstart = self.reset_timer("Time3", tstart) #1
 
             for tup in self.base_links_glob:
                 self.get_simple_response(tup)
@@ -218,7 +220,9 @@ class linkcheck(object):
             logger.debug(str(e), exc_info=True)
 
         self.print_errs()
-        print("totalTime4: ", perf_counter() - tstart)
+        #print("Time4: ", perf_counter() - tstart)
+        print("totalTime: ", perf_counter() - tstart_main)
+        tstart_main
         print("Links checked: ", self.link_count)
 
     def __init__(self):
