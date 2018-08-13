@@ -4,22 +4,21 @@ from datetime import datetime
 import logging
 import sys
 
-__all__ = ['home1', 'full_addy', 'lnfeed', 'ercodes', 'badlist',
-           'the_logger','any_link_glob', 'base_links_glob', 'done_links_glob_singles', 'err_links' ]
+h4  = 'schorrmedia.com/'
+h3    = 'repercussions.com/'
+h2   = 'alexforecast.blogspot.com/'
+h1   = 'azuresults.com/'
+myargs = [h1, h2, h3]
+#myargs = [h1, h2]
 
-#home1   = 'cosmictoys.blogspot.com/'
-home1   = 'schorrmedia.com/'
-home1   = 'alexforecast.blogspot.com/'
-home1   = 'azuresults.com/'
-home1   = 'promatch.org/'
-home1   = 'clarinetinstitute.com/'
-home1   = 'repercussions.com/'
+__all__ = ['myargs', 'lnfeed','the_logger','any_link_glob', 'base_links_glob', 'done_links_glob_singles', 'err_links']
 
-full_addy = 'http://' + home1
+# #home1   = 'cosmictoys.blogspot.com/'
+# home1   = 'promatch.org/'
+# home1   = 'clarinetinstitute.com/'
+# home1   = 'repercussions.com/'
 
 lnfeed = '\n'
-ercodes = [400, 404, 408, 409, 501, 502, 503]
-badlist = ['#','com/#', '?', 'blogger.com', '/search', 'javascript:void(0)', 'widgetType','mailto:']
 any_link_glob, base_links_glob, done_links_glob_singles, err_links   = [], [], [], []
 
 def setup_logger():
@@ -40,8 +39,7 @@ def setup_logger():
     logger1.setLevel(level=logging.DEBUG)
     logger1.addHandler(filehandle)
     logger1.addHandler(console)                       ##logging.getLogger('').addHandler(console)  # add to root
-    lev = logging.getLogger().getEffectiveLevel()
-    logger1.info('Completed configuring logger. Logging level is: '+ str(lev))
+    logger1.info('Completed configuring logger. Logging level is: '+ str(logging.getLogger().getEffectiveLevel()))
     return logger1
 
 

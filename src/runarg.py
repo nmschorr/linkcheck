@@ -1,0 +1,1 @@
+alexforecast.blogspot.com, azuresults.com, schorrmedia.com

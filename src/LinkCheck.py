@@ -7,10 +7,11 @@ from urllib.parse import urlsplit
 from requests_html import HTMLSession
 from src import any_link_glob, base_links_glob, done_links_glob_singles, lnfeed, myargs
 from src import the_logger as logger
+import sys
 
 class linkcheck(object):
 
-    def __init__(self, arg1):
+    def __init__(self, the_arg):
         any_link_glob, base_links_glob, done_links_glob_singles, err_links = [], [], [], []
         print('In linkcheck: __init__')
         self.done_links_glob_singles = done_links_glob_singles
@@ -20,7 +21,7 @@ class linkcheck(object):
         self._MY_PRT = True
         self.link_count = 0
         self.full_addy = None
-        self.main(arg1)
+        self.main(the_arg)
 
     def ck_bad_data(self, link):
         end_val = 0
@@ -177,10 +178,9 @@ class linkcheck(object):
 
        #############---------------------------------------
 
-    def main(self, arg ):
-        self.full_addy = 'http://' + arg
+    def main(self, an_arg ):
+        self.full_addy = 'http://' + an_arg
         print('\n\n------------------- STARTING OVER -----------------------')
-        self.err_links.clear()
         mp = self._MY_PRT
         tstart_main = perf_counter()
         #tstart = perf_counter()
@@ -236,4 +236,15 @@ class linkcheck(object):
 if __name__ == "__main__":  ## if loaded and called by something else, go fish
     None
 
-linkcheck()  ## run this file/class
+
+class linkcheckrun(object):
+
+    with open("runarg.py","r") as f:
+        data=f.read()
+        print(data)
+    f.close()
+
+    for i in data:
+        linkcheck(i)
+
+linkcheckrun()
