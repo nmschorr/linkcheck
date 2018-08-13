@@ -5,13 +5,13 @@
 from time import perf_counter
 from urllib.parse import urlsplit
 from requests_html import HTMLSession
-from src import any_link_glob, base_links_glob, done_links_glob_singles, lnfeed
+from src import any_link_glob, base_links_glob, done_links_glob_singles, lnfeed, myargs
 from src import the_logger as logger
-import sys
 
 class linkcheck(object):
 
-    def __init__(self):
+    def __init__(self, arg1):
+        any_link_glob, base_links_glob, done_links_glob_singles, err_links = [], [], [], []
         print('In linkcheck: __init__')
         self.done_links_glob_singles = done_links_glob_singles
         self.base_links_glob = base_links_glob
@@ -19,9 +19,8 @@ class linkcheck(object):
         self.err_links = []
         self._MY_PRT = True
         self.link_count = 0
-        home1 = sys.argv[1]
-        self.full_addy = 'http://' + home1
-        self.main()
+        self.full_addy = None
+        self.main(arg1)
 
     def ck_bad_data(self, link):
         end_val = 0
@@ -178,7 +177,10 @@ class linkcheck(object):
 
        #############---------------------------------------
 
-    def main(self):
+    def main(self, arg ):
+        self.full_addy = 'http://' + arg
+        print('\n\n------------------- STARTING OVER -----------------------')
+        self.err_links.clear()
         mp = self._MY_PRT
         tstart_main = perf_counter()
         #tstart = perf_counter()
@@ -201,7 +203,6 @@ class linkcheck(object):
                 the_len = len(new_base_links_two)
                 new_base_links_one = new_base_links_two if the_len > 0 else None
 
-            #tstart = self.reset_timer("Time1", tstart) #1
 
             base_glob_now = self.base_links_glob
             new_base_links_here, the_len_b = [], len(base_glob_now)
@@ -211,17 +212,14 @@ class linkcheck(object):
                 if mp: self.my_print("repeats: " + str(repeats) + "-------------------!!In main loop")
                 for baselink in base_glob_now:
                     new_base_links_here = self.get_links(baselink[0])  # first set of base
-                the_len_b = len(new_base_links_here)
-                base_glob_now = new_base_links_here
+                the_len_b, base_glob_now = len(new_base_links_here), new_base_links_here
 
             logger.info("Step Two Done")
-            #tstart = self.reset_timer("Time2", tstart)
             any_link_to_check = list(set(self.any_link_glob))
 
-            for tup in any_link_to_check:
-                self.get_simple_response(tup)
-
-            #tstart = self.reset_timer("Time3", tstart) #1
+            # for tup in any_link_to_check:
+            #     self.get_simple_response(tup)
+            map(lambda x: self.get_simple_response(x), any_link_to_check)
 
             for tup in self.base_links_glob:
                 self.get_simple_response(tup)
@@ -230,9 +228,7 @@ class linkcheck(object):
             logger.debug(str(e), exc_info=True)
 
         self.print_errs()
-        #print("Time4: ", perf_counter() - tstart)
         print("totalTime: ", perf_counter() - tstart_main)
-        tstart_main
         print("Links checked: ", self.link_count)
 
 
