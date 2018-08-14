@@ -4,10 +4,11 @@
 
 from time import perf_counter
 from urllib.parse import urlsplit
+
 from requests_html import HTMLSession
-from src import any_link_glob, base_links_glob, done_links_glob_singles, lnfeed, myargs
+
 from src import the_logger as logger
-import sys
+
 
 class linkcheck(object):
 
@@ -135,6 +136,7 @@ class linkcheck(object):
         try:
             if not self.ck_status_code(response, parent_local):  ## if there's an error
                 try:
+                    # noinspection PyUnresolvedReferences
                     ab_links = response.html.absolute_links
                 except Exception:
                     print('not a link with links: ', parent_local)
@@ -238,13 +240,18 @@ if __name__ == "__main__":  ## if loaded and called by something else, go fish
 
 
 class linkcheckrun(object):
+    from pathlib import Path
+    filenme = Path("E:/PycharmProjects/linkcheck/src/runargs.txt")
+    res, res_list = 1, []
+    with open(filenme, 'r+') as file:
+        while res:
+            res = file.readline()
+            if not res.startswith('#'):
+                res_list.append(res.rstrip())
+    if res_list:
+        res_list.pop(-1)  # last one comes in empty
 
-    with open("runarg.py","r") as f:
-        data=f.read()
-        print(data)
-    f.close()
-
-    for i in data:
-        linkcheck(i)
+    for site in res_list:
+        linkcheck(site)
 
 linkcheckrun()

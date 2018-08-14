@@ -4,14 +4,14 @@ from datetime import datetime
 import logging
 import sys
 
+args_file = "E:/PycharmProjects/linkcheck/src/runargs.txt"
+
 h4  = 'schorrmedia.com/'
 h3    = 'repercussions.com/'
 h2   = 'alexforecast.blogspot.com/'
 h1   = 'azuresults.com/'
 myargs = [h1, h2, h3]
-#myargs = [h1, h2]
 
-__all__ = ['myargs', 'lnfeed','the_logger','any_link_glob', 'base_links_glob', 'done_links_glob_singles', 'err_links']
 
 # #home1   = 'cosmictoys.blogspot.com/'
 # home1   = 'promatch.org/'
@@ -20,6 +20,7 @@ __all__ = ['myargs', 'lnfeed','the_logger','any_link_glob', 'base_links_glob', '
 
 lnfeed = '\n'
 any_link_glob, base_links_glob, done_links_glob_singles, err_links   = [], [], [], []
+__all__ = ['args_file', 'lnfeed','the_logger','any_link_glob', 'base_links_glob', 'done_links_glob_singles', 'err_links']
 
 def setup_logger():
     timestp = format(datetime.now(), '%Y%m%d.%H.%M%S')
