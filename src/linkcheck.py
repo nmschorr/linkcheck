@@ -235,8 +235,8 @@ class linkcheck(object):
 
 
 
-if __name__ == "__main__":  ## if loaded and called by something else, go fish
-    None
+# if __name__ == "__main__":  ## if loaded and called by something else, go fish
+#     None
 
 
 class linkcheckrun(object):
