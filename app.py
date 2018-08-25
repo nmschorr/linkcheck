@@ -1,8 +1,9 @@
-from src import linkcheck
+from src.linkcheck import linkcheck
+
 
 class app(object):
     from pathlib import Path
-    filenme = Path("./runargs.txt")
+    filenme = Path("./src/runargs.txt")
     res, res_list = 1, []
     with open(filenme, 'r+') as file:
         while res:

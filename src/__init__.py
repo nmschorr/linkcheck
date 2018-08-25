@@ -6,18 +6,6 @@ import sys
 
 args_file = "E:/PycharmProjects/linkcheck/src/runargs.txt"
 
-# h4  = 'schorrmedia.com/'
-# h3    = 'repercussions.com/'
-# h2   = 'alexforecast.blogspot.com/'
-# h1   = 'azuresults.com/'
-# myargs = [h1, h2, h3]
-
-
-# #home1   = 'cosmictoys.blogspot.com/'
-# home1   = 'promatch.org/'
-# home1   = 'clarinetinstitute.com/'
-# home1   = 'repercussions.com/'
-
 lnfeed = '\n'
 any_link_glob, base_links_glob, done_links_glob_singles, err_links   = [], [], [], []
 __all__ = ['args_file', 'lnfeed','the_logger','any_link_glob', 'base_links_glob', 'done_links_glob_singles', 'err_links']
