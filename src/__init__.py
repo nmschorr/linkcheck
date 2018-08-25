@@ -6,11 +6,11 @@ import sys
 
 args_file = "E:/PycharmProjects/linkcheck/src/runargs.txt"
 
-h4  = 'schorrmedia.com/'
-h3    = 'repercussions.com/'
-h2   = 'alexforecast.blogspot.com/'
-h1   = 'azuresults.com/'
-myargs = [h1, h2, h3]
+# h4  = 'schorrmedia.com/'
+# h3    = 'repercussions.com/'
+# h2   = 'alexforecast.blogspot.com/'
+# h1   = 'azuresults.com/'
+# myargs = [h1, h2, h3]
 
 
 # #home1   = 'cosmictoys.blogspot.com/'
