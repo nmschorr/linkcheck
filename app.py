@@ -10,16 +10,35 @@ api = Api(app)
 # @app.route('/<string:page_name>/')
 # def hello():
 #     answer = linkcheck('schorrmedia.com')
-#     return str(answer)
+# #     return str(answer)
+#
+# @app.route('/<string:page_name>/')
+# def static_page(page_name):
+#     return render_template('%s.html' % page_name)
+#
+#
+# if __name__ == '__main__':
+#     app.debug = True
+#     app.run(port=5000)
 
-@app.route('/<string:page_name>/')
-def static_page(page_name):
-    return render_template('%s.html' % page_name)
+@app.route('/')
+@app.route('/index')
+def index():
+    user = {'username': 'Miguel'}
+    return '''
+<html>
+    <head>
+        <title>Home Page - Microblog</title>
+    </head>
+    <body>
+        <h1>Hello, ''' + user['username'] + '''!</h1>
+    </body>
+</html>'''
 
 
 if __name__ == '__main__':
-    app.debug = True
-    app.run(port=5000)
+     app.debug = True
+     app.run(port=5000)
 
 
 
