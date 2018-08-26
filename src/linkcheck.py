@@ -7,9 +7,6 @@ from urllib.parse import urlsplit
 
 from requests_html import HTMLSession
 
-from src import the_logger as logger
-
-
 class linkcheck(object):
 
     def __init__(self, the_arg):
@@ -73,7 +70,7 @@ class linkcheck(object):
                 return True
         return False
 
-    def splitty(self, parent_local):
+    def divide_url(self, parent_local):
         thebase_part_local = None
         try:
             thebase_part_local = (urlsplit(parent_local))[1]
@@ -83,22 +80,22 @@ class linkcheck(object):
             print(e)
         return thebase_part_local
 
-    def any_glob(self, this_link, parent_local):
+    def add_to_any(self, this_link, parent_local): #Adding this base link to any glob
         in_any_glob = bool(this_link in [i[0] for i in self.any_link_glob])
         if not in_any_glob:
             self.any_link_glob.append((this_link, parent_local))
 
-    def any_base_glob(self, this_link, parent_local):
+    def add_to_any_base(self, this_link, parent_local): #Adding this base link to base glob
         mp = self._MY_PRT
         _IN_BASE_GLOB = bool(this_link in [i[0] for i in self.base_links_glob])
         if not _IN_BASE_GLOB:  # if not already in this
             if mp: self.base_links_glob.append((this_link, parent_local))
             if mp: self.my_print("Adding this base link to base glob: "  + this_link)
 
-    def check_data(self, this_link, parent_local, any_link_local):
-        has_bad_data = self.ck_bad_data(this_link)
+    def check_for_bad_data(self, this_link, parent_local, any_link_local):
+        has_bad_data = self.ck_bad_data(this_link)  #check for bad data
         link_eq_parent = bool(this_link == parent_local)
-        good_suffix = self.has_correct_suffix(this_link)
+        good_suffix = self.has_correct_suffix(this_link)  #check suffix
         in_any_local = bool(this_link in [i[0] for i in any_link_local])
         self.done_links_glob_singles.append(this_link)  ## add to main done list
         return has_bad_data, link_eq_parent, good_suffix, in_any_local
@@ -109,6 +106,8 @@ class linkcheck(object):
         return _IS_BASE, in_base_local
 
     def print_errs(self):
+        fin_list = []
+        mystr = ''
         if self.err_links:
             errs = list(set(self.err_links))
             er_len = len(errs)
@@ -116,7 +115,11 @@ class linkcheck(object):
             print("-------------- Here are the errors ------------- :")
             errs2 = sorted(errs, key=lambda x: x[0])
             for e in errs2:
+                mystr.append("bad request page: ", e[0], " status code: ", e[1], " referring page: ", e[2])
+
                 print("bad request page: ", e[0], " status code: ", e[1], " referring page: ", e[2])
+                fin_list.append(mystr)
+        return fin_list
 
     def reset_timer(self, name, tstart):
         print(name, perf_counter() - tstart)
@@ -147,7 +150,7 @@ class linkcheck(object):
                         _IN_DONE_GLOB = bool(this_link in self.done_links_glob_singles)
                         if not _IN_DONE_GLOB:    #NOT done yet
                             has_bad_data, link_eq_parent, good_suffix, in_any_local = \
-                                self.check_data(this_link, parent_local, any_link_local)
+                                self.check_for_bad_data(this_link, parent_local, any_link_local)
 
                             if link_eq_parent or has_bad_data:
                                 pass
@@ -155,21 +158,21 @@ class linkcheck(object):
                             elif not good_suffix:
                                 if not in_any_local:
                                     any_link_local.append((this_link, parent_local))
-                                self.any_glob(this_link, parent_local)
+                                self.add_to_any(this_link, parent_local)
 
                             else:
-                                base_pt = self.splitty(parent_local)
+                                base_pt = self.divide_url(parent_local)
                                 _IS_BASE, in_base_local = self.ck_base(this_link, base_pt, base_links_local)
 
                                 if _IS_BASE:  # IS base type
                                     if not in_base_local:  # if not already in this
                                         base_links_local.append(this_link)
-                                    self.any_base_glob(this_link, parent_local)
+                                    self.add_to_any_base(this_link, parent_local)
 
                                 else:                   #if not a home based link
                                     if not in_any_local:
                                         any_link_local.append((this_link, parent_local))
-                                    self.any_glob(this_link, parent_local)
+                                    self.add_to_any(this_link, parent_local)
 
         except Exception as e:
             print(e)
@@ -181,12 +184,15 @@ class linkcheck(object):
        #############---------------------------------------
 
     def main(self, an_arg ):
+        from logging import getLogger
+        from src.setup_logger import this_logger
+        this_logger.setup_logger(self)
+        logger = getLogger('mainlogger')
+
         self.full_addy = 'http://' + an_arg
         print('\n\n------------------- STARTING OVER -----------------------')
         mp = self._MY_PRT
         tstart_main = perf_counter()
-        #tstart = perf_counter()
-        #self.my_print("started timer: " + str(tstart))
         logger.debug('In main() Getting first address: {}'.format(self.full_addy))
         new_sorted, base_only_plain_repeat_grand, repeats = [], [], 0
         try:
@@ -229,29 +235,8 @@ class linkcheck(object):
         except Exception as e:
             logger.debug(str(e), exc_info=True)
 
-        self.print_errs()
+        finlist = self.print_errs()
         print("totalTime: ", perf_counter() - tstart_main)
         print("Links checked: ", self.link_count)
+        return finlist
 
-
-
-# if __name__ == "__main__":  ## if loaded and called by something else, go fish
-#     None
-
-
-# class linkcheckrun(object):
-#     from pathlib import Path
-#     filenme = Path("E:/PycharmProjects/linkcheck/src/runargs.txt")
-#     res, res_list = 1, []
-#     with open(filenme, 'r+') as file:
-#         while res:
-#             res = file.readline()
-#             if not res.startswith('#'):
-#                 res_list.append(res.rstrip())
-#     if res_list:
-#         res_list.pop(-1)  # last one comes in empty
-#
-#     for site in res_list:
-#         linkcheck(site)
-#
-# linkcheckrun()
