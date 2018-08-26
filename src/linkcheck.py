@@ -4,6 +4,7 @@
 
 from time import perf_counter
 from urllib.parse import urlsplit
+import requests
 
 from requests_html import HTMLSession
 
@@ -36,6 +37,8 @@ class linkcheck(object):
     def ck_status_code(self, response, parent_local):
         err_codes = [400, 404, 408, 409, 501, 502, 503]
         #goodcodes = [200]
+        temp_url = response.url
+        print("testing this now: ", temp_url)
 
         if response.status_code in err_codes:
             self.err_links.append((response.url, response.status_code, parent_local))
@@ -49,20 +52,31 @@ class linkcheck(object):
         return url
 
     def get_simple_response(self, tup):
+        parent = tup[1]
+        link_we_are_chkg = tup[0]
+        response = None
         self.link_count += 1
-        self.my_print("Checking this link: " + tup[0])
+        self.my_print("Checking this link: " + link_we_are_chkg)
 
         try:
             session = HTMLSession()
-            response = session.get(tup[0])
+            response = session.get(link_we_are_chkg)
 
-            self.ck_status_code(response, tup[1])
+            self.ck_status_code(response, parent)
 
-        except Exception:
+        except requests.exceptions.ConnectionError as e:
+            print('!!!!!!!! found bad error-------------------------')
+            print(e)
+            short_e = '<' + str(e)[:27] + '>'
+            self.err_links.append((link_we_are_chkg, short_e, parent))
             pass
 
-    def has_correct_suffix(self, link):
+        # except Exception as the_except:
+        #     print(the_except)
+        #     self.err_links.append((response.url, response.status_code, None))
+        #     pass
 
+    def has_correct_suffix(self, link):
         goods = ['html',  'htm',  '/', 'php', 'asp', 'pl', 'com', 'net', 'org', 'css', 'py', 'rb', 'js'
             'jsp','shtml', 'cgi', 'txt']
         for g in goods:
@@ -107,17 +121,18 @@ class linkcheck(object):
 
     def print_errs(self):
         fin_list = []
-        mystr = ''
+        mystr, e = '', ''
         if self.err_links:
             errs = list(set(self.err_links))
             er_len = len(errs)
             print("\nTotal errors: ", er_len)
             print("-------------- Here are the errors ------------- :")
-            errs2 = sorted(errs, key=lambda x: x[0])
+            errs2 = sorted(errs, key=lambda x: x[0])  # sort on first
             for e in errs2:
-                mystr.append("bad request page: ", e[0], " status code: ", e[1], " referring page: ", e[2])
-
-                print("bad request page: ", e[0], " status code: ", e[1], " referring page: ", e[2])
+                mys = "bad request: "
+                str2 = str(e)
+                mystr = mys + str2
+                print("bad request:", e[0], " reason:", str(e[1]), " referrer:", e[2])
                 fin_list.append(mystr)
         return fin_list
 
@@ -225,9 +240,9 @@ class linkcheck(object):
             logger.info("Step Two Done")
             any_link_to_check = list(set(self.any_link_glob))
 
-            # for tup in any_link_to_check:
-            #     self.get_simple_response(tup)
-            map(lambda x: self.get_simple_response(x), any_link_to_check)
+            for tup in any_link_to_check:    #check non-base links
+                self.get_simple_response(tup)
+                                                ##map(lambda x: self.get_simple_response(x), any_link_to_check)
 
             for tup in self.base_links_glob:
                 self.get_simple_response(tup)
