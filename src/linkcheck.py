@@ -13,16 +13,14 @@ class linkcheck(object):
         self.any_link_glob, self.base_links_glob = [],[]
         self.done_links_glob_singles, self.err_links = [],[]
         self.PRT = True
-        self.link_count = 0
-        self.full_addy = None
+        self.link_count, self.full_addy = 0, None
         lc = lc_utils()
         logger = lc.setup_logger()
         self.logger = logger
 
     def ck_status_code(self, response, parent_local):
         err_codes = [400, 404, 408, 409, 501, 502, 503]
-        temp_url = response.url
-        self.logger.debug("testing this now: " + temp_url)
+        self.logger.debug("testing this now: " + response.url)
 
         if response.status_code in err_codes:
             self.err_links.append((response.url, response.status_code, parent_local))
@@ -39,9 +37,7 @@ class linkcheck(object):
         return has_bad_data, link_eq_parent, good_suffix, in_any_local
 
     def get_simple_response(self, tup):
-        parent = tup[1]
-        link_we_are_chkg = tup[0]
-        response = None
+        link_we_are_chkg, parent, response = tup[0], tup[1], None
         self.link_count += 1
         self.logger.debug("Checking this link: " + link_we_are_chkg)
 
@@ -129,10 +125,10 @@ class linkcheck(object):
 
     def main_run(self, a_site):
         self.full_addy = 'http://' + a_site
+        new_sorted, base_only_plain_repeat_grand, repeats = [], [], 0
         self.logger.debug('\n\n------------------- STARTING OVER -----------------------')
         tstart_main = perf_counter()
         print('In main() Getting first address: {}'.format(self.full_addy))
-        new_sorted, base_only_plain_repeat_grand, repeats = [], [], 0
         try:
             #############---------step ONE:
             base_only_plain_repeat = self.get_links(self.full_addy)  #first set of base
