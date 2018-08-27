@@ -9,18 +9,33 @@ app.config['SESSION_TYPE'] = 'memcached'
 app.config['SECRET_KEY'] = 'super secret key'
 #sess = session()
 #sess.init_app(app)
+from src.linkcheck import linkcheck
 
 @app.route('/')
-def index():
-    message = linkcheck('cosmictoys.blogspot.com')
-    flash(message)
-    for i in message.err_links:
-        print(i)
+def app():
+    lc = linkcheck()
+    site = 'schorrmedia.com/mytest.html'
+    answer = lc.main_run(site)
 
-    return render_template('home.html')
+    #flash(message)
+    #for a in answer:
+    #    print(a)
+    a = str(answer[0])
+    print(a)
+
+    '''
+    <html>
+        <head>
+            <title>LinkCheck Results</title>
+        </head>
+        <body>
+            <h1>''' +  a + '''</h1>
+        </body>
+    </html>
+    '''
 
 
-
+app()
 
 # @app.route('/<string:page_name>/')
 # def hello():
@@ -65,8 +80,6 @@ def index():
 # </html>'''
 #
 #
-if __name__ == '__main__':
-     app.debug = True
-     app.run(port=5000)
+
 
 
