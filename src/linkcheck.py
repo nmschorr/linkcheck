@@ -2,87 +2,50 @@
 # Nancy Schorr, 2018
 # this file is in active development
 
-from time import perf_counter
 from urllib.parse import urlsplit
-import requests
-
 from requests_html import HTMLSession
+from requests.exceptions import ConnectionError
+from src.linkcheck_utils import lc_utils
+from time import perf_counter
+
 
 class linkcheck(object):
 
-    def __init__(self, the_arg):
-        any_link_glob, base_links_glob, done_links_glob_singles, err_links = [], [], [], []
+    def __init__(self):
         print('In linkcheck: __init__')
-        self.done_links_glob_singles = done_links_glob_singles
-        self.base_links_glob = base_links_glob
-        self.any_link_glob = any_link_glob
-        self.err_links = []
-        self._MY_PRT = True
+        self.any_link_glob, self.base_links_glob = [],[]
+        self.done_links_glob_singles, self.err_links = [],[]
+        self.PRT = True
         self.link_count = 0
         self.full_addy = None
-        self.main(the_arg)
-
-    def ck_bad_data(self, link):
-        end_val = 0
-        mylist = ['#', 'tel:+']
-        for i in mylist:
-            if i in link:
-                end_val += 1
-        return end_val
-
-
-    def my_print(self, the_line):
-        print(the_line)
-
-    def ck_status_code(self, response, parent_local):
-        err_codes = [400, 404, 408, 409, 501, 502, 503]
-        #goodcodes = [200]
-        temp_url = response.url
-        print("testing this now: ", temp_url)
-
-        if response.status_code in err_codes:
-            self.err_links.append((response.url, response.status_code, parent_local))
-            return 1
-        else:
-            return 0    #ok
-
-    def split_url(self, url):
-        if '?' in url:
-            url = (url.split('?'))[0]
-        return url
+        self.lc = lc_utils()
 
     def get_simple_response(self, tup):
         parent = tup[1]
         link_we_are_chkg = tup[0]
         response = None
         self.link_count += 1
-        self.my_print("Checking this link: " + link_we_are_chkg)
+        print("Checking this link: " + link_we_are_chkg)
 
         try:
             session = HTMLSession()
             response = session.get(link_we_are_chkg)
 
-            self.ck_status_code(response, parent)
+            self.lc.ck_status_code(response, parent)
 
-        except requests.exceptions.ConnectionError as e:
+        except ConnectionError as e:
             print('!!!!!!!! found bad error-------------------------')
             print(e)
-            short_e = '<' + str(e)[:27] + '>'
+            short_e = str(e)[:57]
             self.err_links.append((link_we_are_chkg, short_e, parent))
             pass
 
-        # except Exception as the_except:
-        #     print(the_except)
-        #     self.err_links.append((response.url, response.status_code, None))
-        #     pass
-
-    def has_correct_suffix(self, link):
-        goods = ['html',  'htm',  '/', 'php', 'asp', 'pl', 'com', 'net', 'org', 'css', 'py', 'rb', 'js'
-            'jsp','shtml', 'cgi', 'txt']
-        for g in goods:
-            if link.endswith(g):
-                return True
-        return False
+        except Exception as e:
+            print('!!!!!!!! found error-------------------------')
+            print(e)
+            short_e = str(e)[:57]
+            self.err_links.append((link_we_are_chkg, short_e, parent))
+            pass
 
     def divide_url(self, parent_local):
         thebase_part_local = None
@@ -100,16 +63,15 @@ class linkcheck(object):
             self.any_link_glob.append((this_link, parent_local))
 
     def add_to_any_base(self, this_link, parent_local): #Adding this base link to base glob
-        mp = self._MY_PRT
         _IN_BASE_GLOB = bool(this_link in [i[0] for i in self.base_links_glob])
         if not _IN_BASE_GLOB:  # if not already in this
-            if mp: self.base_links_glob.append((this_link, parent_local))
-            if mp: self.my_print("Adding this base link to base glob: "  + this_link)
+            if self.PRT: self.base_links_glob.append((this_link, parent_local))
+            if self.PRT: print("Adding this base link to base glob: " + this_link)
 
     def check_for_bad_data(self, this_link, parent_local, any_link_local):
-        has_bad_data = self.ck_bad_data(this_link)  #check for bad data
+        has_bad_data = self.lc.ck_bad_data(this_link)  #check for bad data
         link_eq_parent = bool(this_link == parent_local)
-        good_suffix = self.has_correct_suffix(this_link)  #check suffix
+        good_suffix = self.lc.has_correct_suffix(this_link)  #check suffix
         in_any_local = bool(this_link in [i[0] for i in any_link_local])
         self.done_links_glob_singles.append(this_link)  ## add to main done list
         return has_bad_data, link_eq_parent, good_suffix, in_any_local
@@ -121,7 +83,7 @@ class linkcheck(object):
 
     def print_errs(self):
         fin_list = []
-        mystr, e = '', ''
+        answer_string, e = '', ''
         if self.err_links:
             errs = list(set(self.err_links))
             er_len = len(errs)
@@ -129,22 +91,20 @@ class linkcheck(object):
             print("-------------- Here are the errors ------------- :")
             errs2 = sorted(errs, key=lambda x: x[0])  # sort on first
             for e in errs2:
-                mys = "bad request: "
-                str2 = str(e)
-                mystr = mys + str2
-                print("bad request:", e[0], " reason:", str(e[1]), " referrer:", e[2])
-                fin_list.append(mystr)
+                p0 = "BAD LINK: "
+                p1 = " REASON: "
+                p2 = " REFERRING PAGE: "
+                st0 = str(e[0])
+                st1 = str(e[1])
+                st2 = str(e[2])
+                answer_string = p0 + st0 + p1 + st1 + p2 + st2 + '\n'
+                fin_list.append(answer_string)
         return fin_list
-
-    def reset_timer(self, name, tstart):
-        print(name, perf_counter() - tstart)
-        tstart = perf_counter()
-        return tstart
 
     #############---------------------------------------- def
     def get_links(self, parent_local):
-        any_link_local, base_links_local, mp= [], [], self._MY_PRT
-        if mp: self.my_print("-starting-get_home_links - just got this link: " + str(parent_local))
+        any_link_local, base_links_local = [], []
+        if self.PRT: print("-starting-get_home_links - just got this link: " + str(parent_local))
         response = []
 
         session = HTMLSession()
@@ -152,7 +112,7 @@ class linkcheck(object):
         self.done_links_glob_singles.append(parent_local)  ## add to main done list
 
         try:
-            if not self.ck_status_code(response, parent_local):  ## if there's an error
+            if not self.lc.ck_status_code(response, parent_local):  ## if there's an error
                 try:
                     # noinspection PyUnresolvedReferences
                     ab_links = response.html.absolute_links
@@ -193,20 +153,16 @@ class linkcheck(object):
             print(e)
             pass
 
-        if mp: self.my_print('----end get_home_links:---returning base_links_local: ' + str(base_links_local))
+        if self.PRT: print('----end get_home_links:---returning base_links_local: ' + str(base_links_local))
         return list(set(base_links_local))
 
        #############---------------------------------------
 
-    def main(self, an_arg ):
-        from logging import getLogger
-        from src.setup_logger import this_logger
-        this_logger.setup_logger(self)
-        logger = getLogger('mainlogger')
+    def main_run(self, a_site):
+        logger = self.lc.setup_logger()
 
-        self.full_addy = 'http://' + an_arg
+        self.full_addy = 'http://' + a_site
         print('\n\n------------------- STARTING OVER -----------------------')
-        mp = self._MY_PRT
         tstart_main = perf_counter()
         logger.debug('In main() Getting first address: {}'.format(self.full_addy))
         new_sorted, base_only_plain_repeat_grand, repeats = [], [], 0
@@ -219,7 +175,7 @@ class linkcheck(object):
 
             while the_len and repeats < 10:
                 repeats += 1
-                if mp: self.my_print("repeats: " + str(repeats) + "-------------------!!In main loop")
+                if self.PRT: print("repeats: " + str(repeats) + "-------------------!!In main loop")
                 for baselink in new_base_links_one:
                     new_base_links_two = self.get_links(baselink)  # first set of base
 
@@ -232,7 +188,7 @@ class linkcheck(object):
 
             while the_len_b and repeats < 7:
                 repeats += 1
-                if mp: self.my_print("repeats: " + str(repeats) + "-------------------!!In main loop")
+                if self.PRT: print("repeats: " + str(repeats) + "-------------------!!In main loop")
                 for baselink in base_glob_now:
                     new_base_links_here = self.get_links(baselink[0])  # first set of base
                 the_len_b, base_glob_now = len(new_base_links_here), new_base_links_here
