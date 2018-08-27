@@ -14,7 +14,6 @@ class app2(object):
     for site in res_list:
         lc = linkcheck()
         answer = lc.main_run(site)
-        #print('printing from app2')
         for a in answer:
             print(a)
 app2()

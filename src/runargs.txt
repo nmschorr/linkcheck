@@ -3,4 +3,5 @@
 #azuresults.com
 #repercussions.com
 #schorrmedia.com
-cosmictoys.blogspot.com
+#cosmictoys.blogspot.com
+schorrmedia.com/mytest.html
