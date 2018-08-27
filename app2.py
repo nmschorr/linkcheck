@@ -12,5 +12,9 @@ class app2(object):
     if res_list:
         res_list.pop(-1)  # last one comes in empty
     for site in res_list:
-        linkcheck(site)
+        lc = linkcheck()
+        answer = lc.main_run(site)
+        #print('printing from app2')
+        for a in answer:
+            print(a)
 app2()
