@@ -1,41 +1,25 @@
-from src.linkcheck import linkcheck
 from flask import Flask, flash, session, request, render_template
 from flask_restful import Resource, Api
-
-app = Flask(__name__)
-                    # api = Api(app)
-app.secret_key = "super secret key"
-app.config['SESSION_TYPE'] = 'memcached'
-app.config['SECRET_KEY'] = 'super secret key'
-#sess = session()
-#sess.init_app(app)
 from src.linkcheck import linkcheck
 
+app = Flask(__name__)
+#api = Api(app)
+#app.secret_key = "super secret key"
+#app.config['SESSION_TYPE'] = 'memcached'
+#app.config['SECRET_KEY'] = 'super secret key'
+
+
 @app.route('/')
-def app():
+def run():
     lc = linkcheck()
     site = 'schorrmedia.com/mytest.html'
     answer = lc.main_run(site)
+    thelines = str(answer[0])
 
-    #flash(message)
-    #for a in answer:
-    #    print(a)
-    a = str(answer[0])
-    print(a)
+    return render_template('index.html', title='Home', thelines=thelines)
 
-    '''
-    <html>
-        <head>
-            <title>LinkCheck Results</title>
-        </head>
-        <body>
-            <h1>''' +  a + '''</h1>
-        </body>
-    </html>
-    '''
-
-
-app()
+if __name__ == '__main__':
+    app.run(debug=True)
 
 # @app.route('/<string:page_name>/')
 # def hello():

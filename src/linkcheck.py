@@ -72,7 +72,7 @@ class linkcheck(object):
     def get_links(self, parent_local):
         any_link_local, base_links_local, response = [], [], []
         self.logger.debug("-starting-get_home_links - just got this link: " + str(parent_local))
-
+        this_link = None
         session = HTMLSession()
         response = session.get(parent_local)
         self.done_links_glob_singles.append(parent_local)  ## add to main done list
@@ -115,7 +115,8 @@ class linkcheck(object):
                                     self.add_to_any(this_link, parent_local)
 
         except Exception as e:
-            print(e)
+            self.logger.debug('!!!!!!!! found error------------------\n' + str(e))
+            self.err_links.append((this_link, str(e)[:57], parent_local))
             pass
 
         self.logger.debug('----end get_home_links:---returning base_links_local: ' + str(base_links_local))
@@ -165,7 +166,8 @@ class linkcheck(object):
                 self.get_simple_response(tup)
 
         except Exception as e:
-            print(str(e), exc_info=True)
+            print(str(e))
+            pass
 
         finlist = lc_utils().print_errs(self.err_links)
         self.logger.debug("totalTime: " + str(perf_counter() - tstart_main))
