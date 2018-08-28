@@ -88,6 +88,6 @@ class lc_utils(object):
                 p1 = " REASON: "
                 p2 = " REFERRING PAGE: "
                 st0,st1,st2 = str(e[0]),str(e[1]),str(e[2])
-                answer_string = p0 + st0 + p1 + st1 + p2 + st2 + '\n'
+                answer_string = '\n' + p0 + st0 + p1 + st1 + p2 + st2 + '\n\n'
                 fin_list.append(answer_string)
         return fin_list

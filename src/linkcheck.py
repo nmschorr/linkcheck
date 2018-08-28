@@ -12,8 +12,7 @@ class linkcheck(object):
         print('In linkcheck: __init__')
         self.any_link_glob, self.base_links_glob = [],[]
         self.done_links_glob_singles, self.err_links = [],[]
-        self.PRT = True
-        self.link_count, self.full_addy = 0, None
+        self.PRT, self.link_count, self.full_addy = True, 0, None
         lc = lc_utils()
         logger = lc.setup_logger()
         self.logger = logger
@@ -70,9 +69,8 @@ class linkcheck(object):
 
     #############---------------------------------------- def
     def get_links(self, parent_local):
-        any_link_local, base_links_local, response = [], [], []
+        this_link, any_link_local, base_links_local, response = None, [], [], []
         self.logger.debug("-starting-get_home_links - just got this link: " + str(parent_local))
-        this_link = None
         session = HTMLSession()
         response = session.get(parent_local)
         self.done_links_glob_singles.append(parent_local)  ## add to main done list
@@ -125,37 +123,53 @@ class linkcheck(object):
        #############---------------------------------------
 
     def main_run(self, a_site):
-        self.full_addy = 'http://' + a_site
+        full_addy = 'http://' + a_site
         new_sorted, base_only_plain_repeat_grand, repeats = [], [], 0
         self.logger.debug('\n\n------------------- STARTING OVER -----------------------')
         tstart_main = perf_counter()
-        print('In main() Getting first address: {}'.format(self.full_addy))
+        print('In main() Getting first address: {}'.format(full_addy))
         try:
             #############---------step ONE:
-            base_only_plain_repeat = self.get_links(self.full_addy)  #first set of base
+            base_only_plain_repeat = self.get_links(full_addy)  #first set of base
             self.logger.info("Step One Done")   ##first time:  HOME PAGE ONLY  ##first time
             the_len = len(base_only_plain_repeat)
             new_base_links_two, new_sorted, new_base_links_one= [], [], base_only_plain_repeat
 
             while the_len and repeats < 10:
                 repeats += 1
-                if self.PRT:
-                    print("repeats: " + str(repeats) + "-------------------!!In main loop")
+                self.logger.debug("repeats: " + str(repeats) + "-------------------!!In main loop")
                 for baselink in new_base_links_one:
                     new_base_links_two = self.get_links(baselink)  # first set of base
 
                 the_len = len(new_base_links_two)
                 new_base_links_one = new_base_links_two if the_len > 0 else None
 
+        except Exception as e:
+            self.logger.debug('!!!!!!!! found error------------------\n' + str(e))
+            self.err_links.append((e.request.url, str(e)[:57], full_addy))
+            pass
+
+        try:
+
             base_glob_now = self.base_links_glob
             new_base_links_here, the_len_b = [], len(base_glob_now)
 
             while the_len_b and repeats < 7:
+
                 repeats += 1
                 if self.PRT: print("repeats: " + str(repeats) + "-------------------!!In main loop")
                 for baselink in base_glob_now:
-                    new_base_links_here = self.get_links(baselink[0])  # first set of base
+                    base_lin = baselink[0]
+                    parent_lin = baselink[1]
+                    new_base_links_here = self.get_links(base_lin)  # first set of base
                 the_len_b, base_glob_now = len(new_base_links_here), new_base_links_here
+
+        except Exception as e:
+            self.logger.debug('!!!!!!!! found error------------------\n' + str(e))
+            self.err_links.append((base_lin, str(e)[:57], parent_lin))
+            pass
+
+        try:
 
             self.logger.info("Step Two Done")
             any_link_to_check = list(set(self.any_link_glob))
@@ -166,7 +180,8 @@ class linkcheck(object):
                 self.get_simple_response(tup)
 
         except Exception as e:
-            print(str(e))
+            self.logger.debug('!!!!!!!! found error------------------\n' + str(e))
+            self.err_links.append((tup, str(e)[:57], a_site))
             pass
 
         finlist = lc_utils().print_errs(self.err_links)
