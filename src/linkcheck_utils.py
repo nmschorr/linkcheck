@@ -26,6 +26,7 @@ class lc_utils(object):
         logger.info('Completed configuring logger. Logging level is: '+ str(logging.getLogger().getEffectiveLevel()))
         return logger
 
+    @staticmethod
     def ck_bad_data(self, link):
         end_val = 0
         mylist = ['#', 'tel:+']
@@ -34,25 +35,33 @@ class lc_utils(object):
                 end_val += 1
         return end_val
 
-    def check_for_bad_data(self, this_link, parent_local, any_link_local, done_links_glob_sing=[]):
-        has_bad_data = lc_utils().ck_bad_data(this_link)  #check for bad data
-        link_eq_parent = bool(this_link == parent_local)
-        good_suffix = lc_utils().has_correct_suffix(this_link)  #check suffix
-        in_any_local = bool(this_link in [i[0] for i in any_link_local])
-        done_links_glob_sing.append(this_link)  ## add to main done list
-        return has_bad_data, link_eq_parent, good_suffix, in_any_local, done_links_glob_sing
+    @staticmethod
+    def check_for_bad_data(self, this_link, done_lnks_gl=None):
+        if done_lnks_gl:
+            done_lnks_gl.append(this_link)  ## add to main done list
+        else:
+            done_lnks_gl = [this_link]
+        return done_lnks_gl
 
-    def add_to_any_base(self, this_link, parent_local, base_links_glob2=[]): #Adding this base link to base glob
-        _IN_BASE_GLOB = bool(this_link in [i[0] for i in base_links_glob2])
-        if not _IN_BASE_GLOB:  # if not already in this
-            base_links_glob2.append((this_link, parent_local))
-            #self.logger.debug("Adding this base link to base glob: " + this_link)
+    @staticmethod
+    def add_to_any_base(self, this_link, parent_local, base_links_glob2=None): #Adding this base link to base glob
+        if base_links_glob2:
+            _IN_BASE_GLOB = bool(this_link in [i[0] for i in base_links_glob2])
+            if not _IN_BASE_GLOB:  # if not already in this
+                base_links_glob2.append((this_link, parent_local))
+                print("Adding this base link to base glob: " + this_link)
+        else:
+            base_links_glob2= [(this_link, parent_local)]
         return base_links_glob2
 
-    def add_to_any(self, this_link, parent_local, any_link_glob2=[]): #Adding this base link to any glob
-        in_any_glob = bool(this_link in [i[0] for i in self.any_link_glob2])
-        if not in_any_glob:
-            any_link_glob2.append((this_link, parent_local))
+    @staticmethod
+    def add_to_any(self, this_link, parent_local, any_link_glob2=None): #Adding this base link to any glob
+        if any_link_glob2:
+            glob_bool = bool(this_link in [i[0] for i in self.any_link_glob2])
+            if not glob_bool:
+                any_link_glob2.append((this_link, parent_local))
+        else:
+            any_link_glob2 = [(this_link, parent_local)]
         return any_link_glob2
 
 
@@ -79,9 +88,12 @@ class lc_utils(object):
         return False
 
     @staticmethod
-    def ck_base(this_link, thebase_part, base_links_local=[]):
+    def ck_base(this_link, thebase_part, base_links_local=None):
         _IS_BASE = bool(thebase_part in this_link)
-        in_base_local = bool(this_link in [i for i in base_links_local])
+        if base_links_local:
+            in_base_local = bool(this_link in [i for i in base_links_local])
+        else:
+            base_links_local = False
         return _IS_BASE, in_base_local
 
     @staticmethod
@@ -96,7 +108,7 @@ class lc_utils(object):
         return thebase_part_local
 
     @staticmethod
-    def print_errs(errlinks=[]):
+    def print_errs(errlinks=None):
         fin_list = []
         answer_string, e = '', ''
         if errlinks:
@@ -112,4 +124,6 @@ class lc_utils(object):
                 st0,st1,st2 = str(e[0]),str(e[1]),str(e[2])
                 answer_string = '\n' + p0 + st0 + p1 + st1 + p2 + st2 + '\n\n'
                 fin_list.append(answer_string)
+        else:
+            fin_list = [answer_string]
         return fin_list

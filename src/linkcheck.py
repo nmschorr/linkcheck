@@ -9,17 +9,15 @@ from time import perf_counter
 class linkcheck(object):
     def __init__(self):
         self.any_link_glob, self.base_links_glob = [],[]
-        self.done_lnks_gl_singles, self.err_links, self.link_count = [], [], 0
+        self.done_ln_gl_sing, self.err_links, self.link_count = [], [], 0
         self.logger = lc_utils().setup_logger()
         self.logger.debug('In linkcheck: __init__')
-
 
     def handle_exc(self, e, link, plink):
         print(str(e))
         self.logger.debug('!!!!!!!! found error------------------\n' + str(e))
         self.err_links.append((link, str(e)[:57], plink))
         pass
-
 
     def get_simple_response(self, tup):
         er = None
@@ -39,7 +37,7 @@ class linkcheck(object):
         self.logger.debug("-starting-get_home_links - just got this link: " + str(parent_local))
         session = HTMLSession()
         response = session.get(parent_local)
-        self.done_lnks_gl_singles.append(parent_local)  ## add to main done list
+        self.done_ln_gl_sing.append(parent_local)  ## add to main done list
         try:
             er =  self.ck_status_code(response, parent_local )  ## if there's an error
             if not er:  ## if there's an error
@@ -51,11 +49,14 @@ class linkcheck(object):
                     new_links_local = [ab_lin for ab_lin in ab_links]
 
                     for this_link in new_links_local:
-                        _IN_DONE_GLOB = bool(this_link in self.done_lnks_gl_singles)
+                        _IN_DONE_GLOB = bool(this_link in self.done_ln_gl_sing)
                         if not _IN_DONE_GLOB:    #NOT done yet
-                            has_bad_data, lnk_par, good_suffix, in_any_local, self.done_lnks_gl_singles = \
-                                lc_utils.check_for_bad_data(this_link, parent_local, any_link_local, self.done_lnks_gl_singles)
+                            has_bad_data = lc_utils.ck_bad_data(this_link)  # check for bad data
+                            good_suffix = lc_utils.has_correct_suffix(this_link)  # check suffix
+                            lnk_par = bool(this_link == parent_local)
+                            self.done_ln_gl_sing = lc_utils.check_for_bad_data(this_link, self.done_ln_gl_sing)
 
+                            in_any_local = bool(this_link in [i[0] for i in any_link_local])
                             if lnk_par or has_bad_data:
                                 pass
 
@@ -148,7 +149,7 @@ class linkcheck(object):
         finlist = lc_utils().print_errs(self.err_links)
         self.logger.debug("totalTime: " + str(perf_counter() - tstart_main))
         self.logger.debug("Links checked: " + str(self.link_count))
-        x = len(self.done_lnks_gl_singles)
+        x = len(self.done_ln_gl_sing)
         print("done_links_glob_singles: ", x)
         return finlist
 
