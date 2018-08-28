@@ -1,7 +1,7 @@
 #clarinetinstitute.com
 #alexforecast.blogspot.com
 #azuresults.com
-repercussions.com
+#repercussions.com
 #schorrmedia.com
 #cosmictoys.blogspot.com
-#schorrmedia.com/mytest.html
+schorrmedia.com/mytest.html
