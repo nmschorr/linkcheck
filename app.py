@@ -14,7 +14,7 @@ def run():
     site = 'schorrmedia.com/mytest.html'
     answer = lc.main_run(site)
     thelines = str(answer[0])
-    return render_template('index.html', title='Home', thelines=thelines)
+    return render_template('index.html', title='Home', thelines=thelines, parent=site)
 
 if __name__ == '__main__':
     app.run(debug=True)
