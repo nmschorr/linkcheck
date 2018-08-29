@@ -8,7 +8,7 @@ from time import perf_counter
 
 class linkcheck(object):
     def __init__(self):
-        self.any_link_glob, self.base_links_glob = [],[]
+        self.any_link_glob, self.base_lnks_g = [], []
         self.done_ln_gl_sing, self.err_links, self.link_count = [], [], 0
         self.logger = lc().setup_logger()
         self.logger.debug('In linkcheck: __init__')
@@ -33,7 +33,7 @@ class linkcheck(object):
 
     #-----------------------------------------------------------------------
     def do_response(self, tpar):
-        er2 = 0
+        er2, resp = 0, None
         try:
             self.logger.debug("-starting-get_home_links - just got this link: " + str(tpar))
             session = HTMLSession()
@@ -46,66 +46,60 @@ class linkcheck(object):
         return resp, er2
 
     #-----------------------------------------------------------------------
-    def get_links(self, parent_local):
-        this_link, any_link_local,new_links_local, base_links_local, response, ab_links = None, [], [], [], None, []
-        response, resp_err = self.do_response(parent_local)
-        _IS_PARNT = bool(this_link == parent_local)  # is it the parent?
+    def get_links(self, _parent):
+        has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], None, []
+        response, resp_err = self.do_response(_parent)
 
         if resp_err == 0:  ## if there's an error  - 0 is good to continue
             try:
                 ab_links = response.html.absolute_links
-                new_links_local = [ab_lin for ab_lin in ab_links]
+                new_lnks_loc = [ab for ab in ab_links]
             except Exception as e:   print(str(e))
 
-            for this_link in new_links_local:
-                in_any_local = self.tn(this_link, any_link_local)
-                if in_any_local and not self.cg(this_link):    #NOT done yet  cg = check glob
+            for THIS_LN in new_lnks_loc:
+                in_any_local = self.ck_loc(THIS_LN, any_lnk_loc)
+                if not in_any_local and not self.done_gl_sing(THIS_LN):    #NOT done yet  cg = check glob
 
                     try:
-                        has_bad_data, good_suffix = lc.ck_bad_data(this_link)  # check for bad data
-                        self.done_ln_gl_sing = lc.check_for_bad_data(this_link, self.done_ln_gl_sing)
-
-                    except Exception as e:  self.handle_exc(e, this_link, parent_local)
+                        print("link===============", THIS_LN)
+                        print("new_lnks_loc===============", new_lnks_loc)
+                        has_bad, good_suffix = lc.ck_bad_data(THIS_LN)  # check for bad data
+                        self.done_ln_gl_sing = lc.check_for_bad_data(THIS_LN, self.done_ln_gl_sing)
+                    except Exception as e:  self.handle_exc(e, THIS_LN, _parent)
 
                     try:
-                        if _IS_PARNT or has_bad_data:   pass
+                        if self.ispar(THIS_LN, _parent) or has_bad:   pass
 
-                        elif good_suffix:
-                            if not in_any_local:
-                                self.any_link_glob, any_link_local = \
-                                    lc.add_to_any(this_link, parent_local, self.any_link_glob, any_link_local)
+                        base_pt = lc.divide_url(_parent)
+                        _IS_BASE, in_base_local = lc.ck_base(THIS_LN, base_pt, base_lnks_loc)
 
-                            else:
-                                base_pt = lc.divide_url(parent_local)
-                                _IS_BASE, in_base_local = lc.ck_base(this_link, base_pt, base_links_local)
+                        if _IS_BASE:  # IS base type
+                            base_lnks_loc.append(THIS_LN) if not in_base_local else 0
+                            self.base_lnks_g = lc.add_any_bse_g(THIS_LN, _parent, self.base_lnks_g)
 
-                                if _IS_BASE:  # IS base type
-                                    if not in_base_local:  # if not already in this
-                                        base_links_local.append(this_link)
-                                    self.base_links_glob = lc.add_to_any_basegl(this_link, parent_local, self.base_links_glob)
-
-                                else:                   #if not a home based link
-                                    if not in_any_local:
-                                        any_link_local.append((this_link, parent_local))
-                                    if not self.ck_g(this_link):
-                                        self.any_link_glob = lc.add_to_any(this_link, parent_local, self.any_link_glob)
+                        else:                   #if not a home based link
+                            any_lnk_loc.append((THIS_LN, _parent)) if not in_any_local else None
+                            if not self.ck_g(THIS_LN):
+                                self.any_link_glob = lc.add_any(THIS_LN, _parent, self.any_link_glob)
 
                     except Exception as e:
-                        self.handle_exc(e, this_link, parent_local)
+                        self.handle_exc(e, THIS_LN, _parent)
 
-
-        self.logger.debug('----end get_home_links:---returning base_links_local: ' + str(base_links_local))
-        return list(set(base_links_local))
+        self.logger.debug('----end get_home_links:---returning base_links_local: ' + str(base_lnks_loc))
+        return list(set(base_lnks_loc))
 
        #############---------------------------------------
+    def ispar(self, thisln, par_loc):
+        return bool(thisln == par_loc)  # is it the parent?
+
+
     def ck_g(self, this_link):
-        tru_fal = bool(this_link in [i[0] for i in self.any_link_glob])
-        return tru_fal
-        
-    def cg(self, this_link):
+        return bool(this_link in [i[0] for i in self.any_link_glob])
+
+    def done_gl_sing(self, this_link):
         return bool(this_link in self.done_ln_gl_sing)
 
-    def tn(self, this_lin, any_link_loc):
+    def ck_loc(self, this_lin, any_link_loc):
         return bool(this_lin in [i[0] for i in any_link_loc])  # is it local?
 
     def ck_status_code(self, response, parent_local):
@@ -141,7 +135,7 @@ class linkcheck(object):
             print(str(e))
 
         try:
-            base_glob_now = self.base_links_glob
+            base_glob_now = self.base_lnks_g
             new_base_links_here, the_len_b = [], len(base_glob_now)
             while the_len_b and repeats < 7:
 
@@ -156,12 +150,15 @@ class linkcheck(object):
         except Exception as e:
             self.handle_exc(e, base_lin, parent_lin)
 
+        tup = None
         try:
             self.logger.info("Step Two Done")
-            any_link_to_check = list(set(self.any_link_glob))
+            any_link_to_check = list(self.any_link_glob)
+
+            any_link_to_check = set(any_link_to_check)
             for tup in any_link_to_check:    #check non-base links
                 self.get_simple_response(tup)
-            for tup in self.base_links_glob:
+            for tup in self.base_lnks_g:
                 self.get_simple_response(tup)
 
         except Exception as e:
