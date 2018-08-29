@@ -27,54 +27,57 @@ class lc_utils(object):
         return logger
 
     @staticmethod
-    def ck_bad_data(self, link):
+    def ck_bad_data(dlink):
+        print("!!!!!=============inside ckbaddata. val of link: ", dlink)
         end_val = 0
         mylist = ['#', 'tel:+']
         try:
             for i in mylist:
-                if i in link:
+                if i in dlink:
                     end_val += 1
         except Exception as e: print(str(e))
-        good_suf = self.has_correct_suffix(link)  # check suffix
+
+        good_suf = lc_utils().has_correct_suffix(dlink)  # check suffix
+        print("!!!!!inside enval: ", end_val, good_suf)
         return end_val, good_suf
 
     @staticmethod
-    def check_for_bad_data(self, this_link, done_lnks_gl=None):
+    def check_for_bad_data(alink, done_lnks_gl=None):
         try:
             if done_lnks_gl:
-                done_lnks_gl.append(this_link)  ## add to main done list
+                done_lnks_gl.append(alink)  ## add to main done list
             else:
-                done_lnks_gl = [this_link]
+                done_lnks_gl = [alink]
         except Exception as e: print(str(e))
         return done_lnks_gl
 
     @staticmethod
-    def add_to_any_basegl(self, this_link, parent_local, base_links_glob2=None): #Adding this base link to base glob
+    def add_any_bse_g(zlink, parent_local, base_links_glob2=None): #Adding this base link to base glob
         try:
             if base_links_glob2:
-                _IN_BASE_GLOB = bool(this_link in [i[0] for i in base_links_glob2])
+                _IN_BASE_GLOB = bool(zlink in [i[0] for i in base_links_glob2])
                 if not _IN_BASE_GLOB:  # if not already in this
-                    base_links_glob2.append((this_link, parent_local))
-                    print("Adding this base link to base glob: " + this_link)
+                    base_links_glob2.append((zlink, parent_local))
+                    print("Adding this base link to base glob: " + zlink)
                 else:
-                    base_links_glob2= [(this_link, parent_local)]
+                    base_links_glob2= [(zlink, parent_local)]
 
         except Exception as e: print(str(e))
         return base_links_glob2
 
     @staticmethod
-    def add_to_any(self, this_link, parent_local, any_link_loc=None, any_link_glob2=None): #Adding this base link to any glob
+    def add_any(tlink, parent_local, any_link_loc=None, any_lnk_gl2=None): #Adding this base link to any glob
         try:
-            if any_link_glob2:  # don't try without something there
-                glob_bool = bool(this_link in [i[0] for i in self.any_link_glob2])
+            if any_lnk_gl2:  # don't try without something there
+                glob_bool = bool(tlink in [i[0] for i in any_lnk_gl2])
                 if not glob_bool:
-                    any_link_glob2.append((this_link, parent_local)) # add if not there
-                    any_link_loc.append((this_link, parent_local))
+                    any_lnk_gl2.append((tlink, parent_local)) # add if not there
+                    any_link_loc.append((tlink, parent_local))
             else:
-                any_link_glob2 = [(this_link, parent_local)]  # make it if starting empty
-                any_link_loc = [(this_link, parent_local)]
+                any_lnk_gl2 = [(tlink, parent_local)]  # make it if starting empty
+                any_link_loc = [(tlink, parent_local)]
         except Exception as e: print(str(e))
-        return any_link_glob2, any_link_loc
+        return any_lnk_gl2, any_link_loc
 
 
 
@@ -103,14 +106,14 @@ class lc_utils(object):
 
     @staticmethod
     def ck_base(this_link, thebase_part, base_links_local=None):
+        _IS_BASE = False
+        in_base_loc = False
         try:
             _IS_BASE = bool(thebase_part in this_link)
             if base_links_local:
-                in_base_local = bool(this_link in [i for i in base_links_local])
-            else:
-                base_links_local = False
+                in_base_loc = bool(this_link in [i for i in base_links_local])
         except Exception as e: print(str(e))
-        return _IS_BASE, in_base_local
+        return _IS_BASE, in_base_loc
 
     @staticmethod
     def divide_url(parent_local):
