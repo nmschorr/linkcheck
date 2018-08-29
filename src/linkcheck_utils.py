@@ -19,8 +19,10 @@ class lc_utils(object):
         console = logging.StreamHandler(sys.stdout)
         console.setFormatter(formatter)
         console.setLevel(level=logging.DEBUG)
+        console.setLevel(level=logging.INFO)
 
         logger.setLevel(level=logging.DEBUG)
+        logger.setLevel(level=logging.INFO)
         logger.addHandler(filehandle)
         logger.addHandler(console)                       ##logging.getLogger('').addHandler(console)  # add to root
         logger.info('Completed configuring logger. Logging level is: '+ str(logging.getLogger().getEffectiveLevel()))
@@ -28,17 +30,17 @@ class lc_utils(object):
 
     @staticmethod
     def ck_bad_data(dlink):
-        print("!!!!!=============inside ckbaddata. val of link: ", dlink)
+        #print("!!!!!=============inside ckbaddata. val of link: ", dlink)
         end_val = 0
         mylist = ['#', 'tel:+']
         try:
             for i in mylist:
                 if i in dlink:
                     end_val += 1
-        except Exception as e: print(str(e))
+        except Exception as e: print("ck_bad_data: ", str(e))
 
         good_suf = lc_utils().has_correct_suffix(dlink)  # check suffix
-        print("!!!!!inside enval: ", end_val, good_suf)
+        #print("!inside enval: ", end_val, good_suf)
         return end_val, good_suf
 
     @staticmethod
@@ -48,7 +50,8 @@ class lc_utils(object):
                 done_lnks_gl.append(alink)  ## add to main done list
             else:
                 done_lnks_gl = [alink]
-        except Exception as e: print(str(e))
+        except Exception as e:
+            print("check_for_bad_data: ", str(e))
         return done_lnks_gl
 
     @staticmethod
@@ -58,11 +61,12 @@ class lc_utils(object):
                 _IN_BASE_GLOB = bool(zlink in [i[0] for i in base_links_glob2])
                 if not _IN_BASE_GLOB:  # if not already in this
                     base_links_glob2.append((zlink, parent_local))
-                    print("Adding this base link to base glob: " + zlink)
-                else:
-                    base_links_glob2= [(zlink, parent_local)]
+                    #print("Adding this base link to base glob: " + zlink)
+            else:
+                base_links_glob2= [(zlink, parent_local)]
 
-        except Exception as e: print(str(e))
+        except Exception as e:
+            print("add_any_bse_g: ", str(e))
         return base_links_glob2
 
     @staticmethod
@@ -76,7 +80,8 @@ class lc_utils(object):
             else:
                 any_lnk_gl2 = [(tlink, parent_local)]  # make it if starting empty
                 any_link_loc = [(tlink, parent_local)]
-        except Exception as e: print(str(e))
+        except Exception as e:
+            print("add_any: ", str(e))
         return any_lnk_gl2, any_link_loc
 
 
@@ -101,7 +106,8 @@ class lc_utils(object):
             for g in goods:
                 if link.endswith(g):
                     return True
-        except Exception as e: print(str(e))
+        except Exception as e:
+            print("has_correct_suffix: ", str(e))
         return False
 
     @staticmethod
@@ -112,7 +118,8 @@ class lc_utils(object):
             _IS_BASE = bool(thebase_part in this_link)
             if base_links_local:
                 in_base_loc = bool(this_link in [i for i in base_links_local])
-        except Exception as e: print(str(e))
+        except Exception as e:
+            print("ck_base: ", str(e))
         return _IS_BASE, in_base_loc
 
     @staticmethod
@@ -123,7 +130,8 @@ class lc_utils(object):
             if thebase_part_local.startswith('www'):
                 thebase_part_local = thebase_part_local[4:]
         except Exception as e:
-            print(e)
+            #print(e)
+            pass
         return thebase_part_local
 
     @staticmethod
@@ -142,7 +150,7 @@ class lc_utils(object):
                     p1 = " REASON: "
                     p2 = " REFERRING PAGE: "
                     st0,st1,st2 = str(e[0]),str(e[1]),str(e[2])
-                    answer_string = '\n' + p0 + st0 + p1 + st1 + p2 + st2 + '\n\n'
+                    answer_string = p0 + st0 + p1 + st1 + p2 + st2 + '\n'
                     fin_list.append(answer_string)
             else:
                 fin_list = [answer_string]

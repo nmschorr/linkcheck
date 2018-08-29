@@ -14,8 +14,8 @@ class linkcheck(object):
         self.logger.debug('In linkcheck: __init__')
 
     def handle_exc(self, e, link, plink):
-        print(str(e))
-        self.logger.debug('!!!!!!!! found error------------------\n' + str(e))
+        #print(str(e))
+        #self.logger.debug('!!!!!!!! found error------------------\n' + str(e))
         self.err_links.append((link, str(e)[:57], plink))
         pass
 
@@ -42,7 +42,7 @@ class linkcheck(object):
             er2 = self.ck_status_code(resp, tpar)  ## if there's    an error
 
         except Exception as e:
-            print(str(e))
+            print("inside do_response: ", str(e))
         return resp, er2
 
     #-----------------------------------------------------------------------
@@ -50,15 +50,16 @@ class linkcheck(object):
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], None, []
         response, resp_err = self.do_response(_parent)
 
-        if resp_err == 0:  ## if there's an error  - 0 is good to continue
+        if resp_err == 0 and bool(response):  ## if there's an error  - 0 is good to continue
             try:
                 ab_links = response.html.absolute_links
                 new_lnks_loc = [ab for ab in ab_links]
-            except Exception as e:   print(str(e))
+            except Exception as e:
+                print("inside get_links: ", str(e))
 
             for THIS_LN in new_lnks_loc:
-                in_any_local = self.ck_loc(THIS_LN, any_lnk_loc)
-                if not in_any_local and not self.done_gl_sing(THIS_LN):    #NOT done yet  cg = check glob
+                _IN_AN_LOC = self.ck_loc(THIS_LN, any_lnk_loc)
+                if not _IN_AN_LOC and not self.done_gl_sing(THIS_LN):    #NOT done yet  cg = check glob
 
                     try:
                         print("link===============", THIS_LN)
@@ -69,18 +70,15 @@ class linkcheck(object):
 
                     try:
                         if self.ispar(THIS_LN, _parent) or has_bad:   pass
-
-                        base_pt = lc.divide_url(_parent)
-                        _IS_BASE, in_base_local = lc.ck_base(THIS_LN, base_pt, base_lnks_loc)
+                        ##base_pt = lc.divide_url(_parent)
+                        _IS_BASE, in_base_local = lc.ck_base(THIS_LN, lc.divide_url(_parent), base_lnks_loc)
 
                         if _IS_BASE:  # IS base type
                             base_lnks_loc.append(THIS_LN) if not in_base_local else 0
                             self.base_lnks_g = lc.add_any_bse_g(THIS_LN, _parent, self.base_lnks_g)
-
                         else:                   #if not a home based link
-                            any_lnk_loc.append((THIS_LN, _parent)) if not in_any_local else None
                             if not self.ck_g(THIS_LN):
-                                self.any_link_glob = lc.add_any(THIS_LN, _parent, self.any_link_glob)
+                                self.any_link_glob, any_lnk_loc = lc.add_any(THIS_LN, _parent, self.any_link_glob)
 
                     except Exception as e:
                         self.handle_exc(e, THIS_LN, _parent)
@@ -132,7 +130,7 @@ class linkcheck(object):
                 new_base_links_one = new_base_links_two if the_len > 0 else None
 
         except Exception as e:
-            print(str(e))
+            print("inside main_run: ", str(e))
 
         try:
             base_glob_now = self.base_lnks_g
@@ -155,7 +153,7 @@ class linkcheck(object):
             self.logger.info("Step Two Done")
             any_link_to_check = list(self.any_link_glob)
 
-            any_link_to_check = set(any_link_to_check)
+            any_link_to_check = list(set(any_link_to_check))
             for tup in any_link_to_check:    #check non-base links
                 self.get_simple_response(tup)
             for tup in self.base_lnks_g:
