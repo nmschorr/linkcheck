@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+    <head>
+        <title>LinkCheck Results</title>
+    </head>
+    <body>
+    <p>Here's the broken links for this website:
+        {{ parent }}
+
+    </p>
+    <p></p>
+
+    {% block body %}
+
+    {% for user in lines %}
+    <li><a href="{{ user }}">{{ user }}</a></li>
+    {% endfor %}
+
+    {% endblock %}
+
+
+
+
+    </body>
+</html>
