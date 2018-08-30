@@ -22,7 +22,7 @@ class lc_utils(object):
         console.setLevel(level=logging.INFO)
 
         logger.setLevel(level=logging.DEBUG)
-        logger.setLevel(level=logging.INFO)
+        #logger.setLevel(level=logging.INFO)
         logger.addHandler(filehandle)
         logger.addHandler(console)                       ##logging.getLogger('').addHandler(console)  # add to root
         logger.info('Completed configuring logger. Logging level is: '+ str(logging.getLogger().getEffectiveLevel()))
@@ -81,7 +81,7 @@ class lc_utils(object):
                 any_lnk_gl2 = [(tlink, parent_local)]  # make it if starting empty
                 any_link_loc = [(tlink, parent_local)]
         except Exception as e:
-            print("add_any: ", str(e))
+            print("exception in add_any: ", str(e))
         return any_lnk_gl2, any_link_loc
 
 
@@ -130,29 +130,30 @@ class lc_utils(object):
             if thebase_part_local.startswith('www'):
                 thebase_part_local = thebase_part_local[4:]
         except Exception as e:
-            #print(e)
+            print('divide_url: ', str(e))
             pass
         return thebase_part_local
 
     @staticmethod
     def print_errs(errlinks=None):
-        fin_list = []
-        answer_string, e = '', ''
-        try:
-            if errlinks:
-                errs = list(set(errlinks))
-                er_len = len(errs)
-                print("\nTotal errors: ", er_len)
-                print("-------------- Here are the errors ------------- :")
-                errs2 = sorted(errs, key=lambda x: x[0])  # sort on first
-                for e in errs2:
-                    p0 = "BAD LINK: "
-                    p1 = " REASON: "
-                    p2 = " REFERRING PAGE: "
-                    st0,st1,st2 = str(e[0]),str(e[1]),str(e[2])
-                    answer_string = p0 + st0 + p1 + st1 + p2 + st2 + '\n'
-                    fin_list.append(answer_string)
-            else:
-                fin_list = [answer_string]
-        except Exception as e: print(str(e))
-        return fin_list
+        if errlinks:
+            answer_string, e, fin_list = '', '', []
+            p0, p1, p2 = "BAD LINK: ", " REASON: ", " REFERRING PAGE: "
+            try:
+                if errlinks:
+                    errs = list(set(errlinks))
+                    er_len = len(errs)
+                    print("\nTotal errors: ", er_len)
+                    print("-------------- Here are the errors ------------- :")
+                    errs2 = sorted(errs, key=lambda x: x[0])  # sort on first
+                    for e in errs2:
+                        st0,st1,st2 = str(e[0]),str(e[1]),str(e[2])
+                        answer_string = p0 + st0 + p1 + st1 + p2 + st2 + '\n'
+                        fin_list.append(answer_string)
+                else:
+                    fin_list = [answer_string]
+            except Exception as e:
+                print('print_errs: ', str(e))
+            return fin_list
+        else:
+            return []
