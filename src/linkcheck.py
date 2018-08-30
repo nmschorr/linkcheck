@@ -27,7 +27,7 @@ class linkcheck(object):
         try:
             session = HTMLSession()
             response = session.get(link_we_are_chkg)
-            er, self.err_links = lc.ck_status_code(response, parent, self.err_links )
+            er = self.ck_status_code(response, parent)
         except Exception as e:
             self.handle_exc(e, link_we_are_chkg, parent)
 
@@ -59,11 +59,11 @@ class linkcheck(object):
 
             for THIS_LN in new_lnks_loc:
                 _IN_AN_LOC = self.ck_loc(THIS_LN, any_lnk_loc)
-                if not _IN_AN_LOC and not self.done_gl_sing(THIS_LN):    #NOT done yet  cg = check glob
+                if not _IN_AN_LOC and not self._DONE_YET(THIS_LN):    #NOT done yet  cg = check glob
 
                     try:
                         print("link===============", THIS_LN)
-                        print("new_lnks_loc===============", new_lnks_loc)
+                        #print("new_lnks_loc===============", new_lnks_loc)
                         has_bad, good_suffix = lc.ck_bad_data(THIS_LN)  # check for bad data
                         self.done_ln_gl_sing = lc.check_for_bad_data(THIS_LN, self.done_ln_gl_sing)
                     except Exception as e:  self.handle_exc(e, THIS_LN, _parent)
@@ -94,7 +94,7 @@ class linkcheck(object):
     def ck_g(self, this_link):
         return bool(this_link in [i[0] for i in self.any_link_glob])
 
-    def done_gl_sing(self, this_link):
+    def _DONE_YET(self, this_link):
         return bool(this_link in self.done_ln_gl_sing)
 
     def ck_loc(self, this_lin, any_link_loc):
@@ -166,6 +166,6 @@ class linkcheck(object):
         self.logger.debug("totalTime: " + str(perf_counter() - tstart_main))
         self.logger.debug("Links checked: " + str(self.link_count))
         x = len(self.done_ln_gl_sing)
-        print("done_links_glob_singles: ", x)
+        print("errors: ", x)
         return finlist
 
