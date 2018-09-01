@@ -1,5 +1,4 @@
-from flask import Flask,  session, request, render_template, redirect
-from flask_restful import Resource, Api
+from flask import Flask, render_template, request
 from src.linkcheck import linkcheck
 
 #app.secret_key = "super secret key"
@@ -7,26 +6,31 @@ from src.linkcheck import linkcheck
 #app.config['SECRET_KEY'] = 'super secret key'
 app = Flask(__name__)
 
+@app.route('/')
+def get_addy():
+   return render_template('getaddy.html')
 
-@app.route('/signup', methods = ['POST'])
-def signup():
-    email = request.form['email']
-    print("The email address is '" + email + "'")
-    return redirect('/')
+@app.route('/resultpage',methods = ['POST', 'GET'])
+def result():
+    lc = linkcheck()
+    if request.method == 'POST':
+      form_resp = request.form['siteaddy']
+      answers = lc.main_run(form_resp)
+      return render_template("resultpage.html",answers = answers)
 
-#@app.route('/')
+if __name__ == '__main__':
+   app.run(debug = True, port=8080 )
+
+
+###app.run(debug = True, host='0.0.0.0', port=8080 )
+
+
+
 # def run():
 #     lc = linkcheck()
 #     site = 'schorrmedia.com/mytest.html'
 #     lines = lc.main_run(site)
 #     return render_template('index.html', title='Home', lines=lines, parent=site)
-#
 # def handle_data():
 #     projectpath = request.form['projectFilepath']
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
 
