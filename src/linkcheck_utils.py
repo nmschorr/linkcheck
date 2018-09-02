@@ -26,6 +26,7 @@ class lc_utils(object):
         logger.addHandler(filehandle)
         logger.addHandler(console)                       ##logging.getLogger('').addHandler(console)  # add to root
         logger.info('Completed configuring logger. Logging level is: '+ str(logging.getLogger().getEffectiveLevel()))
+
         return logger
 
     @staticmethod
