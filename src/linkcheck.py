@@ -33,7 +33,8 @@ class linkcheck(object):
 
     #-----------------------------------------------------------------------
     def do_response(self, tpar):
-        er2, resp = 0, None
+        er2 = 0
+        resp = object()
         try:
             self.logger.debug("-starting-get_home_links - just got this link: " + str(tpar))
             session = HTMLSession()
@@ -42,13 +43,24 @@ class linkcheck(object):
             er2 = self.ck_status_code(resp, tpar)  ## if there's    an error
 
         except Exception as e:
-            print("inside do_response: ", str(e))
+            self.err_links.append((tpar, str(e)[:27], tpar))
+            print("GOT AN EXCEPTION inside do_response and added to errs: ", str(e))
+            return resp, er2
         return resp, er2
 
     #-----------------------------------------------------------------------
     def get_links(self, _parent):
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], None, []
         response, resp_err = self.do_response(_parent)
+
+
+        try:
+            if response.status_code:
+                myboo = True
+                print("Status code: ", myboo)
+        except:
+            print("no valid response from: ", _parent)
+            return
 
         if resp_err == 0 and bool(response):  ## if there's an error  - 0 is good to continue
             try:
@@ -110,7 +122,7 @@ class linkcheck(object):
 
     def main_run(self, a_site):
         full_addy = 'http://' + a_site
-        new_sorted, base_only_plain_repeat_grand, repeats = [], [], 0
+        new_sorted, repeats = [], 0
         self.logger.debug('\n\n------------------- STARTING OVER -----------------------')
         tstart_main = perf_counter()
         print('In main() Getting first address: {}'.format(full_addy))
@@ -130,7 +142,8 @@ class linkcheck(object):
                 new_base_links_one = new_base_links_two if the_len > 0 else None
 
         except Exception as e:
-            print("inside main_run: ", str(e))
+            print("EXCEPTION inside main_run: ", str(e))
+            pass
 
         try:
             base_glob_now = self.base_lnks_g
@@ -165,7 +178,7 @@ class linkcheck(object):
         finlist = lc.print_errs(self.err_links)
         self.logger.debug("totalTime: " + str(perf_counter() - tstart_main))
         self.logger.debug("Links checked: " + str(self.link_count))
-        x = len(self.done_ln_gl_sing)
-        print("errors: ", x)
+        #x = len(self.done_ln_gl_sing)
+        #print("errors: ", x)
         return finlist
 
