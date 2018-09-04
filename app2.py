@@ -1,4 +1,4 @@
-from src.linkcheck import linkcheck
+from linkcheck import linkcheck
 
 class app2(object):
     from pathlib import Path
