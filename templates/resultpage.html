@@ -1,15 +1,49 @@
 <!doctype html>
 <html>
+    <head>
+        <title>Results from Linkcheck</title>
+
+        </head>
    <body>
+<p>
+   <h2> Here are the broken links:</h2>
 
 
-<table>
+
+</p>
+
+<p>
+    Brief list:</p>
+<p>
+
 {% for item in answers %}
-<TR>
-   <TD class="c2">{{item}}</TD>
-</TR>
+    {{item|safe }}
 {% endfor %}
+
+</p>
+
+<p>
+{% autoescape false %}
+
+<table border=1 cellspacing="1" cellpadding="1" |safe >
+  <tr>
+    <th>Link</th>
+    <th>Error</th>
+    <th>Parent</th>
+  </tr>
+
+{% for item in answers %}
+    <TR>
+        <TD >{{item[0] |safe }}</TD>
+        <TD >{{item[1] |safe }}</TD>
+        <TD >{{item[2] |safe }}</TD>
+    </TR>
+
+{% endfor %}
+
 </table>
+{% endautoescape %}
+
 </body>
 
 
