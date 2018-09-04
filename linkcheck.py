@@ -1,7 +1,7 @@
 # python 3
 # Nancy Schorr, 2018
 # this file is in active development
-from time import perf_counter
+#from time import perf_counter
 from urllib.parse import urlsplit
 from requests_html import HTMLSession
 
@@ -130,7 +130,7 @@ class linkcheck(object):
         full_addy = 'http://' + a_site
         new_sorted, repeats = [], 0
         ##print('\n\n------------------- STARTING OVER -----------------------')
-        tstart_main = perf_counter()
+        #tstart_main = perf_counter()
         ##print('In main() Getting first address: {}'.format(full_addy))
         try:
             #############---------step ONE:
@@ -253,10 +253,10 @@ class linkcheck(object):
             None
         return any_lnk_gl2, any_link_loc
 
-    def reset_timer(self, name, tstart):
-        #print(name, perf_counter() - tstart)
-        tstart = perf_counter()
-        return tstart
+    # def reset_timer(self, name, tstart):
+    #     #print(name, perf_counter() - tstart)
+    #     #tstart = perf_counter()
+    #     return tstart
 
     @staticmethod
     def split_url(url):
