@@ -1,14 +1,13 @@
 from linkcheck import linkcheck
 from flask import (Flask, request, render_template)
-import sys
+#import sys
 
-path1 = '/home/jetgal/linkcheck'   #for pythonanywhere
-path2 = '~/linkcheck'
-path3 = 'linkcheck'
+#path1 = '/home/jetgal/linkcheck'   #for pythonanywhere
+
 
 #sys.path.append(path1)   #for pythonanywhere
-sys.path.append(path2)
-sys.path.append(path3)
+#sys.path.append(path2)
+#sys.path.append(path3)
 
 app = Flask(__name__)
 app.config.from_object(__name__) # load config from this file , flaskr.py
