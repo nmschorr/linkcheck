@@ -11,7 +11,6 @@ from flask import (Flask, request, render_template)
 
 app = Flask(__name__)
 app.config.from_object(__name__) # load config from this file , flaskr.py
-###app.config.from_envvar('LINKCHECK_SETTINGS', silent=True)
 #app.debug = True
 
 @app.route('/')
