@@ -17,7 +17,8 @@
 <p>
 
 {% for item in answers %}
-    {{item|safe }}
+<p> </p>
+    {{item}}
 {% endfor %}
 
 </p>
@@ -34,9 +35,7 @@
 
 {% for item in answers %}
     <TR>
-        <TD >{{item[0] |safe }}</TD>
-        <TD >{{item[1] |safe }}</TD>
-        <TD >{{item[2] |safe }}</TD>
+        <TD >{{item |safe }}</TD>
     </TR>
 
 {% endfor %}
