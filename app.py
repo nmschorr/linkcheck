@@ -1,6 +1,6 @@
 from linkcheck import linkcheck
 from flask import (Flask, request, render_template)
-#import sys
+from flask_socketio import SocketIO
 
 #path1 = '/home/jetgal/linkcheck'   #for pythonanywhere
 
@@ -10,8 +10,12 @@ from flask import (Flask, request, render_template)
 #sys.path.append(path3)
 
 app = Flask(__name__)
-app.config.from_object(__name__) # load config from this file , flaskr.py
+Flask.debug = 1
+# app.config.from_object(__name__) # load config from this file , flaskr.py
 #app.debug = True
+
+# app.config['SECRET_KEY'] = 'secret!'
+# socketio = SocketIO(app)
 
 @app.route('/')
 def get_addy():
