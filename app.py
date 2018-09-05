@@ -1,21 +1,16 @@
 from linkcheck import linkcheck
 from flask import (Flask, request, render_template)
 #from flask_socketio import SocketIO
+import sys, os
 
-#path1 = '/home/jetgal/linkcheck'   #for pythonanywhere
-
-
-#sys.path.append(path1)   #for pythonanywhere
-#sys.path.append(path2)
-#sys.path.append(path3)
 
 app = Flask(__name__)
-#Flask.debug = 1
-# app.config.from_object(__name__) # load config from this file , flaskr.py
-#app.debug = True
+#HOST_NAME = os.environ.get('OPENSHIFT_APP_DNS', 'localhost')
+#APP_NAME = os.environ.get('OPENSHIFT_APP_NAME', 'flask')
+#IP = os.environ.get('OPENSHIFT_PYTHON_IP', '127.0.0.1')
+PORT = int(os.environ.get('OPENSHIFT_PYTHON_PORT', 8080))
+#HOME_DIR = os.environ.get('OPENSHIFT_HOMEDIR', os.getcwd())
 
-# app.config['SECRET_KEY'] = 'secret!'
-# socketio = SocketIO(app)
 
 @app.route('/')
 def get_addy():
@@ -38,4 +33,17 @@ def result():
         #    print(i)
         return render_template("resultpage.html", answers = answers2)
 
-app.run(port=5000)
+app.run(host='0.0.0.0', port=8080)
+
+
+
+
+#Flask.debug = 1
+# app.config.from_object(__name__) # load config from this file , flaskr.py
+#app.debug = True
+#path1 = '/home/jetgal/linkcheck'   #for pythonanywhere
+#sys.path.append(path1)   #for pythonanywhere
+#sys.path.append(path2)
+#sys.path.append(path3)
+# app.config['SECRET_KEY'] = 'secret!'
+# socketio = SocketIO(app)
