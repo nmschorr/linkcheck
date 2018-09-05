@@ -38,4 +38,4 @@ def result():
         #    print(i)
         return render_template("resultpage.html", answers = answers2)
 
-app.run()
+app.run(port=5000)
