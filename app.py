@@ -2,7 +2,7 @@ from linkcheck import linkcheck
 from flask import (Flask, request, render_template)
 #from flask_socketio import SocketIO
 import sys, os
-
+import gunicorn
 
 app = Flask(__name__)
 #HOST_NAME = os.environ.get('OPENSHIFT_APP_DNS', 'localhost')
@@ -10,6 +10,7 @@ app = Flask(__name__)
 #IP = os.environ.get('OPENSHIFT_PYTHON_IP', '127.0.0.1')
 PORT = int(os.environ.get('OPENSHIFT_PYTHON_PORT', 8080))
 #HOME_DIR = os.environ.get('OPENSHIFT_HOMEDIR', os.getcwd())
+GUNICORN_CMD_ARGS="--bind=0.0.0.0"
 
 
 @app.route('/')
@@ -32,6 +33,7 @@ def result():
         #for i in answers2:
         #    print(i)
         return render_template("resultpage.html", answers = answers2)
+
 
 app.run(host='0.0.0.0', port=8080)
 
