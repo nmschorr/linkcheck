@@ -7,41 +7,41 @@
    <body>
 <p>
    <h2> Here are the broken links:</h2>
-
+</p>
+<p>
+</p>
+<p>
 
 
 </p>
-
-<p>
-    Brief list:</p>
-<p>
-
 {% for item in answers %}
+ {{ item[0] }}&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;{{ item[1] }}  <br>
+&nbsp;&nbsp;&nbsp;&nbsp;FOUND ON: <a href="{{ item[2] }}">{{item[2]}}</a>
 <p> </p>
-    {{item}}
 {% endfor %}
 
 </p>
 
-<p>
-{% autoescape false %}
 
-<table border=1 cellspacing="1" cellpadding="1" |safe >
-  <tr>
-    <th>Link</th>
-    <th>Error</th>
-    <th>Parent</th>
-  </tr>
+<!--<p>-->
+<!--{% autoescape false %}-->
 
-{% for item in answers %}
-    <TR>
-        <TD >{{item |safe }}</TD>
-    </TR>
+<!--<table border=1 cellspacing="1" cellpadding="1" |safe >-->
+  <!--<tr>-->
+    <!--<th>Link</th>-->
+    <!--<th>Error</th>-->
+    <!--<th>Parent</th>-->
+  <!--</tr>-->
 
-{% endfor %}
+<!--{% for item in answers %}-->
+    <!--<TR>-->
+        <!--<TD >{{item |safe }}</TD>-->
+    <!--</TR>-->
 
-</table>
-{% endautoescape %}
+<!--{% endfor %}-->
+
+<!--</table>-->
+<!--{% endautoescape %}-->
 
 </body>
 

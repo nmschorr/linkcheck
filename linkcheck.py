@@ -15,7 +15,7 @@ class linkcheck(object):
     def handle_exc(self, e, link, plink):
         ##print(str(e))
         ##print('!!!!!!!! found error------------------\n' + str(e))
-        self.err_links.append((link, str(e)[:27], plink))
+        self.err_links.append((link, str(e)[:42], plink))
         pass
 
     def get_simple_response(self, tup):
@@ -42,7 +42,7 @@ class linkcheck(object):
             er2 = self.ck_status_code(resp, tpar)  ## if there's    an error
 
         except Exception as e:
-            self.err_links.append((tpar, str(e)[:27], tpar))
+            self.err_links.append((tpar, str(e)[:42], tpar))
             ##print("GOT AN EXCEPTION inside do_response and added to errs: ", str(e))
             return resp, er2
         return resp, er2
@@ -307,17 +307,23 @@ class linkcheck(object):
     def print_errs(errlinks=None):
         if errlinks:
             answer_string, e, fin_list = '', '', []
-            p0, p1, p2 = "BAD LINK: ", " REASON: ", " PARENT: "
+            p0, p1, p2 = "BAD LINK: ", " ERROR: ", " PARENT: "
             try:
                 if errlinks:
                     errs = list(set(errlinks))
                     er_len = len(errs)
                     print("\nTotal errors: ", er_len)
                     print("-------------- Here are the errors ------------- :")
-                    errs2 = sorted(errs, key=lambda x: x[0])  # sort on first
+                    errs22 = sorted(errs, key=lambda x: x[0])  # sort on first
+                    errs2 = set(errs22)
                     for e in errs2:
                         st0,st1,st2 = str(e[0]),str(e[1]),str(e[2])
-                        answer_string = p0 + st0 + p1 + st1 + p2 + st2
+                        an1 = p0 + st0
+                        an2= p1 + st1
+                        an3 = st2
+
+                        answer_string=[an1, an2, an3]
+                        #answer_string = p0 + st0 + p1 + st1 + p2 + st2
                         fin_list.append(answer_string)
                         print(answer_string)
                 else:
