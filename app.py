@@ -22,17 +22,16 @@ def get_addy():
 def result():
     print("------------------here inside result")
     answers = []
-    #lc = linkcheck()
     if request.method == 'POST':
         form_resp = request.form['siteaddy']
         print("---------------here inside app result2")
         answers = linkcheck().main(form_resp)
-        answers2 = [("no broken links", "1", "2")]
+        #answers2 = [("no broken links", "1", "2")]  # for testing
         print("-------------------------here inside app result3")
         print("answers: " )
-        #for i in answers2:
-        #    print(i)
-        return render_template("resultpage.html", answers = answers2)
+        for i in answers:
+            print(i)
+        return render_template("resultpage.html", answers = answers)
 
 
 app.run(host='0.0.0.0', port=8080)
@@ -45,7 +44,5 @@ app.run(host='0.0.0.0', port=8080)
 #app.debug = True
 #path1 = '/home/jetgal/linkcheck'   #for pythonanywhere
 #sys.path.append(path1)   #for pythonanywhere
-#sys.path.append(path2)
-#sys.path.append(path3)
 # app.config['SECRET_KEY'] = 'secret!'
 # socketio = SocketIO(app)
