@@ -1,6 +1,6 @@
 from linkcheck import linkcheck
 from flask import (Flask, request, render_template)
-from flask_socketio import SocketIO
+#from flask_socketio import SocketIO
 
 #path1 = '/home/jetgal/linkcheck'   #for pythonanywhere
 
@@ -10,7 +10,7 @@ from flask_socketio import SocketIO
 #sys.path.append(path3)
 
 app = Flask(__name__)
-Flask.debug = 1
+#Flask.debug = 1
 # app.config.from_object(__name__) # load config from this file , flaskr.py
 #app.debug = True
 
