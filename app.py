@@ -33,3 +33,5 @@ def result():
         #for i in answers2:
         #    print(i)
         return render_template("resultpage.html", answers = answers2)
+
+app.run()
