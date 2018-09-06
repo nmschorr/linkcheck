@@ -28,7 +28,9 @@ class linkcheck(object):
             response = session.get(link_we_are_chkg)
             er = self.ck_status_code(response, parent)
         except Exception as e:
-            self.handle_exc(e, link_we_are_chkg, parent)
+            None
+            pass
+            ###self.handle_exc(e, link_we_are_chkg, parent)
 
     #-----------------------------------------------------------------------
     def do_response(self, tpar):
@@ -48,9 +50,9 @@ class linkcheck(object):
         return resp, er2
 
     #-----------------------------------------------------------------------
-    def get_links(self, _parent):
+    def get_links(self, mainlin, _plin):
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], None, []
-        response, resp_err = self.do_response(_parent)
+        response, resp_err = self.do_response(mainlin)
         ##print("-------------INSIDE get_links! --------------")
 
         try:
@@ -58,10 +60,10 @@ class linkcheck(object):
                 myboo = True
                 ##print("Status code: ", myboo)
         except:
-            ##print("no valid response from: ", _parent)
+            ##print("no valid response from: ", mainlin)
             return
 
-        ##print("checking: ", _parent)
+        ##print("checking: ", mainlin)
         ##print("resp_err: ", resp_err)
         ##print("response: ", response)
 
@@ -73,7 +75,7 @@ class linkcheck(object):
                 None
                 #print("exception inside get_links: ", str(e))
 
-            ##print("got this far ", _parent)
+            ##print("got this far ", mainlin)
             for THIS_LN in new_lnks_loc:
                 ##print("THIS_LN ", THIS_LN)
                 _IN_AN_LOC = self.ck_loc(THIS_LN, any_lnk_loc)
@@ -84,22 +86,22 @@ class linkcheck(object):
                         ##print("new_lnks_loc=== going to check bad data next: ", new_lnks_loc)
                         has_bad, good_suffix = self.ck_bad_data(THIS_LN)  # check for bad data
                         self.done_ln_gl_sing = self.check_for_bad_data(THIS_LN, self.done_ln_gl_sing)
-                    except Exception as e:  self.handle_exc(e, THIS_LN, _parent)
+                    except Exception as e:  self.handle_exc(e, THIS_LN, _plin)
 
                     try:
-                        if self.ispar(THIS_LN, _parent) or has_bad:   pass
-                        ##base_pt = divide_url(_parent)
-                        _IS_BASE, in_base_local = self.ck_base(THIS_LN, self.divide_url(_parent), base_lnks_loc)
+                        if self.ispar(THIS_LN, _plin) or has_bad:   pass
+                        ##base_pt = divide_url(_plin)
+                        _IS_BASE, in_base_local = self.ck_base(THIS_LN, self.divide_url(_plin), base_lnks_loc)
 
                         if _IS_BASE:  # IS base type
                             base_lnks_loc.append(THIS_LN) if not in_base_local else 0
-                            self.base_lnks_g = self.add_any_bse_g(THIS_LN, _parent, self.base_lnks_g)
+                            self.base_lnks_g = self.add_any_bse_g(THIS_LN, _plin, self.base_lnks_g)
                         else:                   #if not a home based link
                             if not self.ck_g(THIS_LN):
-                                self.any_link_glob, any_lnk_loc = self.add_any(THIS_LN, _parent, self.any_link_glob)
+                                self.any_link_glob, any_lnk_loc = self.add_any(THIS_LN, _plin, self.any_link_glob)
 
                     except Exception as e:
-                        self.handle_exc(e, THIS_LN, _parent)
+                        self.handle_exc(e, THIS_LN, _plin)
 
         ##print('!! NEW----end get_home_links:---returning base_links_local: ' + str(base_lnks_loc))
         return list(set(base_lnks_loc))
@@ -134,16 +136,16 @@ class linkcheck(object):
         ##print('In main() Getting first address: {}'.format(full_addy))
         try:
             #############---------step ONE:
-            base_only_plain_repeat = self.get_links(full_addy)  #first set of base
+            base_only_plain_repeat = self.get_links(full_addy, full_addy)  #first set of base
             ##print("Step One Done")   ##first time:  HOME PAGE ONLY  ##first time
             the_len = len(base_only_plain_repeat)
             new_base_links_two, new_sorted, new_base_links_one= [], [], base_only_plain_repeat
 
-            while the_len and repeats < 2:
+            while the_len and repeats < 6:
                 repeats += 1
                 ##print("repeats: " + str(repeats) + "-------------------!!In main loop")
                 for baselink in new_base_links_one:
-                    new_base_links_two = self.get_links(baselink)  # first set of base
+                    new_base_links_two = self.get_links(baselink, full_addy)  # first set of base
                 the_len = len(new_base_links_two)
                 new_base_links_one = new_base_links_two if the_len > 0 else None
 
@@ -154,14 +156,14 @@ class linkcheck(object):
         try:
             base_glob_now = self.base_lnks_g
             new_base_links_here, the_len_b = [], len(base_glob_now)
-            while the_len_b and repeats < 2:
+            while the_len_b and repeats < 6:
 
                 repeats += 1
                 ##print("repeats: " + str(repeats) + "-------------------!!In main loop")
                 for baselink in base_glob_now:
                     base_lin = baselink[0]
                     parent_lin = baselink[1]
-                    new_base_links_here = self.get_links(base_lin)  # first set of base
+                    new_base_links_here = self.get_links(base_lin, parent_lin)  # first set of base
                 the_len_b, base_glob_now = len(new_base_links_here), new_base_links_here
 
         except Exception as e:

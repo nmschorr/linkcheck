@@ -15,6 +15,12 @@ def get_addy():
     print("-------------------here inside app")
     return render_template('getaddy.html')
 
+@app.route('/waitpage',methods = ['POST'])
+def waitpg():
+    print("------------------here inside tres")
+    return render_template("waitpage.html")
+
+
 @app.route('/resultpage',methods = ['POST', 'GET'])
 def result():
     print("------------------here inside result")
@@ -31,9 +37,8 @@ def result():
         return render_template("resultpage.html", answers = answers)
 
 HOST='0.0.0.0'
-#HOST='127.0.0.1'
+HOST='127.0.0.1'
 app.run(host=HOST, port=8080)
-#app.run(host='127.0.0.1', port=8080)
 
 
 
