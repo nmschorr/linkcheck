@@ -13,7 +13,7 @@ class linkcheck(object):
         self.myprint('In linkcheck: __init__New!!!')
 
     def myprint(self, print_str):
-        _MYDEBUG = 1
+        _MYDEBUG = 0
         if _MYDEBUG:
             print(print_str)
 
@@ -351,9 +351,9 @@ class linkcheck(object):
         else:
             return []
 
-if __name__ == "__main__":
-    lc = linkcheck()
-    finlistmain = lc.main('repercussions.com')
+# if __name__ == "__main__":
+#     lc = linkcheck()
+#     finlistmain = lc.main('repercussions.com')
     # print("here are the errors")
     # for item in finlistmain:
     #     print(item)
