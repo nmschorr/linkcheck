@@ -337,8 +337,8 @@ class linkcheck(object):
         else:
             return []
 
-if __name__ == "__main__":
-    linkcheck.app()
+# if __name__ == "__main__":
+#     linkcheck.app()
 #     finlistmain = lc.main('openastro.org')
 #     print("here are the errors")
 #     for item in finlistmain:

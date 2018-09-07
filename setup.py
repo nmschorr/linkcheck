@@ -12,6 +12,8 @@ setup(
       install_requires=[
             'flask',
             'requests_html',
-            'gunicorn'
+            'gunicorn',
+            'greenlet',
+            'gevent',
       ],
       )
