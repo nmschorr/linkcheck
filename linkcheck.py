@@ -3,87 +3,92 @@
 # this file is in active development
 #from time import perf_counter
 from urllib.parse import urlsplit
-from requests_html import HTMLSession
+from requests_html import HTMLSession, requests
+# import requests
+
 
 class linkcheck(object):
     def __init__(self):
         self.any_link_glob, self.base_lnks_g = [], []
         self.done_ln_gl_sing, self.err_links, self.link_count = [], [], 0
         #self.logger = lc().setup_logger()
-        print('In linkcheck: __init__New!!!')
+        self.myprint('In linkcheck: __init__New!!!')
+
+    def myprint(self, print_str):
+        _MYDEBUG = 1
+        if _MYDEBUG:
+            print(print_str)
+
 
     def handle_exc(self, e, link, plink):
-        ##print(str(e))
-        ##print('!!!!!!!! found error------------------\n' + str(e))
+        self.myprint(str(e))
+        self.myprint('!!!!!!!! found error------------------\n' + str(e))
         self.err_links.append((link, str(e)[:42], plink))
         pass
 
-    def get_simple_response(self, tup):
+    def get_simple_response(self, lin_and_par_tup):
         er = None
-        link_we_are_chkg, parent, response = tup[0], tup[1], None
+        response = None
+        link_to_ck, parent,  = lin_and_par_tup[0], lin_and_par_tup[1]
         self.link_count += 1
-        ##print("Checking this link: " + link_we_are_chkg)
+        self.myprint("Checking this link: " + link_to_ck)
         try:
             session = HTMLSession()
-            response = session.get(link_we_are_chkg)
+            response = session.get(link_to_ck)
             er = self.ck_status_code(response, parent)
         except Exception as e:
-            None
-            pass
-            ###self.handle_exc(e, link_we_are_chkg, parent)
+            self.myprint("exception inside get_simple_response: " + str(e))
+            ###self.handle_exc(e, link_to_ck, parent)
 
     #-----------------------------------------------------------------------
-    def do_response(self, tpar):
-        er2 = 0
+    def do_response(self, a_link, p_link):
+        t_err = 0
         resp = object()
         try:
-            ##print("-starting-get_home_links - just got this link: " + str(tpar))
+            self.myprint("-starting-get_home_links - just got this link: " + str(a_link))
             session = HTMLSession()
-            resp = session.get(tpar)
-            self.done_ln_gl_sing.append(tpar)  ## add to main done list
-            er2 = self.ck_status_code(resp, tpar)  ## if there's    an error
+            resp = session.get(a_link)
+            self.done_ln_gl_sing.append(a_link)  ## add to main done list
+            t_err = self.ck_status_code(resp, a_link)  ## if there's    an error
 
         except Exception as e:
-            self.err_links.append((tpar, str(e)[:42], tpar))
-            ##print("GOT AN EXCEPTION inside do_response and added to errs: ", str(e))
-            return resp, er2
-        return resp, er2
+            self.err_links.append((a_link, str(e)[:42], p_link))
+            self.myprint("GOT AN EXCEPTION inside do_response and added to errs: " + str(e))
+            return resp, t_err
+        return resp, t_err
 
-    #-----------------------------------------------------------------------
+    #----------------------------------------------------------------------get_links-
     def get_links(self, mainlin, _plin):
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], None, []
-        response, resp_err = self.do_response(mainlin)
-        ##print("-------------INSIDE get_links! --------------")
+        response, resp_err = self.do_response(mainlin, _plin)
+        self.myprint("-------------INSIDE get_links! --------------")
 
         try:
             if response.status_code:
-                myboo = True
-                ##print("Status code: ", myboo)
+                is_bool = True
+                self.myprint("Status code: " + str(is_bool))
         except:
-            ##print("no valid response from: ", mainlin)
+            self.myprint("no valid response from: " + mainlin)
             return
 
-        ##print("checking: ", mainlin)
-        ##print("resp_err: ", resp_err)
-        ##print("response: ", response)
 
-        if resp_err == 0 and myboo:  ## if there's an error  - 0 is good to continue
+        if resp_err == 0 and is_bool == True:  ## if there's an error  - 0 is good to continue
             try:
                 ab_links = response.html.absolute_links
                 new_lnks_loc = [ab for ab in ab_links]
             except Exception as e:
                 None
-                #print("exception inside get_links: ", str(e))
+                self.myprint("exception inside get_links: " + str(e))
 
-            ##print("got this far ", mainlin)
+            self.myprint("got this far " + mainlin)
             for THIS_LN in new_lnks_loc:
-                ##print("THIS_LN ", THIS_LN)
+                self.myprint("THIS_LN " + THIS_LN)
                 _IN_AN_LOC = self.ck_loc(THIS_LN, any_lnk_loc)
                 if not _IN_AN_LOC and not self._DONE_YET(THIS_LN):    #NOT done yet  cg = check glob
 
                     try:
-                        ##print("link===============", THIS_LN)
-                        ##print("new_lnks_loc=== going to check bad data next: ", new_lnks_loc)
+                        self.myprint("link===============" + THIS_LN)
+                        self.myprint("new_lnks_loc=== going to check bad data next: " + str(new_lnks_loc))
                         has_bad, good_suffix = self.ck_bad_data(THIS_LN)  # check for bad data
                         self.done_ln_gl_sing = self.check_for_bad_data(THIS_LN, self.done_ln_gl_sing)
                     except Exception as e:  self.handle_exc(e, THIS_LN, _plin)
@@ -103,7 +108,7 @@ class linkcheck(object):
                     except Exception as e:
                         self.handle_exc(e, THIS_LN, _plin)
 
-        ##print('!! NEW----end get_home_links:---returning base_links_local: ' + str(base_lnks_loc))
+        self.myprint('!! NEW----end get_home_links:---returning base_links_local: ' + str(base_lnks_loc))
         return list(set(base_lnks_loc))
 
        #############---------------------------------------
@@ -120,30 +125,34 @@ class linkcheck(object):
     def ck_loc(self, this_lin, any_link_loc):
         return bool(this_lin in [i[0] for i in any_link_loc])  # is it local?
 
-    def ck_status_code(self, response, parent_local):
+    def ck_status_code(self, response, tpar):
+        link = response.url
         err_codes = [400, 404, 408, 409, 501, 502, 503]
         if response.status_code in err_codes:
-            self.err_links.append((response.url, response.status_code, parent_local))
+            self.err_links.append((link, response.status_code, tpar))
             return 1
         else: return 0  # ok
 
+       #############----------------------------------MAIN-----
+       #############----------------------------------MAIN-----
 
     def main(self, a_site):
         full_addy = 'http://' + a_site
         new_sorted, repeats = [], 0
-        ##print('\n\n------------------- STARTING OVER -----------------------')
+        the_len = 0
+        self.myprint('\n\n------------------- STARTING OVER -----------------------')
         #tstart_main = perf_counter()
-        ##print('In main() Getting first address: {}'.format(full_addy))
+        self.myprint('In main() Getting first address: ' + full_addy)
         try:
             #############---------step ONE:
             base_only_plain_repeat = self.get_links(full_addy, full_addy)  #first set of base
-            ##print("Step One Done")   ##first time:  HOME PAGE ONLY  ##first time
+            self.myprint("Step One Done")   ##first time:  HOME PAGE ONLY  ##first time
             the_len = len(base_only_plain_repeat)
             new_base_links_two, new_sorted, new_base_links_one= [], [], base_only_plain_repeat
 
             while the_len and repeats < 6:
                 repeats += 1
-                ##print("repeats: " + str(repeats) + "-------------------!!In main loop")
+                self.myprint("repeats: " + str(repeats) + "-------------------!!In main loop")
                 for baselink in new_base_links_one:
                     new_base_links_two = self.get_links(baselink, full_addy)  # first set of base
                 the_len = len(new_base_links_two)
@@ -151,7 +160,7 @@ class linkcheck(object):
 
         except Exception as e:
             None
-            #print("Exception inside main_run: " + str(e))
+            self.myprint("Exception inside main_run: " + str(e))
 
         try:
             base_glob_now = self.base_lnks_g
@@ -159,7 +168,7 @@ class linkcheck(object):
             while the_len_b and repeats < 6:
 
                 repeats += 1
-                ##print("repeats: " + str(repeats) + "-------------------!!In main loop")
+                self.myprint("repeats: " + str(repeats) + "-------------------!!In main loop")
                 for baselink in base_glob_now:
                     base_lin = baselink[0]
                     parent_lin = baselink[1]
@@ -171,7 +180,7 @@ class linkcheck(object):
 
         tup = None
         try:
-            print("Step Two Done")
+            self.myprint("Step Two Done")
             any_link_to_check = list(self.any_link_glob)
 
             any_link_to_check = list(set(any_link_to_check))
@@ -184,18 +193,18 @@ class linkcheck(object):
             self.handle_exc(e, tup[0] ,tup[1])
 
         finlist = self.print_errs(self.err_links)
-        ##print("totalTime: " + str(perf_counter() - tstart_main))
-        print("Links checked: " + str(self.link_count))
-        x = len(self.done_ln_gl_sing)
-        ##print("errors: ", x)
+        #self.myprint("totalTime: " + str(perf_counter() - tstart_main))
+        self.myprint("Links checked: " + str(self.link_count))
+        #x = len(self.done_ln_gl_sing)
+        #self.myprint("errors: " + str(x))
         return finlist
 
 
 
 
-    @staticmethod
-    def ck_bad_data(dlink):
-        ##print("!!!!!=============inside ckbaddata. val of link: ", dlink)
+    
+    def ck_bad_data(self, dlink):
+        self.myprint("!!!!!=============inside ckbaddata. val of link: " + dlink)
         end_val = 0
         mylist = ['#', 'tel:+']
         try:
@@ -204,15 +213,15 @@ class linkcheck(object):
                     end_val += 1
         except Exception as e:
             None
-            #print("ck_bad_data: ", str(e))
+            self.myprint("ck_bad_data: " + str(e))
 
         good_suf = linkcheck.has_correct_suffix(dlink)  # check suffix
-        #print("!inside enval: ", end_val, good_suf)
+        self.myprint("!inside enval: " +  end_val + good_suf)
         return end_val, good_suf
 
-    @staticmethod
-    def check_for_bad_data(alink, done_lnks_gl=None):
-        #print("!!!!!=============inside check_for_bad_data. val of link: ", alink)
+    
+    def check_for_bad_data(self, alink, done_lnks_gl=None):
+        self.myprint("!!!!!=============inside check_for_bad_data. val of link: " + alink)
         try:
             if done_lnks_gl:
                 done_lnks_gl.append(alink)  ## add to main done list
@@ -220,27 +229,27 @@ class linkcheck(object):
                 done_lnks_gl = [alink]
         except Exception as e:
             None
-            #print("check_for_bad_data: ", str(e))
+            self.myprint("check_for_bad_data: " + str(e))
         return done_lnks_gl
 
-    @staticmethod
-    def add_any_bse_g(zlink, parent_local, base_links_glob2=None): #Adding this base link to base glob
+    
+    def add_any_bse_g(self, zlink, parent_local, base_links_glob2=None): #Adding this base link to base glob
         try:
             if base_links_glob2:
                 _IN_BASE_GLOB = bool(zlink in [i[0] for i in base_links_glob2])
                 if not _IN_BASE_GLOB:  # if not already in this
                     base_links_glob2.append((zlink, parent_local))
-                    #print("Adding this base link to base glob: " + zlink)
+                    self.myprint("Adding this base link to base glob: " + zlink)
             else:
                 base_links_glob2= [(zlink, parent_local)]
 
         except Exception as e:
-            #print("add_any_bse_g: ", str(e))
+            self.myprint("add_any_bse_g: " + str(e))
             None
         return base_links_glob2
 
-    @staticmethod
-    def add_any(tlink, parent_local, any_link_loc=None, any_lnk_gl2=None): #Adding this base link to any glob
+    
+    def add_any(self, tlink, parent_local, any_link_loc=None, any_lnk_gl2=None): #Adding this base link to any glob
         try:
             if any_lnk_gl2:  # don't try without something there
                 glob_bool = bool(tlink in [i[0] for i in any_lnk_gl2])
@@ -251,23 +260,23 @@ class linkcheck(object):
                 any_lnk_gl2 = [(tlink, parent_local)]  # make it if starting empty
                 any_link_loc = [(tlink, parent_local)]
         except Exception as e:
-            #print("exception in add_any: ", str(e))
+            self.myprint("exception in add_any: " + str(e))
             None
         return any_lnk_gl2, any_link_loc
 
     # def reset_timer(self, name, tstart):
-    #     #print(name, perf_counter() - tstart)
+    #     self.myprint(name, perf_counter() - tstart)
     #     #tstart = perf_counter()
     #     return tstart
 
-    @staticmethod
-    def split_url(url):
+    
+    def split_url(self, url):
         if '?' in url:
             url = (url.split('?'))[0]
         return url
 
-    @staticmethod
-    def has_correct_suffix(link):
+    
+    def has_correct_suffix(self, link):
         try:
             goods = ['html',  'htm',  '/', 'php', 'asp', 'pl', 'com', 'net', 'org', 'css', 'py', 'rb', 'js'
                 'jsp','shtml', 'cgi', 'txt']
@@ -275,12 +284,12 @@ class linkcheck(object):
                 if link.endswith(g):
                     return True
         except Exception as e:
-            #print("Exception in has_correct_suffix: ", str(e))
+            self.myprint("Exception in has_correct_suffix: " + str(e))
             None
         return False
 
-    @staticmethod
-    def ck_base(this_link, thebase_part, base_links_local=None):
+    
+    def ck_base(self, this_link, thebase_part, base_links_local=None):
         _IS_BASE = False
         in_base_loc = False
         try:
@@ -290,23 +299,23 @@ class linkcheck(object):
         except Exception as e:
             None
 
-            #print("ck_base: ", str(e))
+            self.myprint("ck_base: " + str(e))
         return _IS_BASE, in_base_loc
 
-    @staticmethod
-    def divide_url(parent_local):
+    
+    def divide_url(self, parent_local):
         thebase_part_local = None
         try:
             thebase_part_local = (urlsplit(parent_local))[1]
             if thebase_part_local.startswith('www'):
                 thebase_part_local = thebase_part_local[4:]
         except Exception as e:
-            #print('divide_url: ', str(e))
+            self.myprint('divide_url: ' + str(e))
             pass
         return thebase_part_local
 
-    @staticmethod
-    def print_errs(errlinks=None):
+    
+    def print_errs(self, errlinks=None):
         if errlinks:
             answer_string, e, fin_list = '', '', []
             p0, p1, p2 = "BAD LINK: ", " ERROR: ", " PARENT: "
@@ -314,8 +323,8 @@ class linkcheck(object):
                 if errlinks:
                     errs = list(set(errlinks))
                     er_len = len(errs)
-                    print("\nTotal errors: ", er_len)
-                    print("-------------- Here are the errors ------------- :")
+                    self.myprint("\nTotal errors: " + str(er_len))
+                    self.myprint("-------------- Here are the errors ------------- :")
                     errs22 = sorted(errs, key=lambda x: x[0])  # sort on first
                     errs2 = set(errs22)
                     for e in errs2:
@@ -327,12 +336,12 @@ class linkcheck(object):
                         answer_string=[an1, an2, an3]
                         #answer_string = p0 + st0 + p1 + st1 + p2 + st2
                         fin_list.append(answer_string)
-                        print(answer_string)
+                        self.myprint(str(answer_string))
                 else:
                     fin_list = [answer_string]
             except Exception as e:
                 None
-                #print('#print_errs: ', str(e))
+                self.myprint('print_errs: ' + str(e))
             return fin_list
         else:
             return []
