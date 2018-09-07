@@ -31,7 +31,7 @@ def result():
         return render_template("resultpage.html", answers = answers)
 
 HOST='0.0.0.0'
-HOST='127.0.0.1'
+#HOST='127.0.0.1'
 app.run(host=HOST, port=8080)
 
 
