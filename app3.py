@@ -26,20 +26,18 @@ class acsync(object):
     def longtask(self):
         print(str(time.time()))
         while self.lc != "done":
-            print("longtask val of lc: ", self.lc)
+            #print("longtask val of lc: ", self.lc)
 
             while self.lc != "done":
-                time.sleep(7)
+                time.sleep(9)
                 print("!!!! PAST SLEEP 7")
                 self.lc = "done"
-                print("longtask val of lc: ", self.lc)
+        print("all done!")
 
     def task2(self):
         while self.lc != "done":
-            print("inside task2")
-            time.sleep(1)
-            print("task2val of lc: ", self.lc)
-            print(str(time.time()))
+            print("still waiting")
+            time.sleep(2)
         print("done waiting")
 
 
@@ -52,16 +50,11 @@ class acsync(object):
         t1.start()
         t2 = threading.Thread(target=self.task2)
         t2.start()
-        tname = t1.name
-        print("threadname: ", tname)
+
+        print("threadname1: ", t1.name)
+        print("threadname2: ", t2.name)
 
 
-        # thread2 = gevent.spawn(self.task2)
-        # thread2.start()
-        # thread1 = gevent.spawn(self.longtask)
-        # thread1.start()
-        # gevent.joinall([thread1, thread2])
-        print("done")
 
 
 aa = acsync()
@@ -70,22 +63,37 @@ aa.run()
 
 
 
-def foo():
-    while True:
-        print('Running in foo')
-        gevent.sleep(0)
-        print('Explicit context switch to foo again')
-def bar():
-    #while True:
-    print('Explicit context to bar')
-    print('Spawning threads now')
-    thread1 = gevent.spawn(task)
-    thread2 = gevent.spawn(task2)
-    print('Done Spawning threads now')
-    print('Explicit context to bar')
-    gevent.sleep(0)
-    time.sleep(1)
-    print('Implicit context switch back to bar')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
+# def foo():
+#     while True:
+#         print('Running in foo')
+#         gevent.sleep(0)
+#         print('Explicit context switch to foo again')
+# def bar():
+#     #while True:
+#     print('Explicit context to bar')
+#     print('Spawning threads now')
+#     thread1 = gevent.spawn(task)
+#     thread2 = gevent.spawn(task2)
+#     print('Done Spawning threads now')
+#     print('Explicit context to bar')
+#     gevent.sleep(0)
+#     time.sleep(1)
+#     print('Implicit context switch back to bar')
 
 # gevent.joinall([
 #     gevent.spawn(foo),
