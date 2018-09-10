@@ -139,6 +139,19 @@ class linkcheck(object):
 
        #############----------------------------------MAIN-----
        #############----------------------------------MAIN-----
+    def ckaddy(self, addy):
+        if __name__ == '__main__':
+            if addy[0:7]=='http://':
+                addy = addy[7:]
+            if addy[0:8] == 'http://':
+                addy = addy[8:]
+
+        if not addy[0].isChar:
+            return False
+        return addy
+
+
+
 
     def main(self, a_site):
         full_addy = 'http://' + a_site
