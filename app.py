@@ -1,41 +1,28 @@
-from linkcheck import linkcheck
-from flask import (Flask, request, render_template)
-import os
 
-PORT = int(os.environ.get('OPENSHIFT_PYTHON_PORT', 8080))
+from flask import Flask, request, render_template
+from linkcheck import linkcheck
+
+#PORT = int(os.environ.get('OPENSHIFT_PYTHON_PORT', 8080))
 GUNICORN_CMD_ARGS="--bind=0.0.0.0"
 
 app = Flask(__name__)
-
+# to do:  spinner
 
 @app.route('/')
-def get_addy():
-    print("-------------------here inside app")
-    return render_template('getaddy.html')
+def index():
+    return render_template('index.html')
 
+@app.route('/results', methods = ['POST','GET'])
+def results():
+    name = request.form['name']
+    lc = linkcheck()
 
-@app.route('/resultpage',methods = ['POST', 'GET'])
-def result():
-    print("------------------here inside result")
-    answers = []
-    if request.method == 'POST':
-        form_resp = request.form['siteaddy']
-        print("---------------here inside app result2")
-        linkcheck_obj = linkcheck()
-        answers = linkcheck_obj.main(form_resp)
-        #answers2 = [("no broken links", "1", "2")]  # for testing
-        print("-------------------------here inside app result3")
-        print("answers: " )
-        for i in answers:
-            print(i)
-        return render_template("resultpage.html", answers = answers)
+    render_template('waiting.html', name=name)
+    answers = lc.main(name)
+    return render_template('results.html', answers = answers)
 
 HOST='0.0.0.0'
 #HOST='127.0.0.1'
 app.run(host=HOST, port=8080)
 
-
-
-
-#Flask.debug = 1
 
