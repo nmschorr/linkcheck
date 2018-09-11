@@ -1,5 +1,11 @@
 <!DOCTYPE html>
 <html><head>
+    <script type="text/javascript">// <![CDATA[
+        function loading(){
+            $("#loading").show();
+            $("#content").hide();
+        }
+ ]]></script>
     Welcome!
 </head>
    <body>
@@ -9,7 +15,10 @@ Welcome to LinkCheck!
              Enter website or webpage you want to LinkCheck here:
              <input type = "text" size="55" name = "name" />
          </p>
-         <p><input type = "submit" value = "Submit and Test"/></p>
+         <p><input type = "submit" value = "Submit and Test" onclick="loading();"></p>
+
+
+
       </form>
 
    </body>
