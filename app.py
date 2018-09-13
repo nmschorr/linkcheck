@@ -25,6 +25,11 @@ def writeres(data=[]):
 
 app = Flask(__name__)
 
+
+
+
+
+@app.route('/resultsn')
 def worker1(site='schorrmedia.com/m.html'):   # run linkcheck and print to console
     lc = linkcheck()
     print("you again entered: ", site)
@@ -32,6 +37,9 @@ def worker1(site='schorrmedia.com/m.html'):   # run linkcheck and print to conso
     writeres(answers)
     for i in answers:
         print(i)
+
+
+    return render_template('resultsn.html', name=answers)  ## has a form
 
 
 
