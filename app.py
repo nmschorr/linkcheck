@@ -1,28 +1,39 @@
-
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, Response
 from linkcheck import linkcheck
+import time
 
-#PORT = int(os.environ.get('OPENSHIFT_PYTHON_PORT', 8080))
-GUNICORN_CMD_ARGS="--bind=0.0.0.0"
 
 app = Flask(__name__)
-# to do:  spinner
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html')  ## has a form
 
 @app.route('/results', methods = ['POST','GET'])
 def results():
     name = request.form['name']
-    lc = linkcheck()
+    print ("got: ", name)
 
-    render_template('waiting.html', name=name)
-    answers = lc.main(name)
-    return render_template('results.html', answers = answers)
-
-HOST='0.0.0.0'
-#HOST='127.0.0.1'
-app.run(host=HOST, port=8080)
+    return render_template('results.html', name=name)  ## has a form
 
 
+#
+# @app.route( '/stream' )
+# def stream():
+#     g = proc.Group()
+#     p = g.run( [ "bash", "-c", "for ((i=0;i<100;i=i+1)); do echo $i; sleep 1; done" ] )
+#
+#     def read_process():
+#         while g.is_pending():
+#             lines = g.readlines()
+#             for proc, line in lines:
+#                 yield line
+#
+#     return Response( read_process(), mimetype= 'text/plain' )
+#
+# if __name__ == "__main__":
+#     HOST = '127.0.0.1'
+# #   app.run(host='127.0.0.1', port=5000)
+#     app.run(host='127.0.0.1', port=8080)
+
+app.run(host='127.0.0.1', debug=True)

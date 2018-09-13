@@ -1,25 +1,22 @@
 <!doctype html>
 <html>
     <head>
-
-    }
         <title>Results from LinkCheck</title>
 
         </head>
    <body>
-<p>
-   <h2> Here are the broken links:</h2>
-</p>
-<p>
-    Brief list:</p>
-<p>
 
-{% for item in answers %}
- {{ item[0] }}  {{ item[1] }}  PARENT: <a href={{ item[2] }}>{{item[2]}}</a>
-<p> </p>
+   <h2> Here are the broken links:</h2>
+
+    Brief list:
+
+
+{% for item in name %}
+{{ item }}
+
 {% endfor %}
 
-</p>
+
 
 
 </body>
