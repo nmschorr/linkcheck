@@ -153,7 +153,7 @@ class linkcheck(object):
 
 
 
-    def main(self, a_site):
+    def main(self, a_site='schorrmedia.com/m.html'):
         full_addy = 'http://' + a_site
         new_sorted, repeats = [], 0
         the_len = 0

@@ -1,9 +1,40 @@
 from flask import Flask, request, render_template, Response
 from linkcheck import linkcheck
-import time
+import threading, time
 
+import tempfile
+import os
+
+commandname = "cat"
+
+def writeres(data=[]):
+    f = tempfile.NamedTemporaryFile(delete=False,mode='a+t')
+    #for i in data:
+    tname = f.name
+    for line in data:
+        nline = str(line)
+        print(type(nline))
+        print("this is the line: ", nline)
+        f.write(nline)
+        f.write('\n')
+
+    print("tempfile named: ", f.name )
+    ###tempfile.NamedTemporaryFile(buffering=True,newline=True,)
+    f.close() # file is not immediately deleted because we
+              # used delete=False
 
 app = Flask(__name__)
+
+def worker1(site='schorrmedia.com/m.html'):   # run linkcheck and print to console
+    lc = linkcheck()
+    print("you again entered: ", site)
+    answers = lc.main()
+    writeres(answers)
+    for i in answers:
+        print(i)
+
+
+
 
 @app.route('/')
 def index():
@@ -12,8 +43,11 @@ def index():
 @app.route('/results', methods = ['POST','GET'])
 def results():
     name = request.form['name']
-    print ("got: ", name)
-
+    print ("you entered: ", name)
+    threads = []
+    t = threading.Thread(target=worker1)
+    threads.append(t)
+    t.start()
     return render_template('results.html', name=name)  ## has a form
 
 
@@ -35,5 +69,7 @@ def results():
 #     HOST = '127.0.0.1'
 # #   app.run(host='127.0.0.1', port=5000)
 #     app.run(host='127.0.0.1', port=8080)
+
+print("working")
 
 app.run(host='127.0.0.1', debug=True)
