@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 def writeres(data=[]):
     print("inside writeres "  )
-    f = open("demo.html", "w+t")
+    f = open("templates/resultsn.html", "w+t")
     for line in data:
         print("this is the line: ", str(line))
         f.write(str(line))
@@ -17,7 +17,7 @@ def writeres(data=[]):
     return f.name  # used delete=False## file name so we can read it
 
 
-
+@app.route('/resultsn', methods = ['GET'])
 def worker1(site='schorrmedia.com/m.html'):   # run linkcheck and print to console
     lc = linkcheck()
     print("inside thread. you again entered: ", site)
@@ -26,6 +26,8 @@ def worker1(site='schorrmedia.com/m.html'):   # run linkcheck and print to conso
         print(i)
     fname = writeres(answers)
     print("filenm: ", fname)
+    return render_template('resultsn.html')  ## has a form
+
 
 
 
