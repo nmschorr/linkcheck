@@ -11,13 +11,14 @@ env = Environment(
     autoescape=select_autoescape(['html', 'xml'])
 )
 staticdir = "static"
+timestp = format(datetime.now(), '%Y%m%d%H%M%S')
+justfilename = "res" + timestp + ".html"
 gfulldir = path.join(app.root_path, staticdir)
+fnfull = None
 print("gfulldir: " + gfulldir)
 gsite = None
 t = None
 done = None
-justfilename = None
-
 
 def writeres(data=[]):
     global justfilename
@@ -25,9 +26,8 @@ def writeres(data=[]):
     spaces = "&ensp;"  #two spaces
     mtab = "&nbsp;&nbsp;&nbsp;&nbsp;"
     print("inside writeres "  )
-    timestp = format(datetime.now(), '%Y%m%d%H%M%S')
-    justfilename = "res" + timestp + ".html"
     global gfulldir
+    global fnfull
     fnfull = path.join(gfulldir, justfilename)
     f = open(fnfull, "w+t")
     f.write(bothp)
@@ -60,14 +60,12 @@ def resultsn():   # run linkcheck and print to console
     global gsite
     global done
     global t
-    context = {'name': gsite}
+    time.sleep(2)
+    #context = {'name': gsite}
     #threading.currentThread().is_alive()
     print ("reloaded")
-    while t.is_alive():
-        return render_template('notready.html')
-        time.sleep(10)
-    with app.app_context():
-        return render_template('resultsn.html', **context)  ## has a form
+    #####while t.is_alive():
+    return render_template('resultsn.html',name=justfilename)  ## has a form
 
 
 # @app.route('/resultsn', methods = ['GET'])
@@ -80,7 +78,7 @@ def worker1():   # run linkcheck and print to console
         answers = lc.main(gsite)
         for i in answers:
             print(i)
-            justfilename = writeres(answers)
+            writeres(answers)
         print("passing in to resultn justfilename: ", justfilename)
         print("worker1 done")
 
@@ -104,8 +102,9 @@ def results():
     print("just started thread")
     threads.append(t)
     t.start()
+    time.sleep(2)
 
-    return render_template('results.html', name = gsite)  ## has a form
+    return render_template('results.html', name = justfilename)  ## has a form
 
 
 

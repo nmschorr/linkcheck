@@ -153,7 +153,7 @@ class linkcheck(object):
 
 
 
-    def main(self, a_site='schorrmedia.com/m.html'):
+    def main(self, a_site=None):
         full_addy = 'http://' + a_site
         new_sorted, repeats = [], 0
         the_len = 0
@@ -367,9 +367,9 @@ class linkcheck(object):
 # if __name__ == "__main__":
 #     lc = linkcheck()
 #     finlistmain = lc.main('repercussions.com')
-    # print("here are the errors")
-    # for item in finlistmain:
-    #     print(item)
-    # schorrmedia.com/m.html
+#     print("here are the errors")
+#     for item in finlistmain:
+#         print(item)
+#     schorrmedia.com/m.html
 
 
