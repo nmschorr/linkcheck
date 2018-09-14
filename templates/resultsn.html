@@ -10,7 +10,7 @@ var cname = '{{ name }}';
 var wholeurl = locrootdir.concat(cname);
 
 $.when( $.ready ).then(function() {
-  $("#includedContent").load(wholeurl);
+  $("#includedContent").load(wholeurl).attr('href');
 });
 
 
@@ -20,13 +20,19 @@ $.when( $.ready ).then(function() {
 </head>
 <body>
 
-<h2> Here are the broken links:</h2>
-
-Filename:
+<h2>Query Results</h2>
 
 <p></p>
+Here are the broken links. If nothing follows, then no broken links found.
+<p></p>
+<script>
+    document.write(wholeurl)
 
-     <div id="includedContent"></div>
+</script>
+     <div id="includedContent">
+
+
+     </div>
 
 
 

@@ -16,6 +16,11 @@ print("gfulldir: " + gfulldir)
 
 
 def writeres(data=[]):
+    beginp = '<p>'
+    endp = '</p>'
+    bothp =  '<p></p>'
+    spaces = "&ensp;"  #two spaces
+    mtab = "&nbsp;&nbsp;&nbsp;&nbsp;"
     print("inside writeres "  )
     timestp = format(datetime.now(), '%Y%m%d%H%M%S')
     dir = "static/"
@@ -23,10 +28,19 @@ def writeres(data=[]):
     global gfulldir
     fnfull = path.join(gfulldir, justfilename)
     f = open(fnfull, "w+t")
+    f.write(bothp)
     for line in data:
-        print("this is the line: ", str(line))
-        f.write(str(line))
-        f.write('\n')
+            f.write(str(line[0]))
+            f.write(spaces)
+            f.write(str(line[1]))
+            f.write("<br>" + mtab + "  FOUND ON: ")
+
+            f.write("<a href='")
+            f.write(str(line[2]))
+            f.write("'>")
+            f.write(str(line[2]))
+            f.write("</a>")
+            f.write(bothp)
 
     f.close() # file is not immediately deleted because we
     print("fnfull named: ", fnfull )
