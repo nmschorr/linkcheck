@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, Response
+from flask import Flask, request, render_template, Response, flash
 from linkcheck import linkcheck
 import threading, time, tempfile
 from datetime import datetime
@@ -13,17 +13,19 @@ env = Environment(
 staticdir = "static"
 gfulldir = path.join(app.root_path, staticdir)
 print("gfulldir: " + gfulldir)
+gsite = None
+t = None
+done = None
+justfilename = None
 
 
 def writeres(data=[]):
-    beginp = '<p>'
-    endp = '</p>'
+    global justfilename
     bothp =  '<p></p>'
     spaces = "&ensp;"  #two spaces
     mtab = "&nbsp;&nbsp;&nbsp;&nbsp;"
     print("inside writeres "  )
     timestp = format(datetime.now(), '%Y%m%d%H%M%S')
-    dir = "static/"
     justfilename = "res" + timestp + ".html"
     global gfulldir
     fnfull = path.join(gfulldir, justfilename)
@@ -45,23 +47,43 @@ def writeres(data=[]):
     f.close() # file is not immediately deleted because we
     print("fnfull named: ", fnfull )
     print("f.name: ", f.name)
-    return justfilename  # used delete=False## file name so we can read it
+    return render_template('resultsn.html', name=gsite)  ## has a form
 
+
+@app.route('/notready')
+def notready():
+    return render_template('notready.html')
 
 @app.route('/resultsn', methods = ['GET'])
-def worker1(site='schorrmedia.com/m.html'):   # run linkcheck and print to console
-    lc = linkcheck()
-    print("inside thread. you again entered: ", site)
-    answers = lc.main()
-    for i in answers:
-        print(i)
-        justfilename = writeres(answers)
-    print("passing in to resultn justfilename: ", justfilename)
-    return render_template('resultsn.html', name = justfilename)  ## has a form
+def resultsn():   # run linkcheck and print to console
+    global justfilename
+    global gsite
+    global done
+    global t
+    context = {'name': gsite}
+    #threading.currentThread().is_alive()
+    print ("reloaded")
+    while t.is_alive():
+        return render_template('notready.html')
+        time.sleep(10)
+    with app.app_context():
+        return render_template('resultsn.html', **context)  ## has a form
 
-# @app.route('/demotest')
-# def demotest():
-#    return app.static_url_path('demotest.html')
+
+# @app.route('/resultsn', methods = ['GET'])
+
+def worker1():   # run linkcheck and print to console
+        global gsite
+        answers = None
+        lc = linkcheck()
+        print("inside worker1 thread. you entered: ", gsite)
+        answers = lc.main(gsite)
+        for i in answers:
+            print(i)
+            justfilename = writeres(answers)
+        print("passing in to resultn justfilename: ", justfilename)
+        print("worker1 done")
+
 
 
 
@@ -73,14 +95,17 @@ def index():
 def results():
     v = app.root_path
     print("root path: ", v)
-    name = request.form['name']
-    print ("you entered: ", name)
+    global gsite
+    global t
+    gsite = request.form['name']
+    print ("you entered: ", gsite)
     threads = []
     t = threading.Thread(target=worker1)
     print("just started thread")
     threads.append(t)
     t.start()
-    return render_template('results.html', name = name)  ## has a form
+
+    return render_template('results.html', name = gsite)  ## has a form
 
 
 
