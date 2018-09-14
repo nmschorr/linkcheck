@@ -2,17 +2,26 @@ from flask import Flask, request, render_template, Response
 from linkcheck import linkcheck
 import threading, time, tempfile
 from datetime import datetime
+from os import path
 
 app = Flask(__name__)
-fnfull = "0"
+from jinja2 import Environment, PackageLoader, select_autoescape
+env = Environment(
+    loader=PackageLoader('linkcheck', 'templates'),
+    autoescape=select_autoescape(['html', 'xml'])
+)
+staticdir = "static"
+gfulldir = path.join(app.root_path, staticdir)
+print("gfulldir: " + gfulldir)
+
 
 def writeres(data=[]):
     print("inside writeres "  )
     timestp = format(datetime.now(), '%Y%m%d%H%M%S')
-    dir = "resultsn/"
-    justfilename = "results" + timestp + ".html"
-    global fnfull
-    fnfull = dir + justfilename
+    dir = "static/"
+    justfilename = "res" + timestp + ".html"
+    global gfulldir
+    fnfull = path.join(gfulldir, justfilename)
     f = open(fnfull, "w+t")
     for line in data:
         print("this is the line: ", str(line))
@@ -20,7 +29,8 @@ def writeres(data=[]):
         f.write('\n')
 
     f.close() # file is not immediately deleted because we
-    print("file named: ", f.name )
+    print("fnfull named: ", fnfull )
+    print("f.name: ", f.name)
     return justfilename  # used delete=False## file name so we can read it
 
 
@@ -32,12 +42,12 @@ def worker1(site='schorrmedia.com/m.html'):   # run linkcheck and print to conso
     for i in answers:
         print(i)
         justfilename = writeres(answers)
-    print("filenm: ", justfilename)
+    print("passing in to resultn justfilename: ", justfilename)
     return render_template('resultsn.html', name = justfilename)  ## has a form
 
-@app.route('/demotest')
-def demotest():
-   return app.static_url_path('demotest.html')
+# @app.route('/demotest')
+# def demotest():
+#    return app.static_url_path('demotest.html')
 
 
 
