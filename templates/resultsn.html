@@ -2,82 +2,41 @@
 <html>
     <head>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
-$("button").click(function(){
-    $("#div2").load(myurl);
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>   <!---------jquery start---------------->
+var locroot = location.origin;
+var locrootdir = locroot.concat("/static/");
+var cname = '{{ name }}';
+var wholeurl = locrootdir.concat(cname);
+
+$.when( $.ready ).then(function() {
+  $("#includedContent").load(wholeurl);
 });
 
-</script>
 
-<script type=text/javascript>
-var troot = location.origin;
-var wstat = troot.concat("/static/");
-var cname = '{{ name }}';
-var myurl = wstat.concat(cname);
-
-
-
-function load() {
-    var file = new XMLHttpRequest();
-    file.open("GET",myurl, true);
-    file.onreadystatechange = function() {
-      if (file.readyState === 4) {  // Makes sure the document is ready to parse
-        if (file.status === 200) {  // Makes sure it's found the file
-          text = file.responseText;
-          document.getElementById("div1").innerHTML = text;
-        }
-      }
-    }
-}
-window.onLoad = load();
 </script>
 
         <title>Results from LinkCheck</title>
-        </head>
-   <body>
+</head>
+<body>
 
-   <h2> Here are the broken links:</h2>
+<h2> Here are the broken links:</h2>
 
-    Filename:
-
-<p></p>
-
-
-{{ name }}
-
-
-location.origin:  <br>
-<script type="text/javascript">
-   document.write(location.origin);
-   document.write(window.onLoad)
-
-</script>
-
+Filename:
 
 <p></p>
 
+     <div id="includedContent"></div>
 
 
 
 
-<div id="div1">
-    <h2>Let jQuery AJAX Change This Text
-    </h2></div>
 
 
-
-document.write("<p></p>myurl: ");
-document.write(myurl);
-
-
-
-<button>Get External Content</button>
-
+<p></p>
 
 
 
 
 </body>
-
-
 </html>
