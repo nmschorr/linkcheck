@@ -117,7 +117,7 @@ def results():
 
 print("LinkCheck started.")
 HOST='127.0.0.1'
-#HOST='0.0.0.0'
+HOST='0.0.0.0'
 debug = False
 debug = True
 app.run(host=HOST, port=8080, debug=debug)
