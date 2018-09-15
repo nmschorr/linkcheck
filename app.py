@@ -1,35 +1,53 @@
-from flask import Flask, request, render_template, Response, flash
+from flask import Flask, request, render_template
 from linkcheck import linkcheck
-import threading, time, tempfile
+import threading, time
 from datetime import datetime
 from os import path
+from jinja2 import Environment, PackageLoader, select_autoescape
+from nocache import nocache
 
 app = Flask(__name__)
-from jinja2 import Environment, PackageLoader, select_autoescape
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 env = Environment(
     loader=PackageLoader('linkcheck', 'templates'),
-    autoescape=select_autoescape(['html', 'xml'])
+    autoescape=select_autoescape(['html', 'xml']),
 )
-staticdir = "static"
-timestp = format(datetime.now(), '%Y%m%d%H%M%S')
-justfilename = "res" + timestp + ".html"
-gfulldir = path.join(app.root_path, staticdir)
-fnfull = None
-print("gfulldir: " + gfulldir)
-gsite = None
-t = None
-done = None
+
+gsite, t, fnfull, justfilename, justandstatic = None, None, None, None, None
+gfulldir, fnfull, mtab, bothp, timestp = None, None, None, None, None
+
+
+def setupfile():
+    global justfilename, gfulldir, fnfull, mtab, bothp, justandstatic, fnfull, timestp
+    bothp =  '<p></p>'
+    mtab = "&nbsp;&nbsp;&nbsp;&nbsp;"
+    gfulldir = path.join(app.root_path, "static")
+    print("gfulldir: " + gfulldir)
+    timestp = format(datetime.now(), '%Y%m%d%H%M%S')
+    justfilename = "res" + timestp + ".html"
+    justandstatic = path.join("static",justfilename)
+    notred = "Results not ready yet. Keep reloading page until they appear." + mtab
+    reload = "<a href=" + "javascript:location.reload(true)" + ">Refresh this page</a>"
+    scr = "<script>function pageloadEvery(t) {setTimeout('location.reload(true)', t);}</script>"
+    headr = "<!DOCTYPE html><html><head>" + scr + "<title>Not Ready</title></head>"
+    bodreload = "<body onload=javascript:pageloadEvery(10000);>"
+    newst = headr + bodreload + notred + reload  + "</body></html>"
+    fnfull = path.join(gfulldir, justfilename)
+    fj = open(justandstatic, "w")
+    fj.write(newst)
+    fj.close()
+
 
 def writeres(data=[]):
-    global justfilename
-    bothp =  '<p></p>'
+    global justfilename, gfulldir, fnfull, mtab, bothp
     spaces = "&ensp;"  #two spaces
-    mtab = "&nbsp;&nbsp;&nbsp;&nbsp;"
     print("inside writeres "  )
-    global gfulldir
-    global fnfull
-    fnfull = path.join(gfulldir, justfilename)
-    f = open(fnfull, "w+t")
+    print("justfilename: ", justfilename)
+
+    #oldfileversion = open(fnfull, "a+t")
+    #oldfileversion.truncate(0)
+    #oldfileversion.close()
+    f = open(fnfull, "w")
     f.write(bothp)
     for line in data:
             f.write(str(line[0]))
@@ -47,28 +65,19 @@ def writeres(data=[]):
     f.close() # file is not immediately deleted because we
     print("fnfull named: ", fnfull )
     print("f.name: ", f.name)
-    return render_template('resultsn.html', name=gsite)  ## has a form
+    return
 
 
-@app.route('/notready')
-def notready():
-    return render_template('notready.html')
-
-@app.route('/resultsn', methods = ['GET'])
-def resultsn():   # run linkcheck and print to console
-    global justfilename
-    global gsite
-    global done
-    global t
-    time.sleep(2)
-    #context = {'name': gsite}
-    #threading.currentThread().is_alive()
-    print ("reloaded")
-    #####while t.is_alive():
-    return render_template('resultsn.html',name=justfilename)  ## has a form
-
-
-# @app.route('/resultsn', methods = ['GET'])
+def writenote():
+    global justandstatic
+    print("inside writenote. ")
+    answer =  "No broken links found. Thanks for using LinkCheck."
+    outstt = "<!DOCTYPE html><html><head><title>No Broken Links</title></head><body>"
+    newstt = outstt + answer + "</body></html>"
+    fjj = open(justandstatic, "w")
+    #fjj.truncate()
+    fjj.write(newstt)
+    fjj.close()
 
 def worker1():   # run linkcheck and print to console
         global gsite
@@ -76,35 +85,37 @@ def worker1():   # run linkcheck and print to console
         lc = linkcheck()
         print("inside worker1 thread. you entered: ", gsite)
         answers = lc.main(gsite)
-        for i in answers:
-            print(i)
+        if len(answers) > 0:
             writeres(answers)
+        else:
+            print("no errors found")
+            writenote()
+
         print("passing in to resultn justfilename: ", justfilename)
         print("worker1 done")
 
 
-
-
 @app.route('/')
 def index():
+    setupfile()
     return render_template('index.html')  ## has a form
 
+
 @app.route('/results', methods = ['POST','GET'])
+@nocache
 def results():
-    v = app.root_path
-    print("root path: ", v)
-    global gsite
-    global t
+    global gsite, t
+    threads = []
+    rootpath = app.root_path
+    print("root path: ", rootpath)
     gsite = request.form['name']
     print ("you entered: ", gsite)
-    threads = []
     t = threading.Thread(target=worker1)
     print("just started thread")
     threads.append(t)
     t.start()
-    time.sleep(2)
-
-    return render_template('results.html', name = justfilename)  ## has a form
+    time.sleep(1)
+    return render_template('results.html', name = justandstatic)  ## has a form
 
 
 
