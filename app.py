@@ -111,13 +111,15 @@ def results():
     threads.append(t)
     t.start()
     time.sleep(1)
-    return render_template('results.html', name = justandstatic)  ## has a form
+    return render_template('results.html', name = justfilename)  ## has a form
 
 
 
 print("LinkCheck started.")
 HOST='127.0.0.1'
-HOST='0.0.0.0'
+#HOST='0.0.0.0'
 debug = False
 debug = True
-app.run(host=HOST, port=8080, debug=debug)
+PORT=5000
+PORT=8080
+app.run(host=HOST, port=PORT, debug=debug)

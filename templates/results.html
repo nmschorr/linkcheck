@@ -16,12 +16,30 @@
 <p></p>
 
 
-   <h2> Click below for your results:</h2>
+ <h4>  Click the link below to check your results:</h4>
 
 &nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;   <a href="http://0.0.0.0:8080/{{name}}"/>
+&nbsp;&nbsp;&nbsp;&nbsp;
+<br>
 
-Results </a>
+<script>
+
+fname = '{{ name }} ';
+var newURL = "<a href=" + window.location.protocol + "//" + window.location.host + "/static/" + fname + ">Check for Results</a>";
+var theexample = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname + window.location.search
+
+
+document.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+
+document.write(newURL);
+document.write("<br>")
+
+</script>
+
+
+
+<br>
+ </a>
 
    <h4> This might take up to 10+ mins for larger websites.</h4>
 
