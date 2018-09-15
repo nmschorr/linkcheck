@@ -6,8 +6,7 @@ The app linkcheck will check the links found on a website and return the broken 
 Flask==1.0.2
 requests_html==0.9.0
 Gunicorn==19.9.0
-greenlet==0.4.14
-gevent==1.3.6
+
 
 
 

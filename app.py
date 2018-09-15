@@ -44,9 +44,6 @@ def writeres(data=[]):
     print("inside writeres "  )
     print("justfilename: ", justfilename)
 
-    #oldfileversion = open(fnfull, "a+t")
-    #oldfileversion.truncate(0)
-    #oldfileversion.close()
     f = open(fnfull, "w")
     f.write(bothp)
     for line in data:
@@ -75,7 +72,6 @@ def writenote():
     outstt = "<!DOCTYPE html><html><head><title>No Broken Links</title></head><body>"
     newstt = outstt + answer + "</body></html>"
     fjj = open(justandstatic, "w")
-    #fjj.truncate()
     fjj.write(newstt)
     fjj.close()
 
@@ -119,7 +115,9 @@ def results():
 
 
 
-
-print("working")
-
-app.run(host='127.0.0.1', debug=True)
+print("LinkCheck started.")
+DEVHOST='127.0.0.1'
+PHOST='0.0.0.0'
+debug = False
+debug = True
+app.run(host=PHOST, debug=debug)
