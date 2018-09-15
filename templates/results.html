@@ -7,7 +7,11 @@
         <title>Results from LinkCheck</title>
 
 </head>
-<body>
+<body onload="bodyReady();" >
+<script src="varsenv.js" >
+</script>
+
+
 <br>
 <p></p>
 
@@ -16,23 +20,20 @@
 <p></p>
 
 
- <h4>  Click the link below to check your results:</h4>
-
-&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;
+<h4>  Click the link below to check your results:</h4>
 <br>
-
 <script>
 
 fname = '{{ name }} ';
-var newURL = "<a href=" + window.location.protocol + "//" + window.location.host + "/static/" + fname + ">Check for Results</a>";
-var theexample = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname + window.location.search
-
+var newURL = "<a href=" + window.location.protocol + "//" + \
+                window.location.host + "/static/" + fname + ">Check for Results</a>";
 
 document.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 
 document.write(newURL);
 document.write("<br>")
+document.write("<p></p>")
+document.write(homeURL)
 
 </script>
 

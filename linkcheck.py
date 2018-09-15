@@ -80,7 +80,6 @@ class linkcheck(object):
                 ab_links = response.html.absolute_links
                 new_lnks_loc = [ab for ab in ab_links]
             except Exception as e:
-                None
                 self.myprint("exception inside get_links: " + str(e))
 
             self.myprint("got this far " + mainlin)
@@ -150,13 +149,25 @@ class linkcheck(object):
             return False
         return addy
 
+    def ckaddymore(self, addy):
+        one = 'http://'
+        two = 'https://'
+        needprefix = True
+        if addy[0:7]==one:
+            needprefix = True
+        if addy[0:8] == 'https://':
+            needprefix = True
+        if needprefix:
+            full_addy = 'http://' + addy
+        else:
+            full_addy = addy
+        return full_addy
 
 
 
     def main(self, a_site=None):
-        full_addy = 'http://' + a_site
-        new_sorted, repeats = [], 0
-        the_len = 0
+        full_addy = self.ckaddymore(a_site)
+        new_sorted, repeats, the_len = [], 0, 0
         self.myprint('\n\n------------------- STARTING OVER -----------------------')
         #tstart_main = perf_counter()
         self.myprint('In main() Getting first address: ' + full_addy)
@@ -176,7 +187,6 @@ class linkcheck(object):
                 new_base_links_one = new_base_links_two if the_len > 0 else None
 
         except Exception as e:
-            None
             self.myprint("Exception inside main_run: " + str(e))
 
         try:
@@ -231,7 +241,6 @@ class linkcheck(object):
                 if i in dlink:
                     end_val += 1
         except Exception as e:
-            None
             self.myprint("Exception ck_bad_data: " + str(e))
 
         good_suf = self.has_correct_suffix(dlink)  # check suffix
@@ -247,7 +256,6 @@ class linkcheck(object):
             else:
                 done_lnks_gl = [alink]
         except Exception as e:
-            None
             self.myprint("Exception check_for_bad_data: " + str(e))
         return done_lnks_gl
 
@@ -264,13 +272,12 @@ class linkcheck(object):
 
         except Exception as e:
             self.myprint("Exception add_any_bse_g: " + str(e))
-            None
         return base_links_glob2
 
     
     def add_any(self, tlink, parent_local, any_link_loc=None, any_lnk_gl2=None): #Adding this base link to any glob
         try:
-            if any_lnk_gl2:  # don't try without something there
+            if any_lnk_gl2:  # don'w_thread try without something there
                 glob_bool = bool(tlink in [i[0] for i in any_lnk_gl2])
                 if not glob_bool:
                     any_lnk_gl2.append((tlink, parent_local)) # add if not there
@@ -280,7 +287,6 @@ class linkcheck(object):
                 any_link_loc = [(tlink, parent_local)]
         except Exception as e:
             self.myprint("exception in add_any: " + str(e))
-            None
         return any_lnk_gl2, any_link_loc
 
     # def reset_timer(self, name, tstart):
@@ -304,7 +310,6 @@ class linkcheck(object):
                     return True
         except Exception as e:
             self.myprint("Exception in has_correct_suffix: " + str(e))
-            None
         return False
 
     
@@ -316,7 +321,6 @@ class linkcheck(object):
             if base_links_local:
                 in_base_loc = bool(this_link in [i for i in base_links_local])
         except Exception as e:
-            None
             self.myprint("Exception ck_base: " + str(e))
         return _IS_BASE, in_base_loc
 
@@ -358,7 +362,6 @@ class linkcheck(object):
                 else:
                     fin_list = [answer_string]
             except Exception as e:
-                None
                 self.myprint('Exception print_errs: ' + str(e))
             return fin_list
         else:
@@ -366,10 +369,8 @@ class linkcheck(object):
 
 # if __name__ == "__main__":
 #     lc = linkcheck()
-#     finlistmain = lc.main('repercussions.com')
-#     print("here are the errors")
+#     finlistmain = lc.main('schorrmedia.com')
 #     for item in finlistmain:
 #         print(item)
-#     schorrmedia.com/m.html
 
 
