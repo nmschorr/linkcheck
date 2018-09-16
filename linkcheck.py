@@ -100,11 +100,11 @@ class linkcheck(object):
                         ##base_pt = divide_url(_plin)
                         _IS_BASE, in_base_local = self.ck_base(THIS_LN, self.divide_url(_plin), base_lnks_loc)
 
-                        if _IS_BASE:  # IS base type
+                        if _IS_BASE and good_suffix:  # IS base type
                             base_lnks_loc.append(THIS_LN) if not in_base_local else 0
                             self.base_lnks_g = self.add_any_bse_g(THIS_LN, _plin, self.base_lnks_g)
                         else:                   #if not a home based link
-                            if not self.ck_g(THIS_LN):
+                            if not self.ck_g(THIS_LN):  ## add bad suffix here too
                                 self.any_link_glob, any_lnk_loc = self.add_any(THIS_LN, _plin, self.any_link_glob)
 
                     except Exception as e:
@@ -129,7 +129,7 @@ class linkcheck(object):
 
     def ck_status_code(self, response, tpar):
         link = response.html.url
-        err_codes = [400, 404, 408, 409, 501, 502, 503]
+        err_codes = [400, 404, 408, 409]
         if response.status_code in err_codes:
             if link not in self.err_links:
                 self.err_links.append((link, response.status_code, tpar))
