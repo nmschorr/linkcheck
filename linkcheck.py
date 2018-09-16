@@ -318,16 +318,21 @@ class linkcheck(object):
 
     
     def has_correct_suffix(self, link):
+        answ, answ2, final_answer = False
+
         try:
             answ = self.check_sufx(link)
-            # goods = ['html',  'htm',  '/', 'php', 'asp', 'pl', 'com', 'net', 'org', 'css', 'py', 'rb', 'js'
-            #     'jsp','shtml', 'cgi', 'txt', 'edu', 'gov']
-            # for g in goods:
-            #     if link.endswith(g):
-            #         return True
+            goods = ['html',  'htm',  '/', 'php', 'asp', 'pl', 'com', 'net', 'org', 'css', 'py', 'rb', 'js'
+                'jsp','shtml', 'cgi', 'txt', 'edu', 'gov']
+            for g in goods:
+                if link.endswith(g):
+                    answ2 = True
+            if answ == True or answ2 == True:
+                final_answer = True
         except Exception as e:
+            pass
             self.myprint("Exception in has_correct_suffix: " + str(e))
-        return answ
+        return final_answer
 
     
     def ck_base(self, this_link, thebase_part, base_links_local=None):
