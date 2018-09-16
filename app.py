@@ -3,7 +3,8 @@ from linkcheck import linkcheck
 import threading, time, os
 from jinja2 import Environment, PackageLoader, select_autoescape
 from nocache import nocache
-from hcode import hcode_cls
+import hcode
+import hconf
 
 
 gsite, w_thread, fnfull, just_name, just_stat = None, None, None, None, None
@@ -11,7 +12,7 @@ gsite, w_thread, fnfull, just_name, just_stat = None, None, None, None, None
 
 
 app = Flask(__name__)
-hc_obj = hcode_cls()
+hc_obj = hcode.hcode_cls()
 
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 env = Environment(
@@ -25,16 +26,15 @@ def setupfile():
     just_name, just_stat, fnfull = hc_obj.getfns(arp)
 
 def notreadyyet():
-    global just_stat
-    newst= hc_obj.not_ready_msg()
+    global just_stat, gsite
+    newst= hc_obj.not_ready_msg(gsite)
     fj = open(just_stat, "w")
     fj.write(newst)
     fj.close()
 
 def write_no_err_pg():
-    global just_stat, gsite
-    hostnamenow = hc_obj.gethostinfo()
-    newstt = hcode_cls.fin_msg(gsite)
+    global just_stat, gsite, thishost
+    newstt = hc_obj.fin_msg(gsite, thishost)
     fjj = open(just_stat, "w")
     fjj.write(newstt)
     fjj.close()
@@ -78,6 +78,5 @@ HOSTIP = os.getenv('HOSTIP', default='0.0.0.0')
 HOSTPORT = os.getenv('HOSTPORT', default=8080)
 print("hostip: " + HOSTIP + "  HOSTPORT: ", HOSTPORT)
 debugnow = os.getenv('debug', default=False)
-thishost = "http://linkcheckpy-linkcheckpy.7e14.starter-us-west-2.openshiftapps.com"
 print(HOSTIP, HOSTPORT)
 app.run(host=HOSTIP, port=HOSTPORT, debug=debugnow)
