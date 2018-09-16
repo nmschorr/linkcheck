@@ -60,7 +60,7 @@ def index():
 @app.route('/results', methods = ['POST','GET'])
 @nocache             # very important so client server doesn'w_thread cache results
 def results():
-    global gsite, w_thread
+    global gsite, w_thread, just_name
     threads = []
     gsite = request.form['name']
     notreadyyet()
@@ -68,7 +68,7 @@ def results():
     threads.append(w_thread)
     w_thread.start()
     print("just started thread. root path: " + app.root_path + " you entered: ", gsite)
-    time.sleep(1)
+    time.sleep(4)
     return render_template('results.html', name = just_name)  ## has a form
 
 #ns = hcc.getnew()
