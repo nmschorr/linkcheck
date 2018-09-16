@@ -34,7 +34,7 @@ def notreadyyet():
 
 def write_no_err_pg():
     global just_stat, gsite, thishost
-    newstt = hc_obj.fin_msg(gsite, thishost)
+    newstt = hc_obj.fin_msg(gsite)
     fjj = open(just_stat, "w")
     fjj.write(newstt)
     fjj.close()
