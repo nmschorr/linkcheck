@@ -4,6 +4,7 @@
 #from time import perf_counter
 from urllib.parse import urlsplit
 import requests_html as rt
+import validators
 
 
 class linkcheck(object):
@@ -15,7 +16,7 @@ class linkcheck(object):
         self.tlds_list = self.load_tlds()
 
     def myprint(self, print_str):
-        _MYDEBUG = 0
+        _MYDEBUG = 1
         if _MYDEBUG:
             print(print_str)
 
@@ -318,7 +319,7 @@ class linkcheck(object):
 
     
     def has_correct_suffix(self, link):
-        answ, answ2, final_answer = False
+        answ, answ2, final_answer = False, False, False
 
         try:
             answ = self.check_sufx(link)
@@ -330,8 +331,8 @@ class linkcheck(object):
             if answ == True or answ2 == True:
                 final_answer = True
         except Exception as e:
-            pass
             self.myprint("Exception in has_correct_suffix: " + str(e))
+            pass
         return final_answer
 
     
