@@ -11,8 +11,8 @@ class linkcheck(object):
         self.any_link_glob, self.base_lnks_g = [], []
         self.done_ln_gl_sing, self.err_links, self.link_count = [], [], 0
         #self.logger = lc().setup_logger()
-        print(datetime.datetime.now())
-        self.myprint('In linkcheck: __init__New!!!  ' + str(tm) )
+        datet = datetime.datetime.now()
+        self.myprint('In linkcheck: __init__New: ' + str(datet))
         self.tlds_list = self.load_tlds()
 
     def myprint(self, print_str):
@@ -86,7 +86,7 @@ class linkcheck(object):
         try:
             if response.status_code:
                 is_bool = True
-                #self.myprint("Status code: " + str(is_bool))
+                self.myprint("Status code: " + str(is_bool))
         except:
             self.myprint("Exception no valid response from: " + mainlin)
             return
@@ -99,14 +99,17 @@ class linkcheck(object):
             except Exception as e:
                 self.myprint("exception inside get_links: " + str(e))
 
-            #self.myprint("got this far " + mainlin)
+            self.myprint("got this far " + mainlin)
             for THIS_LN in new_lnks_loc:
-                #self.myprint("THIS_LN " + THIS_LN)
+                self.myprint("THIS_LN " + THIS_LN)
+                if THIS_LN =='http://www.geocities.com/TheTropics/Coast/9678/':
+                    print("here")
+                    print("here")
                 _IN_AN_LOC = self.ck_loc(THIS_LN, any_lnk_loc)
                 if not _IN_AN_LOC and not self._DONE_YET(THIS_LN):    #NOT done yet  cg = check glob
 
                     try:
-                        #self.myprint("link: =============== " + THIS_LN)
+                        self.myprint("link: =============== " + THIS_LN)
                         self.myprint("new_lnks_loc === going to check bad data next: " + str(THIS_LN))
                         has_bad, good_suffix = self.ck_bad_data(THIS_LN)  # check for bad data
                         self.done_ln_gl_sing = self.check_for_bad_data(THIS_LN, self.done_ln_gl_sing)
@@ -122,7 +125,7 @@ class linkcheck(object):
                             self.base_lnks_g = self.add_any_bse_g(THIS_LN, _plin, self.base_lnks_g)
                         else:                   #if not a home based link
                             if not self.ck_g(THIS_LN):  ## add bad suffix here too
-                                self.any_link_glob, any_lnk_loc = self.add_any(THIS_LN, _plin, self.any_link_glob)
+                                any_lnk_loc = self.add_any(THIS_LN, _plin)  #does global too
 
                     except Exception as e:
                         self.handle_exc(e, THIS_LN, _plin)
@@ -152,17 +155,6 @@ class linkcheck(object):
                 self.err_links.append((link, response.status_code, tpar))
             return 1
         else: return 0  # ok
-
-     # def ckaddy(self, addy):
-    #     if __name__ == '__main__':
-    #         if addy[0:7]=='http://':
-    #             addy = addy[7:]
-    #         if addy[0:8] == 'http://':
-    #             addy = addy[8:]
-    #
-    #     if not addy[0].isChar:
-    #         return False
-    #     return addy
 
     def ckaddymore(self, addy):
         one = 'http://'
@@ -261,7 +253,7 @@ class linkcheck(object):
             self.myprint("Exception ck_bad_data: " + str(e))
 
         good_suf = self.has_correct_suffix(dlink)  # check suffix
-        #self.myprint("!inside enval: " +  str(end_val) + ' ' + str(good_suf))
+        self.myprint("!inside enval: " +  str(end_val) + ' ' + str(good_suf))
         return end_val, good_suf
 
     
@@ -276,10 +268,6 @@ class linkcheck(object):
             self.myprint("Exception check_for_bad_data: " + str(e))
         return done_lnks_gl
 
-
-    def ck_for_dollar(self,link):
-        pass
-    
     def add_any_bse_g(self, zlink, parent_local, base_links_glob2=None): #Adding this base link to base glob
         try:
             if base_links_glob2:
@@ -295,19 +283,19 @@ class linkcheck(object):
         return base_links_glob2
 
     
-    def add_any(self, tlink, parent_local, any_link_loc=None, any_lnk_gl2=None): #Adding this base link to any glob
+    def add_any(self, tlink, parent_local, any_link_loc=None): #Adding this base link to any glob
         try:
-            if any_lnk_gl2:  # don'w_thread try without something there
-                glob_bool = bool(tlink in [i[0] for i in any_lnk_gl2])
+            if self.any_link_glob:  # don'w_thread try without something there
+                glob_bool = bool(tlink in [i[0] for i in self.any_link_glob])
                 if not glob_bool:
-                    any_lnk_gl2.append((tlink, parent_local)) # add if not there
+                    self.any_link_glob.append((tlink, parent_local)) # add if not there
                     any_link_loc.append((tlink, parent_local))
             else:
-                any_lnk_gl2 = [(tlink, parent_local)]  # make it if starting empty
+                self.any_link_glob = [(tlink, parent_local)]  # make it if starting empty
                 any_link_loc = [(tlink, parent_local)]
         except Exception as e:
             self.myprint("exception in add_any: " + str(e))
-        return any_lnk_gl2, any_link_loc
+        return any_link_loc
 
     # def reset_timer(self, name, tstart):
     #     self.myprint(name, perf_counter() - tstart)
@@ -341,13 +329,14 @@ class linkcheck(object):
     
     def ck_base(self, this_link, thebase_part, base_links_local=None):
         _IS_BASE = False
+        dollar = False
         in_base_loc = False
         try:
             _IS_BASE = bool(thebase_part in this_link)
 
             if _IS_BASE:
-                dollar = self.ck_dollar(this_link, thebase_part)
-                if dollar:
+                early_dollar = self.has_early_dollar(this_link, thebase_part)
+                if early_dollar:
                     _IS_BASE = False # base is embedded after something like twitter.com
                     return _IS_BASE, in_base_loc
 
@@ -357,16 +346,14 @@ class linkcheck(object):
             self.myprint("Exception ck_base: " + str(e))
         return _IS_BASE, in_base_loc
 
-    def ck_dollar(self, link, thebase_part):
-        ib = link.index(thebase_part)
+    def has_early_dollar(self, link, base_p):
         if "$" in link:
-            id = link.index("$")
-        if id < ib:    ## $ before base link
+            if link.index("$") < link.index(base_p):    ## if $ before base link
+                return True     ## it's before base link - not good
+            else:
+                return False     # there's a $ sign but it's ok
+        else:
             return False
-        else: return True
-
-
-
 
     def divide_url(self, parent_local):
         thebase_part_local = None

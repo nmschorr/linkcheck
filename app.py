@@ -39,13 +39,13 @@ def write_no_err_pg():
     fjj = open(just_stat, "w")
     fjj.write(newstt)
     fjj.close()
-    time.sleep(5)
 
 def worker1():   # run linkcheck and print to console
         global gsite, fnfull, just_name
         lc = linkcheck()
         print("inside worker1 thread. you entered: ", gsite)
         answers = lc.main(gsite)
+        time.sleep(5)
         if len(answers) > 0:
             hc_obj.writeres(answers, fnfull)
         else:
