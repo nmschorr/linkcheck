@@ -4,16 +4,14 @@
 #from time import perf_counter
 from urllib.parse import urlsplit
 import requests_html as rt
-import validators
-from time import time
-
+import datetime
 
 class linkcheck(object):
     def __init__(self):
         self.any_link_glob, self.base_lnks_g = [], []
         self.done_ln_gl_sing, self.err_links, self.link_count = [], [], 0
         #self.logger = lc().setup_logger()
-        tm = time()
+        print(datetime.datetime.now())
         self.myprint('In linkcheck: __init__New!!!  ' + str(tm) )
         self.tlds_list = self.load_tlds()
 
@@ -24,7 +22,7 @@ class linkcheck(object):
 
 
     def handle_exc(self, e, link, plink):
-        self.myprint(str(e))
+        #self.myprint(str(e))
         self.myprint('!!!!!!!! found error------------------\n' + str(e))
         if link not in self.err_links:
             self.err_links.append((link, str(e)[:42], plink))
@@ -83,12 +81,12 @@ class linkcheck(object):
     def get_links(self, mainlin, _plin):
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], None, []
         response, resp_err = self.do_response(mainlin, _plin)
-        self.myprint("-------------INSIDE get_links! --------------")
+        self.myprint("-------------INSIDE get_links! --------------: " + mainlin)
 
         try:
             if response.status_code:
                 is_bool = True
-                self.myprint("Status code: " + str(is_bool))
+                #self.myprint("Status code: " + str(is_bool))
         except:
             self.myprint("Exception no valid response from: " + mainlin)
             return
@@ -101,15 +99,15 @@ class linkcheck(object):
             except Exception as e:
                 self.myprint("exception inside get_links: " + str(e))
 
-            self.myprint("got this far " + mainlin)
+            #self.myprint("got this far " + mainlin)
             for THIS_LN in new_lnks_loc:
-                self.myprint("THIS_LN " + THIS_LN)
+                #self.myprint("THIS_LN " + THIS_LN)
                 _IN_AN_LOC = self.ck_loc(THIS_LN, any_lnk_loc)
                 if not _IN_AN_LOC and not self._DONE_YET(THIS_LN):    #NOT done yet  cg = check glob
 
                     try:
-                        self.myprint("link: =============== " + THIS_LN)
-                        self.myprint("new_lnks_loc === going to check bad data next: " + str(new_lnks_loc))
+                        #self.myprint("link: =============== " + THIS_LN)
+                        self.myprint("new_lnks_loc === going to check bad data next: " + str(THIS_LN))
                         has_bad, good_suffix = self.ck_bad_data(THIS_LN)  # check for bad data
                         self.done_ln_gl_sing = self.check_for_bad_data(THIS_LN, self.done_ln_gl_sing)
                     except Exception as e:  self.handle_exc(e, THIS_LN, _plin)
@@ -155,9 +153,7 @@ class linkcheck(object):
             return 1
         else: return 0  # ok
 
-       #############----------------------------------MAIN-----
-       #############----------------------------------MAIN-----
-    # def ckaddy(self, addy):
+     # def ckaddy(self, addy):
     #     if __name__ == '__main__':
     #         if addy[0:7]=='http://':
     #             addy = addy[7:]
@@ -182,6 +178,8 @@ class linkcheck(object):
             full_addy = addy
         return full_addy
 
+      #############----------------------------------MAIN--------------------------
+      #############----------------------------------MAIN-------------------------
 
 
     def main(self, a_site=None):
@@ -263,7 +261,7 @@ class linkcheck(object):
             self.myprint("Exception ck_bad_data: " + str(e))
 
         good_suf = self.has_correct_suffix(dlink)  # check suffix
-        self.myprint("!inside enval: " +  str(end_val) + ' ' + str(good_suf))
+        #self.myprint("!inside enval: " +  str(end_val) + ' ' + str(good_suf))
         return end_val, good_suf
 
     

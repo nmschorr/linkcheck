@@ -5,6 +5,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from nocache import nocache
 import hcode
 import hconf
+import datetime
 
 
 gsite, w_thread, fnfull, just_name, just_stat = None, None, None, None, None
@@ -51,8 +52,7 @@ def worker1():   # run linkcheck and print to console
             print("no errors found")
             write_no_err_pg()
         print("passing in to resultn just_name: " + just_name + "  worker1 done")
-        tm = time()
-        print(str(tm))
+        print(datetime.datetime.now())
 
 
 @app.route('/')
