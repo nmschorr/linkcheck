@@ -5,6 +5,7 @@
 from urllib.parse import urlsplit
 import requests_html as rt
 import validators
+from time import time
 
 
 class linkcheck(object):
@@ -12,7 +13,8 @@ class linkcheck(object):
         self.any_link_glob, self.base_lnks_g = [], []
         self.done_ln_gl_sing, self.err_links, self.link_count = [], [], 0
         #self.logger = lc().setup_logger()
-        self.myprint('In linkcheck: __init__New!!!')
+        tm = time()
+        self.myprint('In linkcheck: __init__New!!!  ' + str(tm) )
         self.tlds_list = self.load_tlds()
 
     def myprint(self, print_str):
@@ -276,6 +278,9 @@ class linkcheck(object):
             self.myprint("Exception check_for_bad_data: " + str(e))
         return done_lnks_gl
 
+
+    def ck_for_dollar(self,link):
+        pass
     
     def add_any_bse_g(self, zlink, parent_local, base_links_glob2=None): #Adding this base link to base glob
         try:
@@ -283,7 +288,7 @@ class linkcheck(object):
                 _IN_BASE_GLOB = bool(zlink in [i[0] for i in base_links_glob2])
                 if not _IN_BASE_GLOB:  # if not already in this
                     base_links_glob2.append((zlink, parent_local))
-                    self.myprint("Adding this base link to base glob: " + zlink)
+                    self.myprint("Adding this BASE LINK to base glob: " + zlink)
             else:
                 base_links_glob2= [(zlink, parent_local)]
 
@@ -341,13 +346,30 @@ class linkcheck(object):
         in_base_loc = False
         try:
             _IS_BASE = bool(thebase_part in this_link)
+
+            if _IS_BASE:
+                dollar = self.ck_dollar(this_link, thebase_part)
+                if dollar:
+                    _IS_BASE = False # base is embedded after something like twitter.com
+                    return _IS_BASE, in_base_loc
+
             if base_links_local:
                 in_base_loc = bool(this_link in [i for i in base_links_local])
         except Exception as e:
             self.myprint("Exception ck_base: " + str(e))
         return _IS_BASE, in_base_loc
 
-    
+    def ck_dollar(self, link, thebase_part):
+        ib = link.index(thebase_part)
+        if "$" in link:
+            id = link.index("$")
+        if id < ib:    ## $ before base link
+            return False
+        else: return True
+
+
+
+
     def divide_url(self, parent_local):
         thebase_part_local = None
         try:

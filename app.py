@@ -38,6 +38,7 @@ def write_no_err_pg():
     fjj = open(just_stat, "w")
     fjj.write(newstt)
     fjj.close()
+    time.sleep(5)
 
 def worker1():   # run linkcheck and print to console
         global gsite, fnfull, just_name
@@ -50,6 +51,8 @@ def worker1():   # run linkcheck and print to console
             print("no errors found")
             write_no_err_pg()
         print("passing in to resultn just_name: " + just_name + "  worker1 done")
+        tm = time()
+        print(str(tm))
 
 
 @app.route('/')
@@ -68,7 +71,6 @@ def results():
     threads.append(w_thread)
     w_thread.start()
     print("just started thread. root path: " + app.root_path + " you entered: ", gsite)
-    time.sleep(4)
     return render_template('results.html', name = just_name)  ## has a form
 
 #ns = hcc.getnew()
