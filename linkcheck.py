@@ -121,7 +121,10 @@ class linkcheck(object):
                         _IS_BASE, in_base_local = self.ck_base(THIS_LN, self.divide_url(_plin), base_lnks_loc)
 
                         if _IS_BASE and good_suffix:  # IS base type
-                            base_lnks_loc.append(THIS_LN) if not in_base_local else 0
+                            if not in_base_local:
+                                base_lnks_loc.append(THIS_LN)
+
+
                             self.base_lnks_g = self.add_any_bse_g(THIS_LN, _plin, self.base_lnks_g)
                         else:                   #if not a home based link
                             if not self.ck_g(THIS_LN):  ## add bad suffix here too
@@ -193,7 +196,8 @@ class linkcheck(object):
                 for baselink in new_base_links_one:
                     new_base_links_two = self.get_links(baselink, full_addy)  # first set of base
                 the_len = len(new_base_links_two)
-                new_base_links_one = new_base_links_two if the_len > 0 else None
+                if the_len > 0:
+                    new_base_links_one = new_base_links_two
 
         except Exception as e:
             self.myprint("Exception inside main_run: " + str(e))
@@ -257,7 +261,7 @@ class linkcheck(object):
         return end_val, good_suf
 
     
-    def check_for_bad_data(self, alink, done_lnks_gl=None):
+    def check_for_bad_data(self, alink, done_lnks_gl=[]):
         self.myprint("!!!!!=============inside check_for_bad_data. val of link: " + alink)
         try:
             if done_lnks_gl:
@@ -268,7 +272,7 @@ class linkcheck(object):
             self.myprint("Exception check_for_bad_data: " + str(e))
         return done_lnks_gl
 
-    def add_any_bse_g(self, zlink, parent_local, base_links_glob2=None): #Adding this base link to base glob
+    def add_any_bse_g(self, zlink, parent_local, base_links_glob2=[]): #Adding this base link to base glob
         try:
             if base_links_glob2:
                 _IN_BASE_GLOB = bool(zlink in [i[0] for i in base_links_glob2])
@@ -283,7 +287,7 @@ class linkcheck(object):
         return base_links_glob2
 
     
-    def add_any(self, tlink, parent_local, any_link_loc=None): #Adding this base link to any glob
+    def add_any(self, tlink, parent_local, any_link_loc=[]): #Adding this base link to any glob
         try:
             if self.any_link_glob:  # don'w_thread try without something there
                 glob_bool = bool(tlink in [i[0] for i in self.any_link_glob])
@@ -327,7 +331,7 @@ class linkcheck(object):
         return final_answer
 
     
-    def ck_base(self, this_link, thebase_part, base_links_local=None):
+    def ck_base(self, this_link, thebase_part, base_links_local=[]):
         _IS_BASE = False
         dollar = False
         in_base_loc = False
@@ -356,7 +360,7 @@ class linkcheck(object):
             return False
 
     def divide_url(self, parent_local):
-        thebase_part_local = None
+        thebase_part_local = ""
         try:
             thebase_part_local = (urlsplit(parent_local))[1]
             if thebase_part_local.startswith('www'):
@@ -367,7 +371,7 @@ class linkcheck(object):
         return thebase_part_local
 
     
-    def print_errs(self, errlinks=None):
+    def print_errs(self, errlinks=[]):
         if errlinks:
             answer_string, e, fin_list = '', '', []
             p0, p1, p2 = "BAD LINK: ", " ERROR: ", " PARENT: "
