@@ -5,12 +5,14 @@
 from urllib.parse import urlsplit
 import requests_html as rt
 
+
 class linkcheck(object):
     def __init__(self):
         self.any_link_glob, self.base_lnks_g = [], []
         self.done_ln_gl_sing, self.err_links, self.link_count = [], [], 0
         #self.logger = lc().setup_logger()
         self.myprint('In linkcheck: __init__New!!!')
+        self.tlds_list = self.load_tlds()
 
     def myprint(self, print_str):
         _MYDEBUG = 0
@@ -24,6 +26,20 @@ class linkcheck(object):
         if link not in self.err_links:
             self.err_links.append((link, str(e)[:42], plink))
         pass
+
+    def load_tlds(self):
+        tlds = []
+        with open('tlds-alpha-by-domain.txt', 'r') as filehandle:
+            for line in filehandle:
+                currentPlace = line[:-1]
+                tlds.append((currentPlace.lower()))
+        return tlds
+
+    def check_sufx(self,sufx):
+        if sufx in self.tlds_list:
+            return True
+        else:
+            return False
 
     def get_simple_response(self, lin_and_par_tup):
         er = None
@@ -138,16 +154,16 @@ class linkcheck(object):
 
        #############----------------------------------MAIN-----
        #############----------------------------------MAIN-----
-    def ckaddy(self, addy):
-        if __name__ == '__main__':
-            if addy[0:7]=='http://':
-                addy = addy[7:]
-            if addy[0:8] == 'http://':
-                addy = addy[8:]
-
-        if not addy[0].isChar:
-            return False
-        return addy
+    # def ckaddy(self, addy):
+    #     if __name__ == '__main__':
+    #         if addy[0:7]=='http://':
+    #             addy = addy[7:]
+    #         if addy[0:8] == 'http://':
+    #             addy = addy[8:]
+    #
+    #     if not addy[0].isChar:
+    #         return False
+    #     return addy
 
     def ckaddymore(self, addy):
         one = 'http://'
@@ -303,14 +319,15 @@ class linkcheck(object):
     
     def has_correct_suffix(self, link):
         try:
-            goods = ['html',  'htm',  '/', 'php', 'asp', 'pl', 'com', 'net', 'org', 'css', 'py', 'rb', 'js'
-                'jsp','shtml', 'cgi', 'txt']
-            for g in goods:
-                if link.endswith(g):
-                    return True
+            answ = self.check_sufx(link)
+            # goods = ['html',  'htm',  '/', 'php', 'asp', 'pl', 'com', 'net', 'org', 'css', 'py', 'rb', 'js'
+            #     'jsp','shtml', 'cgi', 'txt', 'edu', 'gov']
+            # for g in goods:
+            #     if link.endswith(g):
+            #         return True
         except Exception as e:
             self.myprint("Exception in has_correct_suffix: " + str(e))
-        return False
+        return answ
 
     
     def ck_base(self, this_link, thebase_part, base_links_local=None):

@@ -13,5 +13,6 @@ setup(
             'flask',
             'requests_html',
             'gunicorn',
+            'validators',
       ],
       )
