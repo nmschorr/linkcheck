@@ -3,11 +3,15 @@ from linkcheck import linkcheck
 import threading, time, os
 from jinja2 import Environment, PackageLoader, select_autoescape
 from nocache import nocache
-from hcode import datalines, hc, getfns, not_redy_msg, gethostinfo, writeres
+from hcode import hcode_cls
+
 
 gsite, w_thread, fnfull, just_name, just_stat = None, None, None, None, None
 
+
+
 app = Flask(__name__)
+hc_obj = hcode_cls()
 
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 env = Environment(
@@ -16,31 +20,32 @@ env = Environment(
 )
 
 def setupfile():
-    global just_name, fnfull, just_stat, gsite
-    just_name, just_stat, fnfull = getfns(app.root_path)
+    global just_name, fnfull, just_stat
+    arp = app.root_path
+    just_name, just_stat, fnfull = hc_obj.getfns(arp)
 
-def notreadyyet(site):
+def notreadyyet():
     global just_stat
-    newst= not_redy_msg(site)
+    newst= hc_obj.not_ready_msg()
     fj = open(just_stat, "w")
     fj.write(newst)
     fj.close()
 
 def write_no_err_pg():
     global just_stat, gsite
-    hostnamenow = gethostinfo()
-    newstt = hc(gsite,hostnamenow)
+    hostnamenow = hc_obj.gethostinfo()
+    newstt = hcode_cls.fin_msg(gsite)
     fjj = open(just_stat, "w")
     fjj.write(newstt)
     fjj.close()
 
 def worker1():   # run linkcheck and print to console
-        global gsite
+        global gsite, fnfull, just_name
         lc = linkcheck()
         print("inside worker1 thread. you entered: ", gsite)
         answers = lc.main(gsite)
         if len(answers) > 0:
-            writeres(answers)
+            hc_obj.writeres(answers, fnfull)
         else:
             print("no errors found")
             write_no_err_pg()
@@ -58,7 +63,7 @@ def results():
     global gsite, w_thread
     threads = []
     gsite = request.form['name']
-    notreadyyet(gsite)
+    notreadyyet()
     w_thread = threading.Thread(target=worker1)
     threads.append(w_thread)
     w_thread.start()
@@ -66,12 +71,13 @@ def results():
     time.sleep(1)
     return render_template('results.html', name = just_name)  ## has a form
 
-ns = gethostinfo()
-print("LinkCheck started.   " + ns)
+#ns = hcc.getnew()
+#print("LinkCheck started.   " + ns)
 
 HOSTIP = os.getenv('HOSTIP', default='0.0.0.0')
 HOSTPORT = os.getenv('HOSTPORT', default=8080)
 print("hostip: " + HOSTIP + "  HOSTPORT: ", HOSTPORT)
 debugnow = os.getenv('debug', default=False)
-
+thishost = "http://linkcheckpy-linkcheckpy.7e14.starter-us-west-2.openshiftapps.com"
+print(HOSTIP, HOSTPORT)
 app.run(host=HOSTIP, port=HOSTPORT, debug=debugnow)

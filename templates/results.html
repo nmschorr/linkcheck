@@ -24,9 +24,10 @@
 <br>
 <script>
 
-fname = '{{ name }} ';
-var newURL = "<a href=" + window.location.protocol + "//" + \
-                window.location.host + "/static/" + fname + ">Check for Results</a>";
+var fname = '{{ name }} ';
+var df = document.referrer;
+var statd = "static/"
+var newURL = "<a href=" + df + statd + fname + ">Check for Results</a>";
 
 document.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 

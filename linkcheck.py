@@ -154,9 +154,9 @@ class linkcheck(object):
         two = 'https://'
         needprefix = True
         if addy[0:7]==one:
-            needprefix = True
+            needprefix = False
         if addy[0:8] == 'https://':
-            needprefix = True
+            needprefix = False
         if needprefix:
             full_addy = 'http://' + addy
         else:
