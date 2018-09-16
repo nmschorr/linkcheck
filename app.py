@@ -9,7 +9,7 @@ import hconf
 
 gsite, w_thread, fnfull, just_name, just_stat = None, None, None, None, None
 
-
+thishost=hconf.thishost
 
 app = Flask(__name__)
 hc_obj = hcode.hcode_cls()

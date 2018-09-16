@@ -3,8 +3,7 @@ from datetime import datetime
 from socket import gethostname, gethostbyaddr
 import hconf
 
-
-fullpar = '<p></p>'
+thishost=hconf.thishost
 fullpar = '<p></p>'
 linebreaks3 = fullpar + fullpar
 mtab = "&nbsp;&nbsp;&nbsp;&nbsp;"
