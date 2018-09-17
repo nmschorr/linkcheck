@@ -9,6 +9,7 @@ class LinkCheckLib(object):
 
     def setup(self):
         tlds_list = self.load_tlds()
+        return tlds_list
 
     def ispar(self, thisln, par_loc):
         return bool(thisln == par_loc)  # is it the parent?
@@ -81,7 +82,7 @@ class LinkCheckLib(object):
 
         return final_answer
 
-    def myprint(print_str):
+    def myprint(self, print_str):
         _MYDEBUG = 1
         if _MYDEBUG:
             print(print_str)

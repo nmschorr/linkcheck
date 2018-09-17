@@ -4,11 +4,12 @@
 #from time import perf_counter
 import requests_html as rt
 from datetime import datetime
-import linkchecklib
+from linkchecklib import LinkCheckLib
 
 
-class LinkCheck(linkchecklib):
+class LinkCheck(LinkCheckLib):
     def __init__(self):
+        super().__init__()
         self.any_link_glob, self.base_lnks_g = [], []
         self.done_ln_gl_sing, self.err_links, self.link_count = [], [], 0
         #self.logger = lc().setup_logger()
@@ -264,8 +265,8 @@ class LinkCheck(linkchecklib):
         return finlist
 
 
-if __name__ == "__main__":
-    print("main")
+# if __name__ == "__main__":
+#     print("main")
 
 
 
