@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template
-from linkcheck import linkcheck
+import linkcheck
 import threading, time, os
 from jinja2 import Environment, PackageLoader, select_autoescape
 from nocache import nocache
@@ -9,7 +9,7 @@ import datetime
 
 
 gsite, w_thread, fnfull, just_name, just_stat = None, None, None, None, None
-
+lc = linkcheck.linkcheck()
 thishost=hconf.thishost
 
 app = Flask(__name__)
@@ -42,7 +42,6 @@ def write_no_err_pg():
 
 def worker1():   # run linkcheck and print to console
         global gsite, fnfull, just_name
-        lc = linkcheck()
         print("inside worker1 thread. you entered: ", gsite)
         answers = lc.main(gsite)
         time.sleep(5)
@@ -81,4 +80,4 @@ HOSTPORT = os.getenv('HOSTPORT', default=8080)
 print("hostip: " + HOSTIP + "  HOSTPORT: ", HOSTPORT)
 debugnow = os.getenv('debug', default=False)
 print(HOSTIP, HOSTPORT)
-app.run(host=HOSTIP, port=HOSTPORT, debug=debugnow)
+app.run(host=HOSTIP, port=HOSTPORT)
