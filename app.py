@@ -9,7 +9,7 @@ import datetime
 
 
 gsite, w_thread, fnfull, just_name, just_stat = None, None, None, None, None
-lc = linkcheck.linkcheck()
+lc = linkcheck.LinkCheck()
 thishost=hconf.thishost
 
 app = Flask(__name__)
@@ -40,7 +40,7 @@ def write_no_err_pg():
     fjj.write(newstt)
     fjj.close()
 
-def worker1():   # run linkcheck and print to console
+def worker1():   # run LinkCheck and print to console
         global gsite, fnfull, just_name
         print("inside worker1 thread. you entered: ", gsite)
         answers = lc.main(gsite)

@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-      name='linkcheck',
+      name='LinkCheck',
       version='1.4',
       description='Check links from any website',
       author='Nancy Schorr',
