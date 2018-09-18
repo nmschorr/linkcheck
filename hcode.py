@@ -1,6 +1,6 @@
 from os import path
 from datetime import datetime
-from socket import gethostname, gethostbyaddr
+# from socket import gethostname, gethostbyaddr
 import hconf
 
 thishost=hconf.thishost

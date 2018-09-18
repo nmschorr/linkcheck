@@ -1,16 +1,16 @@
 from urllib.parse import urlsplit
-import requests_html as rt
 from requests_html import HTMLSession
+
 
 class LinkCheckLib(object):
     tlds_list= 0
-    any_link_glob = []
     done_ln_gl_sing, err_links= [], []
     _MYDEBUG = 1
+    any_link_glob = 0
+
 
     def __init__(self):
         print("yes")
-
 
     @classmethod
     def ispar(cls, thisln, par_loc):

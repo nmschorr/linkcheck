@@ -10,13 +10,13 @@ from linkchecklib import LinkCheckLib
 class LinkCheck(LinkCheckLib):
     base_lnks_g = 0
     link_count = 0
+    done_ln_gl_sing, err_links = [], []
+    global LinkCheckLib.any_link_glob
 
     def __init__(self):
         super().__init__()
-        # self.any_link_glob, self.base_lnks_g = [], []
-        # self.done_ln_gl_sing, self.err_links, self.link_count = [], [], 0
-        #self.logger = lc().setup_logger()
         datet = datetime.now()
+
 
     def get_simple_response(self, lin_and_par_tup):
         er, response = "0", "0"
@@ -75,6 +75,7 @@ class LinkCheck(LinkCheckLib):
     # #----------------------------------------------------------------------get_links-
     def get_links(self, mainlin, _plin):
         global base_lnks_g
+
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], "0", []
         response, resp_err = self.do_response(mainlin, _plin)
         self.myprint("-------------INSIDE get_links! --------------: " + mainlin)
@@ -121,7 +122,7 @@ class LinkCheck(LinkCheckLib):
                                 base_lnks_loc.append(THIS_LN)
 
 
-                            self.base_lnks_g = self.add_any_bse_g(THIS_LN, _plin)
+                            self.add_any_bse_g(THIS_LN, _plin)
                         else:                   #if not a home based link
                             if not self.ck_g(THIS_LN):  ## add bad suffix here too
                                 any_lnk_loc = self.add_any(THIS_LN, _plin)  #does global too
@@ -140,6 +141,7 @@ class LinkCheck(LinkCheckLib):
 
     def main(self, a_site="a"):
         global done_ln_gl_sing, base_lnks_g
+
         full_addy = self.ckaddymore(a_site)
         new_sorted, repeats, the_len = [], 0, 0
         self.myprint('\n\n------------------- STARTING OVER -----------------------')
@@ -172,16 +174,12 @@ class LinkCheck(LinkCheckLib):
                 repeats += 1
                 self.myprint("repeats: " + str(repeats) + "-------------------!!In main loop")
                 for baselink in base_glob_now:
-                    base_lin = baselink[0]
-                    parent_lin = baselink[1]
+                    base_lin, parent_lin = baselink[0], baselink[1]
                     new_base_links_here = self.get_links(base_lin, parent_lin)  # first set of base
                 the_len_b, base_glob_now = len(new_base_links_here), new_base_links_here
 
         except Exception as e:
-            #self.handle_exc(e, base_lin, parent_lin)
             self.myprint("Exception after baselink in base_glob_now: " + str(e))
-
-
 
         tup = ()
         try:
