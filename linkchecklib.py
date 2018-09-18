@@ -9,7 +9,7 @@ class LinkCheckLib(object):
     ###from config import any_link_glob, err_links, _MYDEBUG
 
     def __init__(self):
-        print("yes")
+        #print("yes")
         err_links = []
         self.err_links = err_links
         tlds_list = []
@@ -50,23 +50,18 @@ class LinkCheckLib(object):
             self.err_links = []
         if self.err_links:
             answer_string, e, fin_list = '', '', []
-            p0, p1, p2 = "BAD LINK: ", " ERROR: ", " PARENT: "
             try:
                 if self.err_links:
                     errs = list(set(self.err_links))
                     er_len = len(errs)
-                    self.myprint("\nTotal errors: " + str(er_len))
-                    self.myprint("-------------- Here are the errors ------------- :")
+                    nstring = "\nTotal errors: " + str(er_len) + " Here are the errors ---:"
+                    self.myprint(nstring)
                     errs22 = sorted(errs, key=lambda x: x[0])  # sort on first
                     errs2 = set(errs22)
                     for e in errs2:
-                        st0, st1, st2 = str(e[0]), str(e[1]), str(e[2])
-                        an1 = p0 + st0
-                        an2 = p1 + st1
-                        an3 = st2
+                        an0, an1, an2 = str(e[0]), str(e[1]), str(e[2])
 
-                        answer_string = [an1, an2, an3]
-                        # answer_string = p0 + st0 + p1 + st1 + p2 + st2
+                        answer_string = [an0, an1, an2]
                         fin_list.append(answer_string)
                         self.myprint(str(answer_string))
                 else:
@@ -122,7 +117,7 @@ class LinkCheckLib(object):
     #----------------------------------------------------------------------get_links-
 
     def ck_bad_data(self, dlink):
-        self.myprint("!!!!!=============inside ckbaddata. val of link: " + dlink)
+        #self.myprint("!!!!!=============inside ckbaddata. val of link: " + dlink)
         end_val = 0
         mylist = ['#', 'tel:+']
         try:

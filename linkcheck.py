@@ -30,7 +30,7 @@ class LinkCheck(LinkCheckLib):
             response = session.get(link_to_ck)
             er = self.ck_status_code(response, parent)
         except Exception as e:
-            self.myprint("exception inside get_simple_response: " + str(e))
+            self.myprint("Exception inside get_simple_response: " + str(e))
             self.handle_exc(e, link_to_ck, parent)
 
 
@@ -75,7 +75,7 @@ class LinkCheck(LinkCheckLib):
 
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], "0", []
         response, resp_err = self.do_response(mainlin, _plin)
-        self.myprint("-------------INSIDE get_links! --------------: " + mainlin)
+        #self.myprint("-------------INSIDE get_links! --------------: " + mainlin)
         is_bool = True
         good_suffix = True
         has_bad = False
@@ -94,9 +94,9 @@ class LinkCheck(LinkCheckLib):
                 ab_links = response.html.absolute_links
                 new_lnks_loc = [ab for ab in ab_links]
             except Exception as e:
-                self.myprint("exception inside get_links: " + str(e))
+                self.myprint("Exception inside get_links: " + str(e))
 
-            self.myprint("got this far " + mainlin)
+            #self.myprint("got this far " + mainlin)
             for THIS_LN in new_lnks_loc:
                 #self.myprint("THIS_LN " + THIS_LN)
                 _IN_AN_LOC = self.ck_loc(THIS_LN, any_lnk_loc)
@@ -137,18 +137,17 @@ class LinkCheck(LinkCheckLib):
 
     def main(self, a_site="a"):
 
-        for i in globals():
-            print(str(i))
+        # for i in globals():
+        #     print(str(i))
 
         full_addy = self.ckaddymore(a_site)
         new_sorted, repeats, the_len = [], 0, 0
-        self.myprint('\n\n------------------- STARTING OVER -----------------------')
         #tstart_main = perf_counter()
-        self.myprint('In main() Getting first address: ' + full_addy)
+        self.myprint('In main() STARTING OVER Getting first address: ' + full_addy)
         try:
             #############---------step ONE:
             base_only_plain_repeat = self.get_links(full_addy, full_addy)  #first set of base
-            self.myprint("Step One Done")   ##first time:  HOME PAGE ONLY  ##first time
+            #self.myprint("Step One Done")   ##first time:  HOME PAGE ONLY  ##first time
             the_len = len(base_only_plain_repeat)
             new_base_links_two, new_sorted, new_base_links_one= [], [], base_only_plain_repeat
 
@@ -170,7 +169,7 @@ class LinkCheck(LinkCheckLib):
             while the_len_b and repeats < 6:
 
                 repeats += 1
-                self.myprint("repeats: " + str(repeats) + "-------------------!!In main loop")
+                #self.myprint("repeats: " + str(repeats) + "-------------------!!In main loop")
                 for baselink in base_glob_now:
                     base_lin, parent_lin = baselink[0], baselink[1]
                     new_base_links_here = self.get_links(base_lin, parent_lin)  # first set of base
@@ -181,7 +180,7 @@ class LinkCheck(LinkCheckLib):
 
         tup = ()
         try:
-            self.myprint("Step Two Done")
+            #self.myprint("Step Two Done")
             any_link_to_check = list(any_link_glob)
 
             any_link_to_check = list(set(any_link_to_check))

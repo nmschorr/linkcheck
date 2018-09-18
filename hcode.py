@@ -23,25 +23,44 @@ class hcode_cls(object):
         return newstt
 
     def datalines(self, f,data):
-        global thishost, fullpar, linebreaks3, mtab
-        home_url = "<a href=" + thishost + ">Start Over</a>"
-        spaces = "&ensp;"  #two spaces
-        for line in data:
-            f.write(str(line[0]))
-            f.write(spaces)
-            f.write(str(line[1]))
-            f.write("<br>" + mtab + "  FOUND ON: ")
+        global thishost, fullpar, linebreaks3, mtab, endbod
+        home_url = mtab + mtab + "<h2><a href=" + thishost + ">Start Over</a></h2><p></p>"
 
+        sm = "http://schorrmedia.com"
+        smedia_url = "<h3><a href=" + sm + ">Visit SchorrMedia.com</a>"
+
+        git_url = "<a href=https://github.com/nmschorr/linkcheck>See the code for this on Github</a></h3>"
+        spaces = "&ensp;"  #two spaces
+        f.write("<!doctype html><html><head></head><body><div style=margin-left:5em;>")
+
+        f.write("<p></p><h3>Here are your broken links:</h3><p></p>")
+        for line in data:
+            f.write("BAD LINK-->  ")
+            f.write("<a href='")
+            f.write(str(line[0]))
+            f.write("'>")
+            f.write(str(line[0]))
+            f.write("</a>")
+            f.write(spaces)
+            f.write("**ERROR-->  ")
+            f.write(str(line[1]))  ## the error
+            f.write(spaces)
+            f.write("<br>" + mtab + "  ***FOUND ON: ")
             f.write("<a href='")
             f.write(str(line[2]))
             f.write("'>")
             f.write(str(line[2]))
             f.write("</a>")
+
             f.write(fullpar)
 
         f.write(linebreaks3)
         f.write(home_url)
-        f.write(endbod)
+        f.write(mtab)
+        f.write(smedia_url)
+        f.write(mtab)
+        f.write(git_url)
+        f.write("</div>" + endbod )
 
 
     def not_ready_msg(self, gsite):
