@@ -76,7 +76,8 @@ def results():
 
 HOSTIP = os.getenv('HOSTIP', default='0.0.0.0')
 HOSTPORT = os.getenv('HOSTPORT', default=8080)
-HOSTPORT = 5000
+#HOSTPORT = 5000
+HOSTPORT = 8080
 print("hostip: " + HOSTIP + "  HOSTPORT: ", HOSTPORT)
 debugnow = os.getenv('debug', default=False)
 app.run(host=HOSTIP, port=HOSTPORT, debug=True)
