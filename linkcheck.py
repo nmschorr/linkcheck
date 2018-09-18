@@ -31,10 +31,7 @@ class LinkCheck(LinkCheckLib):
             er = self.ck_status_code(response, parent)
         except Exception as e:
             self.myprint("exception inside get_simple_response: " + str(e))
-            if str(e).find("Document is empty"):   # for mp3 and similar files
-                return
-            else:
-                self.handle_exc(e, link_to_ck, parent)
+            self.handle_exc(e, link_to_ck, parent)
 
 
     #---------------------------------------------------------------------------------------

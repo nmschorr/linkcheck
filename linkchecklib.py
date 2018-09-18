@@ -197,7 +197,10 @@ class LinkCheckLib(object):
 
     def handle_exc( self, e, link, plink):
         self.myprint('!!!!!!!! found error------------------\n' + str(e))
-        if link not in self.err_links:
+        tempstr = str(e)
+        if "Document is empty" in str(e):  # for mp3 and similar files
+            None
+        elif link not in self.err_links:
             self.err_links.append((link, str(e)[:42], plink))
 
 
