@@ -1,13 +1,16 @@
 from urllib.parse import urlsplit
 from requests_html import HTMLSession
 
+any_link_glob=0
+base_lnks_g = 0
+link_count = 0
+done_ln_gl_sing = 0
+err_links = 0
+tlds_list = 0
+_MYDEBUG = 1
 
 class LinkCheckLib(object):
-    tlds_list= 0
-    done_ln_gl_sing, err_links= [], []
-    _MYDEBUG = 1
-    any_link_glob = 0
-
+    ###from config import any_link_glob, err_links, _MYDEBUG
 
     def __init__(self):
         print("yes")
@@ -26,13 +29,13 @@ class LinkCheckLib(object):
 
     def ck_g(self, this_link):
         global any_link_glob
-        return bool(this_link in [i[0] for i in self.any_link_glob])
+        return bool(this_link in [i[0] for i in any_link_glob])
 
      
      
     def _DONE_YET(self, this_link):
         global done_ln_gl_sing
-        return bool(this_link in self.done_ln_gl_sing)
+        return bool(this_link in done_ln_gl_sing)
 
     @classmethod
     def ck_loc(cls, this_lin, any_link_loc):
@@ -104,12 +107,12 @@ class LinkCheckLib(object):
             self.myprint("-starting-get_home_links - just got this link: " + str(a_link))
             session = HTMLSession()
             resp = session.get(a_link)
-            self.done_ln_gl_sing.append(a_link)  ## add to main done list
+            done_ln_gl_sing.append(a_link)  ## add to main done list
             t_err = self.ck_status_code(resp, a_link)  ## if there's    an error
 
         except Exception as e:
-            if a_link not in self.err_links:
-                self.err_links.append((a_link, str(e)[:42], p_link))
+            if a_link not in err_links:
+                err_links.append((a_link, str(e)[:42], p_link))
             self.myprint("GOT AN EXCEPTION inside do_response and added to errs: " + str(e))
             return resp, t_err
         return resp, t_err
@@ -139,14 +142,14 @@ class LinkCheckLib(object):
         global done_ln_gl_sing
         
         if self.done_ln_gl_sing == 0:
-            self.done_ln_gl_sing = []
+            done_ln_gl_sing = []
             self.myprint("!!!!!=============inside check_for_bad_data. val of link: " + alink)
         try:
-            if self.done_ln_gl_sing:
-                self.done_ln_gl_sing.append(alink)  ## add to main done list
+            if done_ln_gl_sing:
+                done_ln_gl_sing.append(alink)  ## add to main done list
                 
             else:
-                self.done_ln_gl_sing = [alink]
+                done_ln_gl_sing = [alink]
         except Exception as e:
             self.myprint("Exception check_for_bad_data: " + str(e))
 
@@ -173,13 +176,13 @@ class LinkCheckLib(object):
 
     def myprint(self, print_str):
         global _MYDEBUG
-        if self._MYDEBUG:
+        if _MYDEBUG:
             print(print_str)
 
     @classmethod
     def myprinter(cls, print_str):
         global _MYDEBUG
-        if cls._MYDEBUG:
+        if _MYDEBUG:
             print(print_str)
 
     def load_tlds(self):
@@ -201,8 +204,8 @@ class LinkCheckLib(object):
     def handle_exc( self, e, link, plink):
         global err_links
         self.myprint('!!!!!!!! found error------------------\n' + str(e))
-        if link not in self.err_links:
-            self.err_links.append((link, str(e)[:42], plink))
+        if link not in err_links:
+            err_links.append((link, str(e)[:42], plink))
 
 
     def ck_status_code(self, response, tpar):
@@ -210,8 +213,8 @@ class LinkCheckLib(object):
         tlink = response.html.url
         err_codes = [400, 404, 408, 409]
         if response.status_code in err_codes:
-            if tlink not in self.err_links:
-                self.err_links.append((tlink, response.status_code, tpar))
+            if tlink not in err_links:
+                err_links.append((tlink, response.status_code, tpar))
             return 1
         else: return 0  # ok
 

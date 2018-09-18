@@ -4,18 +4,18 @@
 #from time import perf_counter
 import requests_html as rt
 from datetime import datetime
-from linkchecklib import LinkCheckLib
+from linkchecklib import *
+
+
 
 
 class LinkCheck(LinkCheckLib):
-    base_lnks_g = 0
-    link_count = 0
-    done_ln_gl_sing, err_links = [], []
-    global LinkCheckLib.any_link_glob
+    a = any_link_glob
 
     def __init__(self):
         super().__init__()
         datet = datetime.now()
+
 
 
     def get_simple_response(self, lin_and_par_tup):
@@ -140,7 +140,11 @@ class LinkCheck(LinkCheckLib):
 
 
     def main(self, a_site="a"):
-        global done_ln_gl_sing, base_lnks_g
+        global done_ln_gl_sing
+        global base_lnks_g
+
+        for i in globals():
+            print(str(i))
 
         full_addy = self.ckaddymore(a_site)
         new_sorted, repeats, the_len = [], 0, 0
