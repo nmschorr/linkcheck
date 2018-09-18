@@ -7,14 +7,14 @@ _MYDEBUG = 1
 
 class LinkCheckLib(object):
     ###from config import any_link_glob, err_links, _MYDEBUG
-    done_ln_gl_sing = []
-    tlds_list = []
 
     def __init__(self):
         print("yes")
         err_links = []
         self.err_links = err_links
+        tlds_list = []
         self.tlds_list = tlds_list
+        self.done_ln_gl_sing = done_ln_gl_sing
 
     @classmethod
     def ispar(cls, thisln, par_loc):
@@ -121,9 +121,8 @@ class LinkCheckLib(object):
 
     #----------------------------------------------------------------------get_links-
 
-    @classmethod
-    def ck_bad_data(cls, dlink):
-        cls.myprinter("!!!!!=============inside ckbaddata. val of link: " + dlink)
+    def ck_bad_data(self, dlink):
+        self.myprint("!!!!!=============inside ckbaddata. val of link: " + dlink)
         end_val = 0
         mylist = ['#', 'tel:+']
         try:
@@ -131,10 +130,10 @@ class LinkCheckLib(object):
                 if i in dlink:
                     end_val += 1
         except Exception as e:
-            cls.myprinter("Exception ck_bad_data: " + str(e))
+            self.myprint("Exception ck_bad_data: " + str(e))
 
-        good_suf = cls.has_correct_suffix(dlink)  # check suffix
-        cls.myprinter("!inside enval: " + str(end_val) + ' ' + str(good_suf))
+        good_suf = self.has_correct_suffix(dlink)  # check suffix
+        self.myprint("!inside enval: " + str(end_val) + ' ' + str(good_suf))
         return end_val, good_suf
 
     #-----------------------------------------------------------------------------
@@ -156,12 +155,11 @@ class LinkCheckLib(object):
             self.myprint("Exception check_for_bad_data: " + str(e))
 
 
-    @classmethod
-    def has_correct_suffix(cls, link):
+    def has_correct_suffix(self, link):
         answ, answ2, final_answer = False, False, False
 
         try:
-            answ = cls.check_sufx(link)
+            answ = self.check_sufx(link)
             goods = ['html', 'htm', '/', 'php', 'asp', 'pl', 'com', 'net', 'org',
                      'css', 'py', 'rb', 'js','jsp', 'shtml',
                      'cgi', 'txt', 'edu', 'gov']
@@ -171,9 +169,7 @@ class LinkCheckLib(object):
             if answ == True or answ2 == True:
                 final_answer = True
         except Exception as e:
-            cls.myprinter("Exception in has_correct_suffix: " + str(e))
-
-
+            self.myprint("Exception in has_correct_suffix: " + str(e))
         return final_answer
 
     def myprint(self, print_str):
@@ -188,17 +184,13 @@ class LinkCheckLib(object):
             print(print_str)
 
     def load_tlds(self):
-        global tlds_list
-        tlds_list = []
         with open('tlds-alpha-by-domain.txt', 'r') as filehandle:
             for line in filehandle:
                 currentPlace = line[:-1]
-                tlds_list.append((currentPlace.lower()))
+                self.tlds_list.append((currentPlace.lower()))
 
-    @classmethod
-    def check_sufx(cls, sufx):
-        global tlds_list
-        if sufx.lower() in tlds_list:
+    def check_sufx(self, sufx):
+        if sufx.lower() in self.tlds_list:
             return True
         else:
             return False
