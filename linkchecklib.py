@@ -1,19 +1,20 @@
 from urllib.parse import urlsplit
 from requests_html import HTMLSession
 
-any_link_glob=0
-base_lnks_g = 0
-link_count = 0
-done_ln_gl_sing = 0
-err_links = 0
-tlds_list = 0
+any_link_glob=[]
+done_ln_gl_sing = []
 _MYDEBUG = 1
 
 class LinkCheckLib(object):
     ###from config import any_link_glob, err_links, _MYDEBUG
+    done_ln_gl_sing = []
+    tlds_list = []
 
     def __init__(self):
         print("yes")
+        err_links = []
+        self.err_links = err_links
+        self.tlds_list = tlds_list
 
     @classmethod
     def ispar(cls, thisln, par_loc):
@@ -43,15 +44,16 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------------
 
     
-    def print_errs(self, errlinks=0):
-        if errlinks == 0:
-            errlinks = []
-        if errlinks:
+    def print_errs(self):
+
+        if self.err_links == 0:
+            self.err_links = []
+        if self.err_links:
             answer_string, e, fin_list = '', '', []
             p0, p1, p2 = "BAD LINK: ", " ERROR: ", " PARENT: "
             try:
-                if errlinks:
-                    errs = list(set(errlinks))
+                if self.err_links:
+                    errs = list(set(self.err_links))
                     er_len = len(errs)
                     self.myprint("\nTotal errors: " + str(er_len))
                     self.myprint("-------------- Here are the errors ------------- :")
@@ -99,7 +101,7 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------
 
     def do_response(self, a_link, p_link):
-        global done_ln_gl_sing, err_links
+        global done_ln_gl_sing
         t_err = 0
         #resp = rt.HTMLResponse
         resp = "0"
@@ -111,8 +113,8 @@ class LinkCheckLib(object):
             t_err = self.ck_status_code(resp, a_link)  ## if there's    an error
 
         except Exception as e:
-            if a_link not in err_links:
-                err_links.append((a_link, str(e)[:42], p_link))
+            if a_link not in self.err_links:
+                self.err_links.append((a_link, str(e)[:42], p_link))
             self.myprint("GOT AN EXCEPTION inside do_response and added to errs: " + str(e))
             return resp, t_err
         return resp, t_err
@@ -121,7 +123,7 @@ class LinkCheckLib(object):
 
     @classmethod
     def ck_bad_data(cls, dlink):
-        #print("!!!!!=============inside ckbaddata. val of link: " + dlink)
+        cls.myprinter("!!!!!=============inside ckbaddata. val of link: " + dlink)
         end_val = 0
         mylist = ['#', 'tel:+']
         try:
@@ -129,7 +131,7 @@ class LinkCheckLib(object):
                 if i in dlink:
                     end_val += 1
         except Exception as e:
-            print("Exception ck_bad_data: " + str(e))
+            cls.myprinter("Exception ck_bad_data: " + str(e))
 
         good_suf = cls.has_correct_suffix(dlink)  # check suffix
         cls.myprinter("!inside enval: " + str(end_val) + ' ' + str(good_suf))
@@ -193,28 +195,26 @@ class LinkCheckLib(object):
                 currentPlace = line[:-1]
                 tlds_list.append((currentPlace.lower()))
 
-
-    def check_sufx(self, sufx):
+    @classmethod
+    def check_sufx(cls, sufx):
         global tlds_list
-        if sufx in tlds_list:
+        if sufx.lower() in tlds_list:
             return True
         else:
             return False
 
     def handle_exc( self, e, link, plink):
-        global err_links
         self.myprint('!!!!!!!! found error------------------\n' + str(e))
-        if link not in err_links:
-            err_links.append((link, str(e)[:42], plink))
+        if link not in self.err_links:
+            self.err_links.append((link, str(e)[:42], plink))
 
 
     def ck_status_code(self, response, tpar):
-        global err_links
         tlink = response.html.url
         err_codes = [400, 404, 408, 409]
         if response.status_code in err_codes:
-            if tlink not in err_links:
-                err_links.append((tlink, response.status_code, tpar))
+            if tlink not in self.err_links:
+                self.err_links.append((tlink, response.status_code, tpar))
             return 1
         else: return 0  # ok
 

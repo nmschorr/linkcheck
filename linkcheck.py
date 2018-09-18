@@ -8,21 +8,23 @@ from linkchecklib import *
 
 
 
-
 class LinkCheck(LinkCheckLib):
-    a = any_link_glob
+    #####a = any_link_glob
 
     def __init__(self):
         super().__init__()
         datet = datetime.now()
-
+        base_lnks_g = []
+        self.base_lnks_g = base_lnks_g
 
 
     def get_simple_response(self, lin_and_par_tup):
+        link_count = 0
+
         er, response = "0", "0"
         link_to_ck, parent,  = lin_and_par_tup[0], lin_and_par_tup[1]
-        self.link_count += 1
-        self.myprint("Checking this link: " + link_to_ck)
+        link_count += 1
+        self.myprint("Checking this link: " + link_to_ck )
         try:
             session = rt.HTMLSession()
             response = session.get(link_to_ck)
@@ -37,7 +39,6 @@ class LinkCheck(LinkCheckLib):
 
     #---------------------------------------------------------------------------------------
     def add_any_bse_g(self, zlink, parent_local):  # Adding this base link to base glob
-        global base_lnks_g
 
         if self.base_lnks_g == 0:
             self.base_lnks_g = []
@@ -59,13 +60,13 @@ class LinkCheck(LinkCheckLib):
         if any_link_loc == 0:
             any_link_loc = []
         try:
-            if self.any_link_glob:  # don'w_thread try without something there
-                glob_bool = bool(tlink in [i[0] for i in self.any_link_glob])
+            if any_link_glob:  # don'w_thread try without something there
+                glob_bool = bool(tlink in [i[0] for i in any_link_glob])
                 if not glob_bool:
-                    self.any_link_glob.append((tlink, parent_local))  # add if not there
+                    any_link_glob.append((tlink, parent_local))  # add if not there
                     any_link_loc.append((tlink, parent_local))
             else:
-                self.any_link_glob = [(tlink, parent_local)]  # make it if starting empty
+                any_link_glob = [(tlink, parent_local)]  # make it if starting empty
                 any_link_loc = [(tlink, parent_local)]
         except Exception as e:
             self.myprint("exception in add_any: " + str(e))
@@ -74,7 +75,6 @@ class LinkCheck(LinkCheckLib):
 
     # #----------------------------------------------------------------------get_links-
     def get_links(self, mainlin, _plin):
-        global base_lnks_g
 
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], "0", []
         response, resp_err = self.do_response(mainlin, _plin)
@@ -82,7 +82,6 @@ class LinkCheck(LinkCheckLib):
         is_bool = True
         good_suffix = True
         has_bad = False
-        global done_ln_gl_sing
 
 
         try:
@@ -102,14 +101,14 @@ class LinkCheck(LinkCheckLib):
 
             self.myprint("got this far " + mainlin)
             for THIS_LN in new_lnks_loc:
-                self.myprint("THIS_LN " + THIS_LN)
+                #self.myprint("THIS_LN " + THIS_LN)
                 _IN_AN_LOC = self.ck_loc(THIS_LN, any_lnk_loc)
                 if not _IN_AN_LOC and not self._DONE_YET(THIS_LN):    #NOT done yet  cg = check glob
 
                     try:
                         self.myprint("new_lnks_loc === going to check bad data next: " + str(THIS_LN))
                         has_bad, good_suffix = self.ck_bad_data(THIS_LN)  # check for bad data
-                        self.done_ln_gl_sing = self.check_for_bad_data(THIS_LN, self.done_ln_gl_sing)
+                        self.check_for_bad_data(THIS_LN)
                     except Exception as e:  self.handle_exc(e, THIS_LN, _plin)
 
                     try:
@@ -140,8 +139,6 @@ class LinkCheck(LinkCheckLib):
 
 
     def main(self, a_site="a"):
-        global done_ln_gl_sing
-        global base_lnks_g
 
         for i in globals():
             print(str(i))
@@ -188,7 +185,7 @@ class LinkCheck(LinkCheckLib):
         tup = ()
         try:
             self.myprint("Step Two Done")
-            any_link_to_check = list(self.any_link_glob)
+            any_link_to_check = list(any_link_glob)
 
             any_link_to_check = list(set(any_link_to_check))
             for tup in any_link_to_check:    #check non-base links
@@ -199,11 +196,10 @@ class LinkCheck(LinkCheckLib):
         except Exception as e:
             self.handle_exc(e, tup[0] ,tup[1])
 
-        finlist = self.print_errs(self.err_links)
-        # self.write_some_contents(self.base_lnks_g, "base_lnks_g")
-        self.write_some_contents(self.done_ln_gl_sing, "done_ln_gl_sing")
+        finlist = self.print_errs()
+        # self.write_some_contents(self.base_lnks_g, "self.base_lnks_g")
+        #self.write_some_contents(self.done_ln_gl_sing, "done_ln_gl_sing")
         #self.myprint("totalTime: " + str(perf_counter() - tstart_main))
-        #self.myprint("Links checked: " + str(self.link_count))
         #x = len(self.done_ln_gl_sing)
         #self.myprint("errors: " + str(x))
         return finlist
