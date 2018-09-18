@@ -34,7 +34,7 @@ def notreadyyet():
     fj.close()
 
 def write_no_err_pg():
-    global just_stat, gsite, thishost
+    global just_stat, gsite
     newstt = hc_obj.fin_msg(gsite)
     fjj = open(just_stat, "w")
     fjj.write(newstt)
@@ -72,12 +72,11 @@ def results():
     print("just started thread. root path: " + app.root_path + " you entered: ", gsite)
     return render_template('results.html', name = just_name)  ## has a form
 
-#ns = hcc.getnew()
-#print("LinkCheck started.   " + ns)
+
 
 HOSTIP = os.getenv('HOSTIP', default='0.0.0.0')
 HOSTPORT = os.getenv('HOSTPORT', default=8080)
+HOSTPORT = 5000
 print("hostip: " + HOSTIP + "  HOSTPORT: ", HOSTPORT)
 debugnow = os.getenv('debug', default=False)
-print(HOSTIP, HOSTPORT)
-app.run(host=HOSTIP, port=HOSTPORT)
+app.run(host=HOSTIP, port=HOSTPORT, debug=True)
