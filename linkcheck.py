@@ -79,7 +79,7 @@ class LinkCheck(LinkCheckLib):
         self.myprint("-------------Starting get_links with: " + mainlin)
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], "0", []
         response, resp_err = self.do_response(mainlin, _plin)
-        time.sleep(.4)
+        time.sleep(.05)
         is_bool = True
         good_suffix = True
         has_bad = False

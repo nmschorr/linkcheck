@@ -6,6 +6,7 @@ from nocache import nocache
 import app_support_code
 import app_support_conf
 import datetime
+from flask_socketio import SocketIO, send
 
 
 gsite, w_thread, fnfull, just_name, just_stat = None, None, None, None, None
@@ -13,6 +14,13 @@ lc = linkcheck.LinkCheck()
 thishost=app_support_conf.thishost
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
+
+@socketio.on('message')
+def websock_done(message):
+    send(message)
+
 hc_obj = app_support_code.hcode_cls()
 
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -51,9 +59,11 @@ def worker1():   # run LinkCheck and print to console
             print("no errors found")
             write_no_err_pg()
         print("passing in to resultn just_name: " + just_name + "  worker1 done")
-        lc.send_done_msg()
         print(datetime.datetime.now())
 
+    #-----------------------------------------------------------------------------
+
+    #-----------------------------------------------------------------------------
 
 @app.route('/')
 def index():
@@ -82,3 +92,5 @@ HOSTPORT = 8080
 print("hostip: " + HOSTIP + "  HOSTPORT: ", HOSTPORT)
 debugnow = os.getenv('debug', default=False)
 app.run(host=HOSTIP, port=HOSTPORT, debug=True)
+
+websock_done("message")

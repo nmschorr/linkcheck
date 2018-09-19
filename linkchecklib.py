@@ -143,16 +143,16 @@ class LinkCheckLib(object):
         self.myprint("!inside ck_bad_data: " + str(good_or_bad) + ' ' + str(good_suffix))
         return good_or_bad, good_suffix
 
-    #-----------------------------------------------------------------------------
-    def send_done_msg(self):
-        from websocket import create_connection
-        ws = create_connection("ws://localhost:8080/websocket")
-        print("sending done via websocket")
-        ws.send("done")
-        result = ws.recv()
-        print("Received '%s'" % result)
-        ws.close()
-    #-----------------------------------------------------------------------------
+    # #-----------------------------------------------------------------------------
+    # def websocket_done_msg(self):
+    #     from websocket import create_connection
+    #     ws = create_connection("ws://localhost:8080/results")
+    #     print("sending done via websocket")
+    #     ws.send("done")
+    #     result = ws.recv()
+    #     print("Received '%s'" % result)
+    #     ws.close()
+    # #-----------------------------------------------------------------------------
 
     #def check_for_bad_data(cls, alink, done_lnks_gl=0):
     def check_for_bad_data(self, alink):
@@ -223,6 +223,8 @@ class LinkCheckLib(object):
         tempstr = str(e)
         self.myprint('!!!!! Inside handle_exc. Error------------------\n' + tempstr)
         if "Document is empty" in tempstr:  # for mp3 and similar files
+            return
+        if "object has no attribute" in tempstr:  # for mp3 and similar files
             return
         elif link not in self.err_links:
             self.err_links.append((link, tempstr[:42], plink))

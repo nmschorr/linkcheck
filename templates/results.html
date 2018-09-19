@@ -31,20 +31,6 @@
 <h4>  Click the link below to check your results:</h4>
 <br>
 <script>
-
-if (window.addEventListener){
-    addEventListener("message", listenerFunction, false)
-} else {
-    attachEvent("onmessage", listenerFunction)
-}
-
-
-function listenerFunction(e) {
-  if (typeof e.data == "string") {
-  console.log(“The message is a text: ” +  e.data); }}
-
-
-
 var fname = '{{ name }} ';
 var df = document.referrer;
 var statd = "static/"
@@ -56,7 +42,20 @@ document.write(newURL);
 document.write("<br>")
 document.write("<p></p>")
 document.write(homeURL)
+</script>
 
+
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+    var sock = io.connect('http://' + document.domain + ':' + location.port);
+    var socket = io.connect('http://127.0.0.1:8080');
+    console.log(JSON.stringify(socket));
+    console.log("%o", socket);
+
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+    });
 </script>
 
 
