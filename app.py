@@ -51,6 +51,7 @@ def worker1():   # run LinkCheck and print to console
             print("no errors found")
             write_no_err_pg()
         print("passing in to resultn just_name: " + just_name + "  worker1 done")
+        lc.send_done_msg()
         print(datetime.datetime.now())
 
 

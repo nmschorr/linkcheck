@@ -16,11 +16,17 @@ class LinkCheckLib(object):
         self.tlds_list = tlds_list
         self.done_ln_gl_sing = done_ln_gl_sing
         self.any_link_glob = any_link_glob
+    #-----------------------------------------------------------------------------
 
 
     @classmethod
-    def ispar(cls, thisln, par_loc):
-        return bool(thisln == par_loc)  # is it the parent?
+    def ispar(cls, thisln, par_loc):   # is it a parent? part of the main website?
+        if par_loc in thisln:
+            return True
+        else:
+            return False # is it the parent?
+
+    #-----------------------------------------------------------------------------
 
     def write_some_contents(self, contnt, nme):
         fname = str(nme) + ".log"
@@ -28,17 +34,20 @@ class LinkCheckLib(object):
         for i in contnt:
             wf.write(i)
             wf.close()
+    #-----------------------------------------------------------------------------
 
 
     def ck_g(self, this_link):
         global any_link_glob
         return bool(this_link in [i[0] for i in any_link_glob])
 
-     
+    #-----------------------------------------------------------------------------
+
      
     def _DONE_YET(self, this_link):
         global done_ln_gl_sing
         return bool(this_link in done_ln_gl_sing)
+    #-----------------------------------------------------------------------------
 
     @classmethod
     def ck_loc(cls, this_lin, any_link_loc):
@@ -103,55 +112,66 @@ class LinkCheckLib(object):
         #resp = rt.HTMLResponse
         resp = "0"
         try:
-            self.myprint("-starting-get_home_links - just got this link: " + str(a_link))
-            session = HTMLSession()
-            resp = session.get(a_link)
-            done_ln_gl_sing.append(a_link)  ## add to main done list
-            t_err = self.ck_status_code(resp, a_link)  ## if there's    an error
-            session.close()
+            if a_link not in done_ln_gl_sing:
+                self.myprint("-starting-get_home_links - just got this link: " + str(a_link))
+                done_ln_gl_sing.append(a_link)  ## add to main done list
+                session = HTMLSession()
+                resp = session.get(a_link)
+                t_err = self.ck_status_code(resp, a_link)  ## if there's    an error
+                session.close()
 
         except Exception as e:
-            if a_link not in self.err_links:
-                self.err_links.append((a_link, str(e)[:42], p_link))
-            self.myprint("GOT AN EXCEPTION inside do_response and added to errs: " + str(e))
+            self.handle_exc(self, e, a_link, p_link)
+            self.myprint("GOT AN EXCEPTION inside do_response")
             return resp, t_err
         return resp, t_err
 
     #----------------------------------------------------------------------get_links-
 
     def ck_bad_data(self, dlink):
-        #self.myprint("!!!!!=============inside ckbaddata. val of link: " + dlink)
-        end_val = 0
+        self.myprint("!!!!!=============inside ck_bad_data. val of link: " + dlink)
+        good_or_bad = 0
         mylist = ['#', 'tel:+']
         try:
-            for i in mylist:
-                if i in dlink:
-                    end_val += 1
+            for item in mylist:
+                if item in dlink:
+                    good_or_bad += 1
         except Exception as e:
             self.myprint("Exception ck_bad_data: " + str(e))
 
-        good_suf = self.has_correct_suffix(dlink)  # check suffix
-        self.myprint("!inside enval: " + str(end_val) + ' ' + str(good_suf))
-        return end_val, good_suf
+        good_suffix = self.has_correct_suffix(dlink)  # check suffix
+        self.myprint("!inside ck_bad_data: " + str(good_or_bad) + ' ' + str(good_suffix))
+        return good_or_bad, good_suffix
 
+    #-----------------------------------------------------------------------------
+    def send_done_msg(self):
+        from websocket import create_connection
+        ws = create_connection("ws://localhost:8080/websocket")
+        print("sending done via websocket")
+        ws.send("done")
+        result = ws.recv()
+        print("Received '%s'" % result)
+        ws.close()
     #-----------------------------------------------------------------------------
 
     #def check_for_bad_data(cls, alink, done_lnks_gl=0):
     def check_for_bad_data(self, alink):
-        global done_ln_gl_sing
-        
-        if self.done_ln_gl_sing == 0:
-            done_ln_gl_sing = []
-            self.myprint("!!!!!=============inside check_for_bad_data. val of link: " + alink)
-        try:
-            if done_ln_gl_sing:
-                done_ln_gl_sing.append(alink)  ## add to main done list
-                
-            else:
-                done_ln_gl_sing = [alink]
-        except Exception as e:
-            self.myprint("Exception check_for_bad_data: " + str(e))
-
+        # global done_ln_gl_sing
+        #
+        # if self.done_ln_gl_sing == 0:
+        #     done_ln_gl_sing = []
+        #     self.myprint("!!!!!=============inside check_for_bad_data. val of link: " + alink)
+        # try:
+        #     if done_ln_gl_sing:
+        #         done_ln_gl_sing.append(alink)  ## add to main done list
+        #
+        #     else:
+        #         done_ln_gl_sing = [alink]
+        # except Exception as e:
+        #     self.myprint("Exception check_for_bad_data: " + str(e))
+        print("")
+        return
+    #-----------------------------------------------------------------------------
 
     def has_correct_suffix(self, link):
         answ, answ2, final_answer = False, False, False
@@ -169,23 +189,27 @@ class LinkCheckLib(object):
         except Exception as e:
             self.myprint("Exception in has_correct_suffix: " + str(e))
         return final_answer
+    #-----------------------------------------------------------------------------
 
     def myprint(self, print_str):
         global _MYDEBUG
         if _MYDEBUG:
             print(print_str)
+    #-----------------------------------------------------------------------------
 
     @classmethod
     def myprinter(cls, print_str):
         global _MYDEBUG
         if _MYDEBUG:
             print(print_str)
+    #-----------------------------------------------------------------------------
 
     def load_tlds(self):
         with open('tlds-alpha-by-domain.txt', 'r') as filehandle:
             for line in filehandle:
                 currentPlace = line[:-1]
                 self.tlds_list.append((currentPlace.lower()))
+    #-----------------------------------------------------------------------------
 
     def check_sufx(self, sufx):
         low_sufx = str(sufx).lower()
@@ -193,24 +217,31 @@ class LinkCheckLib(object):
             return True
         else:
             return False
+    #-----------------------------------------------------------------------------
 
     def handle_exc( self, e, link, plink):
-        self.myprint('!!!!!!!! found error------------------\n' + str(e))
         tempstr = str(e)
-        if "Document is empty" in str(e):  # for mp3 and similar files
-            None
+        self.myprint('!!!!! Inside handle_exc. Error------------------\n' + tempstr)
+        if "Document is empty" in tempstr:  # for mp3 and similar files
+            return
         elif link not in self.err_links:
-            self.err_links.append((link, str(e)[:42], plink))
+            self.err_links.append((link, tempstr[:42], plink))
+    #-----------------------------------------------------------------------------
 
 
     def ck_status_code(self, response, tpar):
-        tlink = response.html.url
-        err_codes = [400, 404, 408, 409]
-        if response.status_code in err_codes:
-            if tlink not in self.err_links:
-                self.err_links.append((tlink, response.status_code, tpar))
-            return 1
-        else: return 0  # ok
+        try:
+            tlink = response.html.url
+            err_codes = [400, 404, 408, 409]
+            if response.status_code in err_codes:
+                if tlink not in self.err_links:
+                    self.err_links.append((tlink, response.status_code, tpar))
+                return 1
+            else: return 0  # ok
+        except Exception as e:
+            self.myprint("Exception in ck_status_code: " + str(e))
+
+    #-----------------------------------------------------------------------------
 
     
     @classmethod
@@ -227,10 +258,12 @@ class LinkCheckLib(object):
         else:
             full_addy = addy
         return full_addy
+    #-----------------------------------------------------------------------------
 
     
     @classmethod
     def has_early_dollar( cls, clink, base_p):
+        print("in hasearlydollar: ", clink, " ", base_p)
         bp = clink.index(base_p)
         if "$" or "?" or "#" in clink:
             if (clink.index("$") < bp) or (clink.index("?") < bp) or (clink.index("#") < bp):
@@ -240,6 +273,7 @@ class LinkCheckLib(object):
                 return False     # there's a $ sign but it's ok
         else:
             return False
+    #-----------------------------------------------------------------------------
 
     @classmethod
     def divide_url(cls, parent_local):

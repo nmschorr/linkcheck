@@ -73,22 +73,25 @@ class LinkCheck(LinkCheckLib):
 
     # #----------------------------------------------------------------------get_links-
     def get_links(self, mainlin, _plin):
+        global done_ln_gl_sing
+        import time
 
+        self.myprint("-------------Starting get_links with: " + mainlin)
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], "0", []
         response, resp_err = self.do_response(mainlin, _plin)
-        self.myprint("-------------INSIDE get_links! --------------: " + mainlin)
+        time.sleep(.4)
         is_bool = True
         good_suffix = True
         has_bad = False
 
 
         try:
-            if response.status_code:
-                self.myprint("Status code: " + str(is_bool))
-        except:
+            if response.status_code != "0":
+                self.myprint("Status code: " + str(response.status_code))
+        except Exception as e:
             self.myprint("Exception no valid response from: " + mainlin)
+            #self.handle_exc(e, mainlin, _plin)
             return
-
 
         if resp_err == 0 and is_bool == True:  ## if there's an error  - 0 is good to continue
             try:
@@ -96,44 +99,61 @@ class LinkCheck(LinkCheckLib):
                 new_lnks_loc = [ab for ab in ab_links]
             except Exception as e:
                 self.myprint("Exception inside get_links: " + str(e))
+                return
 
-            #self.myprint("got this far " + mainlin)
+            self.myprint("Starting Main Check" + mainlin)
             for THIS_LN in new_lnks_loc:
-                #self.myprint("THIS_LN " + THIS_LN)
-                _IN_AN_LOC = self.ck_loc(THIS_LN, any_lnk_loc)
-                if not _IN_AN_LOC and not self._DONE_YET(THIS_LN):    #NOT done yet  cg = check glob
+                if THIS_LN not in done_ln_gl_sing:
+                    self.myprint("THIS_LN " + THIS_LN)
+                    _IS_PARENT = False
+                    _IS_PARENT = self.ispar(THIS_LN, _plin)
 
-                    try:
-                        self.myprint("new_lnks_loc === going to check bad data next: " + str(THIS_LN))
-                        has_bad, good_suffix = self.ck_bad_data(THIS_LN)  # check for bad data
-                        self.check_for_bad_data(THIS_LN)
-                    except Exception as e:  self.handle_exc(e, THIS_LN, _plin)
+                    _IN_AN_LOC = self.ck_loc(THIS_LN, any_lnk_loc)
+                    if not _IN_AN_LOC and not self._DONE_YET(THIS_LN):    #NOT done yet  cg = check glob
 
-                    try:
-                        if self.ispar(THIS_LN, _plin) or has_bad:
+                        try:
+                            self.myprint("new_lnks_loc === going to check bad data next: " + str(THIS_LN))
+                            has_bad, good_suffix = self.ck_bad_data(THIS_LN)  # check for bad data
+                            #self.check_for_bad_data(THIS_LN)
+                        except Exception as e:
+                            self.handle_exc(e, THIS_LN, _plin)
                             continue
-                        _IS_BASE, in_base_local = self.ck_base(THIS_LN, self.divide_url(_plin), base_lnks_loc)
 
-                        if _IS_BASE and good_suffix:  # IS base type
-                            if not in_base_local:
-                                base_lnks_loc.append(THIS_LN)
+                        try:
+                            if self.ispar(THIS_LN, _plin) or has_bad:
+                                continue
+                            _IS_BASE, in_base_local = self.ck_base(THIS_LN, self.divide_url(_plin), base_lnks_loc)
+
+                            if _IS_BASE and good_suffix:  # IS base type
+                                if not in_base_local:
+                                    base_lnks_loc.append(THIS_LN)
 
 
-                            self.add_any_bse_g(THIS_LN, _plin)
-                        else:                   #if not a home based link
-                            if not self.ck_g(THIS_LN):  ## add bad suffix here too
-                                any_lnk_loc = self.add_any(THIS_LN, _plin)  #does global too
+                                self.add_any_bse_g(THIS_LN, _plin)
+                            else:                   #if not a home based link
+                                if not self.ck_g(THIS_LN):  ## add bad suffix here too
+                                    any_lnk_loc = self.add_any(THIS_LN, _plin)  #does global too
+                                    continue
 
-                    except Exception as e:
-                        self.handle_exc(e, THIS_LN, _plin)
+                        except Exception as e:
+                            self.handle_exc(e, THIS_LN, _plin)
+                            continue
 
-        self.myprint('!! NEW----end get_home_links:---returning base_links_local: ' + str(base_lnks_loc))
-        return list(set(base_lnks_loc))
+            self.myprint('---returning base_links_local: ' + str(base_lnks_loc))
+            self.myprint('!! NEW----end get_home_links \n\n')
+            return list(set(base_lnks_loc))
 
 
 
     #############----------------------------------MAIN--------------------------
       #############----------------------------------MAIN-------------------------
+    def rem_errs(self, tlinks=[]):
+        global done_ln_gl_sing
+        for link in tlinks:
+            if link in done_ln_gl_sing:
+                tlinks.remove(link)
+        return tlinks
+
 
 
     def main(self, a_site="a"):
@@ -167,7 +187,9 @@ class LinkCheck(LinkCheckLib):
                 repeats += 1
                 self.myprint("repeats: " + str(repeats) + "-------------------!!In main loop ")
                 for baselink in new_base_links_one:
-                    new_base_links_two = self.get_links(baselink, full_addy)  # first set of base
+                    new_base_links_tmp = self.get_links(baselink, full_addy)  # first set of base
+                    new_base_links_two = self.rem_errs(new_base_links_tmp)
+
                 the_len = len(new_base_links_two)
                 if the_len > 0:
                     new_base_links_one = new_base_links_two

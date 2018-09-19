@@ -4,6 +4,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
+
+
         <title>Results from LinkCheck</title>
 <style>
 </style>
@@ -13,6 +15,8 @@
 <body onload="bodyReady();" style="{padding-left:5em; }" >
         <!--script src="/templates/varsenv.js" >-->
 <script>
+
+
 </script>
 
 
@@ -27,6 +31,19 @@
 <h4>  Click the link below to check your results:</h4>
 <br>
 <script>
+
+if (window.addEventListener){
+    addEventListener("message", listenerFunction, false)
+} else {
+    attachEvent("onmessage", listenerFunction)
+}
+
+
+function listenerFunction(e) {
+  if (typeof e.data == "string") {
+  console.log(“The message is a text: ” +  e.data); }}
+
+
 
 var fname = '{{ name }} ';
 var df = document.referrer;
