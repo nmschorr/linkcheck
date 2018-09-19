@@ -138,14 +138,20 @@ class LinkCheck(LinkCheckLib):
 
     def main(self, a_site="a"):
         ## reset globals
-        self.clear_error_links(self)
+        self.err_links.clear()
+        self.done_ln_gl_sing.clear()
+        self.any_link_glob.clear()
         global any_link_glob
         global done_ln_gl_sing
         self.base_lnks_g.clear()
+        done_ln_gl_sing.clear()
+        any_link_glob.clear()
         self.myprint("Starting main with: " + a_site)
+        base_only_plain_repeat = 0
+        new_base_links_one = 0
         # for i in globals():
         #     print(str(i))
-
+        full_addy = ''
         full_addy = self.ckaddymore(a_site)
         new_sorted, repeats, the_len = [], 0, 0
         #tstart_main = perf_counter()

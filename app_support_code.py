@@ -96,4 +96,8 @@ class hcode_cls(object):
         self.datalines(f,data)
         f.close() # file is not immediately deleted because we
         print("fnfull named: ", fnfull , "f.name: ", f.name)
+        donef = fnfull + "done"
+        fd = open(donef,"w")
+        fd.write("done")
+        fd.close() # file is not immediately deleted because we
 

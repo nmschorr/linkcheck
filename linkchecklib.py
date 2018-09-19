@@ -17,10 +17,6 @@ class LinkCheckLib(object):
         self.done_ln_gl_sing = done_ln_gl_sing
         self.any_link_glob = any_link_glob
 
-    def clear_error_links(self):
-        self.err_links.clear()
-        self.done_ln_gl_sing.clear()
-        self.any_link_glob.clear()
 
     @classmethod
     def ispar(cls, thisln, par_loc):
@@ -192,7 +188,8 @@ class LinkCheckLib(object):
                 self.tlds_list.append((currentPlace.lower()))
 
     def check_sufx(self, sufx):
-        if sufx.lower() in self.tlds_list:
+        low_sufx = str(sufx).lower()
+        if low_sufx in self.tlds_list:
             return True
         else:
             return False
