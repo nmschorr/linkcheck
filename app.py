@@ -3,17 +3,17 @@ import linkcheck
 import threading, time, os
 from jinja2 import Environment, PackageLoader, select_autoescape
 from nocache import nocache
-import hcode
-import hconf
+import app_support_code
+import app_support_conf
 import datetime
 
 
 gsite, w_thread, fnfull, just_name, just_stat = None, None, None, None, None
 lc = linkcheck.LinkCheck()
-thishost=hconf.thishost
+thishost=app_support_conf.thishost
 
 app = Flask(__name__)
-hc_obj = hcode.hcode_cls()
+hc_obj = app_support_code.hcode_cls()
 
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 env = Environment(

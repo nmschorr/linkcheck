@@ -1,5 +1,5 @@
 # python 3
-done_ln_gl_sing = []
+#done_ln_gl_sing = []
 # base_lnks_g = 0
 # done_ln_gl_sing = 0
 # err_links = 0

@@ -9,7 +9,6 @@ from linkchecklib import *
 
 
 class LinkCheck(LinkCheckLib):
-    #####a = any_link_glob
 
     def __init__(self):
         super().__init__()
@@ -29,6 +28,8 @@ class LinkCheck(LinkCheckLib):
             session = rt.HTMLSession()
             response = session.get(link_to_ck)
             er = self.ck_status_code(response, parent)
+            session.close()
+
         except Exception as e:
             self.myprint("Exception inside get_simple_response: " + str(e))
             self.handle_exc(e, link_to_ck, parent)
@@ -75,7 +76,7 @@ class LinkCheck(LinkCheckLib):
 
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], "0", []
         response, resp_err = self.do_response(mainlin, _plin)
-        #self.myprint("-------------INSIDE get_links! --------------: " + mainlin)
+        self.myprint("-------------INSIDE get_links! --------------: " + mainlin)
         is_bool = True
         good_suffix = True
         has_bad = False
@@ -136,7 +137,12 @@ class LinkCheck(LinkCheckLib):
 
 
     def main(self, a_site="a"):
-
+        ## reset globals
+        self.clear_error_links(self)
+        global any_link_glob
+        global done_ln_gl_sing
+        self.base_lnks_g.clear()
+        self.myprint("Starting main with: " + a_site)
         # for i in globals():
         #     print(str(i))
 
@@ -181,6 +187,7 @@ class LinkCheck(LinkCheckLib):
         tup = ()
         try:
             #self.myprint("Step Two Done")
+            any_link_to_check = 0
             any_link_to_check = list(any_link_glob)
 
             any_link_to_check = list(set(any_link_to_check))

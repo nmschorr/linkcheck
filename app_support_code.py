@@ -1,17 +1,14 @@
 from os import path
 from datetime import datetime
-# from socket import gethostname, gethostbyaddr
-import hconf
+import app_support_conf
 
-thishost=hconf.thishost
+thishost=app_support_conf.thishost
 fullpar = '<p></p>'
 linebreaks3 = fullpar + fullpar
 mtab = "&nbsp;&nbsp;&nbsp;&nbsp;"
 endbod = "</body></html>"
 
 class hcode_cls(object):
-
-
 
     def fin_msg(self, asite):
         global endbod,linebreaks3, thishost
@@ -51,7 +48,6 @@ class hcode_cls(object):
             f.write("'>")
             f.write(str(line[2]))
             f.write("</a>")
-
             f.write(fullpar)
 
         f.write(linebreaks3)
@@ -91,19 +87,7 @@ class hcode_cls(object):
         justandstatic = path.join(stat, just_name)
         gfulldir = path.join(apart, stat)
         fnfull = path.join(gfulldir, just_name)
-
         return just_name, justandstatic, fnfull
-
-
-
-    #
-    # def getnew():
-    #     if gethostname().find('.') >= 0:
-    #         namesock = gethostname()
-    #     else:
-    #         namesock = gethostbyaddr(gethostname())[0]
-    #     return namesock
-
 
     def writeres(self, data, fnfull):
         global fullpar

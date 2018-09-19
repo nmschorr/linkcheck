@@ -15,6 +15,12 @@ class LinkCheckLib(object):
         tlds_list = []
         self.tlds_list = tlds_list
         self.done_ln_gl_sing = done_ln_gl_sing
+        self.any_link_glob = any_link_glob
+
+    def clear_error_links(self):
+        self.err_links.clear()
+        self.done_ln_gl_sing.clear()
+        self.any_link_glob.clear()
 
     @classmethod
     def ispar(cls, thisln, par_loc):
@@ -106,6 +112,7 @@ class LinkCheckLib(object):
             resp = session.get(a_link)
             done_ln_gl_sing.append(a_link)  ## add to main done list
             t_err = self.ck_status_code(resp, a_link)  ## if there's    an error
+            session.close()
 
         except Exception as e:
             if a_link not in self.err_links:
