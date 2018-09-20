@@ -2,6 +2,22 @@
 <html>
 <head>
 
+<script>
+var myfun = function(){
+    var request = new XMLHttpRequest();
+
+    request.open('GET', 'http://127.0.0.1:8080/static/res20180919150343.htmldone');
+    request.send();
+    console.log('some fun here'); // 4th
+    console.log(request.status)
+    debugger;
+    if ( request.status == 200) {
+            console.log("perfect");
+        };
+}
+
+
+</script>
 
 
 
@@ -10,32 +26,10 @@
 
 </head>
 
-
-
-
-<body>
-
+<body onload="myfun();">
 <h4> test</h4>
 <br>
 
-<script>
-window.onload = function(){
-    var request = new XMLHttpRequest();
-
-    request.onreadystatechange = function() {
-        if ( this.status == 200) {
-            console.log(this.responseText);
-        }
-    };
-
-    request.open('GET', 'http://127.0.0.1:8080/static/res20180919150343.htmldone');
-    request.send();
-}
-
-
-
-
-</script>
 
 
 
