@@ -6,7 +6,6 @@ from nocache import nocache
 import app_support_code
 import app_support_conf
 import datetime
-from flask_socketio import SocketIO, send
 
 
 gsite, w_thread, fnfull, just_name, just_stat = None, None, None, None, None
@@ -15,11 +14,6 @@ thishost=app_support_conf.thishost
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app)
-
-@socketio.on('message')
-def websock_done(message):
-    send(message)
 
 hc_obj = app_support_code.hcode_cls()
 
@@ -93,4 +87,3 @@ print("hostip: " + HOSTIP + "  HOSTPORT: ", HOSTPORT)
 debugnow = os.getenv('debug', default=False)
 app.run(host=HOSTIP, port=HOSTPORT, debug=True)
 
-websock_done("message")

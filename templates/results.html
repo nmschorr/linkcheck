@@ -35,27 +35,19 @@ var fname = '{{ name }} ';
 var df = document.referrer;
 var statd = "static/"
 var newURL = "<a href=" + df + statd + fname + ">Check for Results</a>";
-
 document.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 
 document.write(newURL);
-document.write("<br>")
-document.write("<p></p>")
-document.write(homeURL)
+document.write("<br>");
+document.write("<p></p>");
+document.write(homeURL);
 </script>
 
 
 
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
-<script type="text/javascript" charset="utf-8">
-    var sock = io.connect('http://' + document.domain + ':' + location.port);
-    var socket = io.connect('http://127.0.0.1:8080');
-    console.log(JSON.stringify(socket));
-    console.log("%o", socket);
+<script>
 
-    socket.on('connect', function() {
-        socket.emit('my event', {data: 'I\'m connected!'});
-    });
+
 </script>
 
 

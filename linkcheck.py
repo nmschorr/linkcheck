@@ -5,8 +5,7 @@
 import requests_html as rt
 from datetime import datetime
 from linkchecklib import *
-
-
+from urllib3 import HTTPSConnectionPool
 
 class LinkCheck(LinkCheckLib):
 
@@ -29,6 +28,10 @@ class LinkCheck(LinkCheckLib):
             response = session.get(link_to_ck)
             er = self.ck_status_code(response, parent)
             session.close()
+
+        except HTTPSConnectionPool as he:
+            print("HTTPSConnectionPool Exception inside get_simple_response: " + str(he))
+            return
 
         except Exception as e:
             self.myprint("Exception inside get_simple_response: " + str(e))
