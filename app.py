@@ -13,7 +13,7 @@ lc = linkcheck.LinkCheck()
 thishost=app_support_conf.thishost
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
+##app.config['SECRET_KEY'] = 'secret!'
 
 hc_obj = app_support_code.hcode_cls()
 

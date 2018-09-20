@@ -3,17 +3,31 @@
 <head>
 
 <script>
-var myfun = function(){
-    var request = new XMLHttpRequest();
 
-    request.open('GET', 'http://127.0.0.1:8080/static/res20180919150343.htmldone');
-    request.send();
-    console.log('some fun here'); // 4th
-    console.log(request.status)
-    debugger;
-    if ( request.status == 200) {
-            console.log("perfect");
-        };
+function doesFileExist(urlToFile) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('HEAD', urlToFile, false);
+    xhr.send();
+
+    if (xhr.status == "404") {
+        return false;
+    } else {
+        return true;
+        console.log("perfect");
+    }
+}
+
+function myfun(){
+        var tfile = 'http://127.0.0.1:8080/static/res20180919150343.htmldone';
+        var result = doesFileExist(tfile);
+
+        if (result == true) {
+                console.log("yay, file exists!");
+            // yay, file exists!
+        } else {
+                 console.log("file does not exist!");
+           // file does not exist!
+        }
 }
 
 

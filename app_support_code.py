@@ -75,7 +75,7 @@ class hcode_cls(object):
 
         headr0 = startdoc1 + scr2 + atitle3
         stylee1 = "<style>body {padding-left:10em;}</style></head>"
-        bodreload2 = "<body onload=javascript:pageloadEvery(10000);>"
+        bodreload2 = "<body onload=javascript:pageloadEvery(15000);>"
         newst = headr0 + stylee1 + bodreload2 + usr_msg3 + refresh4  + endbod
         return newst
 
