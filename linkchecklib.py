@@ -254,10 +254,10 @@ class LinkCheckLib(object):
         needprefix = True
         if addy[0:7]==one:
             needprefix = False
-        if addy[0:8] == 'https://':
+        if addy[0:8] == two:
             needprefix = False
         if needprefix:
-            full_addy = 'http://' + addy
+            full_addy = one + addy
         else:
             full_addy = addy
         return full_addy

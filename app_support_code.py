@@ -1,7 +1,6 @@
 from os import path
 from datetime import datetime
 import app_support_conf
-import os
 
 thishost=app_support_conf.thishost
 print("host: ", thishost)
@@ -63,7 +62,6 @@ class hcode_cls(object):
 
     def not_ready_msg(self, gsite):
         global endbod, fullpar
-        global done_file
 
         usr_msg3 = "Results not ready yet."+ fullpar +"You entered: " + gsite + fullpar + \
                  "Page will automatically reload until results appear." + fullpar
@@ -72,45 +70,43 @@ class hcode_cls(object):
         jst2 = "javascript:location.reload(true)"
         refresh4 = arf1 + jst2 + ">Refresh this page</a>"
 
-        startdoc1 = "<!DOCTYPE html><html><head>"
-        ##scr_st = "<script>function pageloadEvery(w_thread)"
-        ##scr2 = scr_st + "{setTimeout('location.reload(true)', w_thread);}</script>"
-        scr2 = '<script src=./jscript.js></script>'
-        scr3 = '<script>function checkRefrsh(){var re=doesFileExist(\"' + done_file_url + '\");'
-        scr4 = "if (re==true) { location.reload(true); }</script>"
-        atitle3 = "<title>Not Ready</title>"
+        sc1 = "<!DOCTYPE html><html><head>"
+        sc2 = '<script src=./jscript.js></script>'
+        sc3 = '<script>var doneword ="done" ;  '
+        sc4 = ' var donename=window.location.href + doneword;  '
+        sc5 = ' function checkRefrsh(){ var re=doesFileExist(donename); '
+        sc6 = " if (re==true) { location.reload(true); }}</script>"
+        sc7 = "<title>Not Ready</title>"
+        headr0 = sc1 + sc2 + sc3 + sc4 + sc5 + sc6 + sc7
 
-        headr0 = startdoc1 + scr2 + scr3+ scr4+ atitle3
-        stylee1 = "<style>body {padding-left:10em;}</style></head>"
-        #bodreload2 = "<body onload=javascript:pageloadEvery(15000);>"
-        bodreload2 = "<body onload=keepchecking();>"
-        newst = headr0 + stylee1 + bodreload2 + usr_msg3 + refresh4  + endbod
+        st1 = "<style>body {padding-left:10em;}</style></head>"
+        st2 = "<body onload=keepchecking();>"
+        newst = headr0 + st1 + st2 + usr_msg3 + refresh4  + endbod
         return newst
 
-    def getfns(self, apart):
-        global done_file
+    def make_filenames(self, ospath):
         stat = "static"
         timestp = format(datetime.now(), '%Y%m%d%H%M%S')
-        just_name = "res" + timestp + ".html"
-        justandstatic = path.join(stat, just_name)
-        gfulldir = path.join(apart, stat)
-        fnfull = path.join(gfulldir, just_name)
-        done_file = fnfull + "done"
-        HOSTIP = os.getenv('HOSTIP', default='0.0.0.0')
-        HOSTPORT = os.getenv('HOSTPORT', default=8080)
-        done_file_url = "http://" + HOSTIP + ":" + HOSTPORT + "\\" + justandstatic
-        return just_name, justandstatic, fnfull, done_file_url
+        nme_only = "res" + timestp + ".html"
+        nme_plus_static = path.join(stat, nme_only)
+        fname_only = "res" + timestp + ".html"
+        os_donefile =  "res" + timestp + ".htmldone"
+
+        os_path_plus_stat = path.join(ospath, stat)
+        ospath_full = path.join(os_path_plus_stat, fname_only)
+        os_donefile_path = path.join(os_path_plus_stat, os_donefile)
+
+        return ospath_full, os_donefile_path, nme_only, nme_plus_static
 
     def writeres(self, data, fnfull):
-        global thishost
         global fullpar
-        global done_file, done_file_url
+        global cpu_dn_file_path
         f = open(fnfull, "w")
         f.write(fullpar)
         self.datalines(f,data)
         f.close() # file is not immediately deleted because we
-        print("fnfull named: ", fnfull , "f.name: ", f.name)
-        fd = open(done_file,"w")
+        print("reg_os_file_path named: ", fnfull , "f.name: ", f.name)
+        fd = open(cpu_dn_file_path,"w")
         fd.write("done")
         fd.close() # file is not immediately deleted because we
 

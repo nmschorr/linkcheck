@@ -8,10 +8,13 @@ import app_support_conf
 import datetime
 
 
-gsite, w_thread, fnfull, just_name, just_stat = None, None, None, None, None
+gsite, w_thread= None, None
 lc = linkcheck.LinkCheck()
 thishost=app_support_conf.thishost
-done_file_url= "notsetyet"
+os_DONE_filepath= "c-notsetyet"
+reg_os_file_path= "r-notsetyet"
+just_name = "notset"
+just_stat = "notset"
 
 app = Flask(__name__)
 ##app.config['SECRET_KEY'] = 'secret!'
@@ -25,9 +28,9 @@ env = Environment(
 )
 
 def setupfile():
-    global just_name, fnfull, just_stat, done_file_url
-    arp = app.root_path
-    just_name, just_stat, fnfull, done_file_url = hc_obj.getfns(arp)
+    global reg_os_file_path, os_DONE_filepath, just_name, just_stat
+    os_root_path = app.root_path        #os path
+    reg_os_file_path, os_DONE_filepath, just_name, just_stat= hc_obj.make_filenames(os_root_path)
 
 def notreadyyet():
     global just_stat, gsite
@@ -44,12 +47,12 @@ def write_no_err_pg():
     fjj.close()
 
 def worker1():   # run LinkCheck and print to console
-        global gsite, fnfull, just_name
+        global gsite, reg_os_file_path, just_name
         print("inside worker1 thread. you entered: ", gsite)
         answers = lc.main(gsite)
         time.sleep(5)
         if len(answers) > 0:
-            hc_obj.writeres(answers, fnfull)
+            hc_obj.writeres(answers, reg_os_file_path)
         else:
             print("no errors found")
             write_no_err_pg()

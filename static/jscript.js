@@ -22,7 +22,7 @@ function refreshData() {
 function keepchecking() {
     x = 7;  // 5 Seconds
     console.log("in keepchecking");
-    setTimeout(checkAndRefresh, x*1000);
+    setTimeout(checkRefrsh, x*1000);
 }
 
 
