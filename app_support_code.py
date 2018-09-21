@@ -3,11 +3,14 @@ from datetime import datetime
 import app_support_conf
 
 thishost=app_support_conf.thishost
+print("host: ", thishost)
 fullpar = '<p></p>'
 linebreaks3 = fullpar + fullpar
 mtab = "&nbsp;&nbsp;&nbsp;&nbsp;"
 endbod = "</body></html>"
 done_file = ""
+done_file2 = ""
+justname = ""
 
 class hcode_cls(object):
 
@@ -86,18 +89,20 @@ class hcode_cls(object):
         return newst
 
     def getfns(self, apart):
-
+        global justname
         stat = "static"
         timestp = format(datetime.now(), '%Y%m%d%H%M%S')
         just_name = "res" + timestp + ".html"
+        justname = just_name
         justandstatic = path.join(stat, just_name)
         gfulldir = path.join(apart, stat)
         fnfull = path.join(gfulldir, just_name)
         return just_name, justandstatic, fnfull
 
     def writeres(self, data, fnfull):
+        global thishost, justname
         global fullpar
-        global done_file
+        global done_file, done_file2
         f = open(fnfull, "w")
         f.write(fullpar)
         self.datalines(f,data)
@@ -105,6 +110,7 @@ class hcode_cls(object):
         print("fnfull named: ", fnfull , "f.name: ", f.name)
         done_file = fnfull + "done"
         fd = open(done_file,"w")
+        done_file2 = thishost + "/static/" + justname + "done"
         fd.write("done")
         fd.close() # file is not immediately deleted because we
 

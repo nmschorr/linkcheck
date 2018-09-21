@@ -122,7 +122,7 @@ class LinkCheckLib(object):
                 session.close()
 
         except Exception as e:
-            self.handle_exc(self, e, a_link, p_link)
+            self.handle_exc(e, a_link, p_link)
             self.myprint("GOT AN EXCEPTION inside do_response")
             return resp, t_err
         return resp, t_err
