@@ -7,6 +7,7 @@ fullpar = '<p></p>'
 linebreaks3 = fullpar + fullpar
 mtab = "&nbsp;&nbsp;&nbsp;&nbsp;"
 endbod = "</body></html>"
+done_file = ""
 
 class hcode_cls(object):
 
@@ -61,6 +62,7 @@ class hcode_cls(object):
 
     def not_ready_msg(self, gsite):
         global endbod, fullpar
+        global done_file
         usr_msg3 = "Results not ready yet."+ fullpar +"You entered: " + gsite + fullpar + \
                  "Page will automatically reload until results appear." + fullpar
 
@@ -69,13 +71,17 @@ class hcode_cls(object):
         refresh4 = arf1 + jst2 + ">Refresh this page</a>"
 
         startdoc1 = "<!DOCTYPE html><html><head>"
-        scr_st = "<script>function pageloadEvery(w_thread)"
-        scr2 = scr_st + "{setTimeout('location.reload(true)', w_thread);}</script>"
+        ##scr_st = "<script>function pageloadEvery(w_thread)"
+        ##scr2 = scr_st + "{setTimeout('location.reload(true)', w_thread);}</script>"
+        scr2 = "<script src=./jscript.js></script>"
+        scr3 = "<script>function checkRefrsh(){var re=doesFileExist(" + done_file + ");"
+        scr4 = "if (re==true) { location.reload(true); }</script>"
         atitle3 = "<title>Not Ready</title>"
 
-        headr0 = startdoc1 + scr2 + atitle3
+        headr0 = startdoc1 + scr2 + scr3+ scr4+ atitle3
         stylee1 = "<style>body {padding-left:10em;}</style></head>"
-        bodreload2 = "<body onload=javascript:pageloadEvery(15000);>"
+        #bodreload2 = "<body onload=javascript:pageloadEvery(15000);>"
+        bodreload2 = "<body onload=keepchecking();>"
         newst = headr0 + stylee1 + bodreload2 + usr_msg3 + refresh4  + endbod
         return newst
 
@@ -91,13 +97,14 @@ class hcode_cls(object):
 
     def writeres(self, data, fnfull):
         global fullpar
+        global done_file
         f = open(fnfull, "w")
         f.write(fullpar)
         self.datalines(f,data)
         f.close() # file is not immediately deleted because we
         print("fnfull named: ", fnfull , "f.name: ", f.name)
-        donef = fnfull + "done"
-        fd = open(donef,"w")
+        done_file = fnfull + "done"
+        fd = open(done_file,"w")
         fd.write("done")
         fd.close() # file is not immediately deleted because we
 

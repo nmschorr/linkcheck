@@ -15,7 +15,7 @@ function doesFileExist(urlToFile) {
 }
 
 function checkAndRefresh(){
-        var tfile = 'http://127.0.0.1:8080/static/res20180919150343.htmldone';
+        var done_file = 'http://127.0.0.1:8080/static/res20180919150343.htmldone';
         var result = doesFileExist(tfile);
 
         if (result == true) {
@@ -43,3 +43,5 @@ function keepchecking() {
 }
 
 
+"function checkRefrsh(){var re = doesFileExist(done_file);"
+"if (re==true) { location.reload(true); }</script>"
