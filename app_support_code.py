@@ -1,6 +1,7 @@
 from os import path
 from datetime import datetime
 import app_support_conf
+import os
 
 thishost=app_support_conf.thishost
 print("host: ", thishost)
@@ -8,9 +9,6 @@ fullpar = '<p></p>'
 linebreaks3 = fullpar + fullpar
 mtab = "&nbsp;&nbsp;&nbsp;&nbsp;"
 endbod = "</body></html>"
-done_file = ""
-done_file2 = ""
-justname = ""
 
 class hcode_cls(object):
 
@@ -66,6 +64,7 @@ class hcode_cls(object):
     def not_ready_msg(self, gsite):
         global endbod, fullpar
         global done_file
+
         usr_msg3 = "Results not ready yet."+ fullpar +"You entered: " + gsite + fullpar + \
                  "Page will automatically reload until results appear." + fullpar
 
@@ -76,8 +75,8 @@ class hcode_cls(object):
         startdoc1 = "<!DOCTYPE html><html><head>"
         ##scr_st = "<script>function pageloadEvery(w_thread)"
         ##scr2 = scr_st + "{setTimeout('location.reload(true)', w_thread);}</script>"
-        scr2 = "<script src=./jscript.js></script>"
-        scr3 = "<script>function checkRefrsh(){var re=doesFileExist(" + done_file + ");"
+        scr2 = '<script src=./jscript.js></script>'
+        scr3 = '<script>function checkRefrsh(){var re=doesFileExist(\"' + done_file_url + '\");'
         scr4 = "if (re==true) { location.reload(true); }</script>"
         atitle3 = "<title>Not Ready</title>"
 
@@ -89,28 +88,29 @@ class hcode_cls(object):
         return newst
 
     def getfns(self, apart):
-        global justname
+        global done_file
         stat = "static"
         timestp = format(datetime.now(), '%Y%m%d%H%M%S')
         just_name = "res" + timestp + ".html"
-        justname = just_name
         justandstatic = path.join(stat, just_name)
         gfulldir = path.join(apart, stat)
         fnfull = path.join(gfulldir, just_name)
-        return just_name, justandstatic, fnfull
+        done_file = fnfull + "done"
+        HOSTIP = os.getenv('HOSTIP', default='0.0.0.0')
+        HOSTPORT = os.getenv('HOSTPORT', default=8080)
+        done_file_url = "http://" + HOSTIP + ":" + HOSTPORT + "\\" + justandstatic
+        return just_name, justandstatic, fnfull, done_file_url
 
     def writeres(self, data, fnfull):
-        global thishost, justname
+        global thishost
         global fullpar
-        global done_file, done_file2
+        global done_file, done_file_url
         f = open(fnfull, "w")
         f.write(fullpar)
         self.datalines(f,data)
         f.close() # file is not immediately deleted because we
         print("fnfull named: ", fnfull , "f.name: ", f.name)
-        done_file = fnfull + "done"
         fd = open(done_file,"w")
-        done_file2 = thishost + "/static/" + justname + "done"
         fd.write("done")
         fd.close() # file is not immediately deleted because we
 

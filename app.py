@@ -11,6 +11,7 @@ import datetime
 gsite, w_thread, fnfull, just_name, just_stat = None, None, None, None, None
 lc = linkcheck.LinkCheck()
 thishost=app_support_conf.thishost
+done_file_url= "notsetyet"
 
 app = Flask(__name__)
 ##app.config['SECRET_KEY'] = 'secret!'
@@ -24,9 +25,9 @@ env = Environment(
 )
 
 def setupfile():
-    global just_name, fnfull, just_stat
+    global just_name, fnfull, just_stat, done_file_url
     arp = app.root_path
-    just_name, just_stat, fnfull = hc_obj.getfns(arp)
+    just_name, just_stat, fnfull, done_file_url = hc_obj.getfns(arp)
 
 def notreadyyet():
     global just_stat, gsite
