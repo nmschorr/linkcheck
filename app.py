@@ -22,6 +22,7 @@ gc = app_support_code.hcode_cls()
 
 
 def setup():
+    gc.__init__()
     reg_os_file_path, osdonefile = gc.ret_ospaths()
     os_root_path = app.root_path        #os path
     just_name, just_stat= gc.make_filenames(os_root_path)
@@ -74,7 +75,6 @@ def index():
 @nocache             # very important so client server doesn'w_thread cache results
 def results():
     setup()
-
     threads = []
     gsite = request.form['name']
     gc.setgsite(gsite)

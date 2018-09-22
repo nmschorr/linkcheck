@@ -11,10 +11,17 @@ class hcode_cls(object):
     end_body_html_tags = "</body></html>"
     ospath_full = 'notset'
     os_donefile_path = 'notset'
+    just_name_cls = "notset"
+    just_stat_cls = "notset"
+    gsite_cls = "notset"
 
     def __init__(self):
-        None
-
+        self.os_donefile = "empty"
+        self.ospath_full = 'notset'
+        self.os_donefile_path = 'notset'
+        self.just_name_cls = "notset"
+        self.just_stat_cls = "notset"
+        self.gsite_cls = "notset"
 
     def fin_msg(self, asite):
         thishost = app_support_conf.thishost
@@ -124,9 +131,6 @@ class hcode_cls(object):
         fd.write("done")
         fd.close() # file is not immediately deleted because we
 
-    just_name_cls = "notset"
-    just_stat_cls = "notset"
-    gsite_cls = "notset"
 
     def setname(self, jnme):
         self.just_name_cls = jnme
