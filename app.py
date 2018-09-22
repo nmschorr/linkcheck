@@ -8,62 +8,59 @@ import app_support_conf
 import datetime
 
 
-gsite, w_thread= None, None
-lc = linkcheck.LinkCheck()
-thishost=app_support_conf.thishost
-#reg_os_file_path= "r-notsetyet"
-just_name = "notset"
-just_stat = "notset"
-osdonefile = "c-notsetyet"
+
+
 app = Flask(__name__)
 ##app.config['SECRET_KEY'] = 'secret!'
-
-hc_obj = app_support_code.hcode_cls()
 
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 env = Environment(
     loader=PackageLoader('linkcheck', 'templates'),
     autoescape=select_autoescape(['html', 'xml']),
 )
+gc = app_support_code.hcode_cls()
+
 
 def setup():
-    global reg_os_file_path, osdonefile, just_name, just_stat
+    reg_os_file_path, osdonefile = gc.ret_ospaths()
     os_root_path = app.root_path        #os path
-    reg_os_file_path, osdonefile, just_name, just_stat= hc_obj.make_filenames(os_root_path)
+    just_name, just_stat= gc.make_filenames(os_root_path)
+    gc.setname(just_name)
+    gc.setstat(just_stat)
     print("in init - osdonefile: ", osdonefile)
 
-# def setupfile():
-#     global reg_os_file_path, osdonefile, just_name, just_stat
-#     os_root_path = app.root_path        #os path
-#     reg_os_file_path, osdonefile, just_name, just_stat= hc_obj.make_filenames(os_root_path)
-#     print("osdonefile: ", osdonefile)
-
 def notreadyyet():
-    global just_stat, gsite
-    newst= hc_obj.not_ready_msg(gsite)
+    gsite = gc.getgsite()
+    just_stat = gc.getstat()
+    newst= gc.not_ready_msg(gsite)
     fj = open(just_stat, "w")
     fj.write(newst)
     fj.close()
 
 def write_no_err_pg():
-    global just_stat, gsite
-    newstt = hc_obj.fin_msg(gsite)
+    gsite = gc.getgsite()
+    just_stat = gc.getstat()
+    newstt = gc.fin_msg(gsite)
     fjj = open(just_stat, "w")
     fjj.write(newstt)
     fjj.close()
 
 def worker1():   # run LinkCheck and print to console
-        global gsite, reg_os_file_path, just_name, osdonefile
-        print("inside worker1 thread. you entered: ", gsite)
-        answers = lc.main(gsite)
-        time.sleep(5)
-        if len(answers) > 0:
-            hc_obj.writeres(answers, reg_os_file_path, osdonefile)
-        else:
-            print("no errors found")
-            write_no_err_pg()
-        print("passing in to resultn just_name: " + just_name + "  worker1 done")
-        print(datetime.datetime.now())
+    lc = linkcheck.LinkCheck()
+    reg_os_file_path, osdonefile = gc.ret_ospaths()
+    print("osdonefile in worker1: ", osdonefile)
+    gsite = gc.getgsite()
+
+    print("inside worker1 thread. you entered: ", gsite)
+    answers = lc.main(gsite)
+    time.sleep(2)
+    if len(answers) > 0:
+        gc.writeres(answers, reg_os_file_path, osdonefile)
+    else:
+        print("no errors found")
+        write_no_err_pg()
+    dt = datetime.datetime.now()
+    print(dt + "  worker1 done")
 
     #-----------------------------------------------------------------------------
 
@@ -71,16 +68,17 @@ def worker1():   # run LinkCheck and print to console
 
 @app.route('/')
 def index():
-    #setupfile()
     return render_template('index.html')  ## has a form
 
 @app.route('/results', methods = ['POST','GET'])
 @nocache             # very important so client server doesn'w_thread cache results
 def results():
-    global gsite, w_thread, just_name
     setup()
+
     threads = []
     gsite = request.form['name']
+    gc.setgsite(gsite)
+    just_name = gc.getname()
     notreadyyet()
     w_thread = threading.Thread(target=worker1)
     threads.append(w_thread)
