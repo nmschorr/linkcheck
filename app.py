@@ -78,6 +78,7 @@ def index():
 @nocache             # very important so client server doesn'w_thread cache results
 def results():
     global gsite, w_thread, just_name
+    setup()
     threads = []
     gsite = request.form['name']
     notreadyyet()
@@ -87,7 +88,8 @@ def results():
     print("just started thread. root path: " + app.root_path + " you entered: ", gsite)
     return render_template('results.html', name = just_name)  ## has a form
 
-
+import socket
+print(socket.gethostbyaddr(socket.gethostname())[0])
 
 HOSTIP = os.getenv('HOSTIP', default='0.0.0.0')
 HOSTPORT = os.getenv('HOSTPORT', default=8080)
@@ -95,6 +97,5 @@ HOSTPORT = os.getenv('HOSTPORT', default=8080)
 HOSTPORT = 8080
 print("hostip: " + HOSTIP + "  HOSTPORT: ", HOSTPORT)
 debugnow = os.getenv('debug', default=False)
-setup()
 app.run(host=HOSTIP, port=HOSTPORT, debug=True)
 
