@@ -11,11 +11,10 @@ import datetime
 gsite, w_thread= None, None
 lc = linkcheck.LinkCheck()
 thishost=app_support_conf.thishost
-os_DONE_filepath= "c-notsetyet"
-reg_os_file_path= "r-notsetyet"
+#reg_os_file_path= "r-notsetyet"
 just_name = "notset"
 just_stat = "notset"
-
+osdonefile = "c-notsetyet"
 app = Flask(__name__)
 ##app.config['SECRET_KEY'] = 'secret!'
 
@@ -27,10 +26,17 @@ env = Environment(
     autoescape=select_autoescape(['html', 'xml']),
 )
 
-def setupfile():
-    global reg_os_file_path, os_DONE_filepath, just_name, just_stat
+def setup():
+    global reg_os_file_path, osdonefile, just_name, just_stat
     os_root_path = app.root_path        #os path
-    reg_os_file_path, os_DONE_filepath, just_name, just_stat= hc_obj.make_filenames(os_root_path)
+    reg_os_file_path, osdonefile, just_name, just_stat= hc_obj.make_filenames(os_root_path)
+    print("in init - osdonefile: ", osdonefile)
+
+# def setupfile():
+#     global reg_os_file_path, osdonefile, just_name, just_stat
+#     os_root_path = app.root_path        #os path
+#     reg_os_file_path, osdonefile, just_name, just_stat= hc_obj.make_filenames(os_root_path)
+#     print("osdonefile: ", osdonefile)
 
 def notreadyyet():
     global just_stat, gsite
@@ -47,12 +53,12 @@ def write_no_err_pg():
     fjj.close()
 
 def worker1():   # run LinkCheck and print to console
-        global gsite, reg_os_file_path, just_name
+        global gsite, reg_os_file_path, just_name, osdonefile
         print("inside worker1 thread. you entered: ", gsite)
         answers = lc.main(gsite)
         time.sleep(5)
         if len(answers) > 0:
-            hc_obj.writeres(answers, reg_os_file_path)
+            hc_obj.writeres(answers, reg_os_file_path, osdonefile)
         else:
             print("no errors found")
             write_no_err_pg()
@@ -65,7 +71,7 @@ def worker1():   # run LinkCheck and print to console
 
 @app.route('/')
 def index():
-    setupfile()
+    #setupfile()
     return render_template('index.html')  ## has a form
 
 @app.route('/results', methods = ['POST','GET'])
@@ -89,5 +95,6 @@ HOSTPORT = os.getenv('HOSTPORT', default=8080)
 HOSTPORT = 8080
 print("hostip: " + HOSTIP + "  HOSTPORT: ", HOSTPORT)
 debugnow = os.getenv('debug', default=False)
+setup()
 app.run(host=HOSTIP, port=HOSTPORT, debug=True)
 

@@ -13,11 +13,11 @@ function doesFileExist(urlToFile) {
     }
 }
 
-function refreshData() {
-    x = 5;  // 5 Seconds
-    console.log("howdy");
-    setTimeout(refreshData, x*1000);
-}
+//function refreshData() {
+//    x = 5;  // 5 Seconds
+//    console.log("howdy");
+//    setTimeout(refreshData, x*1000);
+//}
 
 function keepchecking() {
     x = 7;  // 5 Seconds

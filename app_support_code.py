@@ -72,16 +72,20 @@ class hcode_cls(object):
 
         sc1 = "<!DOCTYPE html><html><head>"
         sc2 = '<script src=./jscript.js></script>'
-        sc3 = '<script>var doneword ="done" ;  '
-        sc4 = ' var donename=window.location.href + doneword;  '
-        sc5 = ' function checkRefrsh(){ var re=doesFileExist(donename); '
-        sc6 = " if (re==true) { location.reload(true); }}</script>"
-        sc7 = "<title>Not Ready</title>"
-        headr0 = sc1 + sc2 + sc3 + sc4 + sc5 + sc6 + sc7
+        sc3 = '<script>   '
+        sc4 = ' function checkDoneFile(){ '
+        sc5 = ' var dname=window.location.href + "done";  '
+        sc6 = ' var rel=doesFileExist(dname); '
+        sc7 = " if (rel==true) { location.reload(true); }}</script>"
+        sc7b = "<title>Not Ready</title>"
+        headr0 = sc1 + sc2 + sc3 + sc4 + sc5 + sc6 + sc7 + sc7b
 
         st1 = "<style>body {padding-left:10em;}</style></head>"
-        st2 = "<body onload=keepchecking();>"
-        newst = headr0 + st1 + st2 + usr_msg3 + refresh4  + endbod
+        st2 = "<body>   "
+        st2b = "<script>setInterval(checkDoneFile, 2000);</script>"
+
+
+        newst = headr0 + st1 + st2 + st2b + usr_msg3 + refresh4  + endbod
         return newst
 
     def make_filenames(self, ospath):
@@ -93,20 +97,23 @@ class hcode_cls(object):
         os_donefile =  "res" + timestp + ".htmldone"
 
         os_path_plus_stat = path.join(ospath, stat)
-        ospath_full = path.join(os_path_plus_stat, fname_only)
+        ospath_full =      path.join(os_path_plus_stat, fname_only)
         os_donefile_path = path.join(os_path_plus_stat, os_donefile)
+        print("make_filenames os_donefile_path: ", os_donefile_path)
 
         return ospath_full, os_donefile_path, nme_only, nme_plus_static
 
-    def writeres(self, data, fnfull):
+        #  reg_os_file_path, osdonefile, just_name, just_stat
+
+    def writeres(self, data, fnfull, osdonefile_loc):
         global fullpar
-        global cpu_dn_file_path
         f = open(fnfull, "w")
         f.write(fullpar)
         self.datalines(f,data)
         f.close() # file is not immediately deleted because we
         print("reg_os_file_path named: ", fnfull , "f.name: ", f.name)
-        fd = open(cpu_dn_file_path,"w")
+        print("osdonef in writeres: ", osdonefile_loc)
+        fd = open(osdonefile_loc,"w")
         fd.write("done")
         fd.close() # file is not immediately deleted because we
 
