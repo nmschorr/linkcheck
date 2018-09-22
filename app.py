@@ -6,7 +6,7 @@ from nocache import nocache
 import app_support_code
 import app_support_conf
 import datetime
-
+from flask import make_response
 
 
 
@@ -46,6 +46,8 @@ def write_no_err_pg():
     fjj.write(newstt)
     fjj.close()
 
+
+
 def worker1():   # run LinkCheck and print to console
     lc = linkcheck.LinkCheck()
     reg_os_file_path, osdonefile = gc.ret_ospaths()
@@ -64,7 +66,17 @@ def worker1():   # run LinkCheck and print to console
     print(dt + "  worker1 done")
 
     #-----------------------------------------------------------------------------
-
+@app.after_request
+def add_header(response):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "-1"
+    response.headers['Cache-Control'] = 'public, max-age=0'
+    return response
     #-----------------------------------------------------------------------------
 
 @app.route('/')
@@ -84,7 +96,12 @@ def results():
     threads.append(w_thread)
     w_thread.start()
     print("just started thread. root path: " + app.root_path + " you entered: ", gsite)
+    # response = make_response(render_template('results.html', name = just_name) )
+    # add_header(response)
+    # return response
     return render_template('results.html', name = just_name)  ## has a form
+
+
 
 import socket
 print(socket.gethostbyaddr(socket.gethostname())[0])

@@ -13,12 +13,6 @@ function doesFileExist(urlToFile) {
     }
 }
 
-//function refreshData() {
-//    x = 5;  // 5 Seconds
-//    console.log("howdy");
-//    setTimeout(refreshData, x*1000);
-//}
-
 function keepchecking() {
     x = 7;  // 5 Seconds
     console.log("in keepchecking");
@@ -26,6 +20,11 @@ function keepchecking() {
 }
 
 
+//function refreshData() {
+//    x = 5;  // 5 Seconds
+//    console.log("howdy");
+//    setTimeout(refreshData, x*1000);
+//}
 //function checkAndRefresh(){
 //        var done_file = 'http://127.0.0.1:8080/static/res20180919150343.htmldone';
 //        var result = doesFileExist(tfile);
