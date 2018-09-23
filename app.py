@@ -106,7 +106,7 @@ def worker1():   # run LinkCheck and print to console
     site = pc.get_site()
     print("inside worker1 thread. you entered: ", site)
     answers = lc.main(site)
-    time.sleep(4)
+    time.sleep(2)
     if len(answers) > 0:
         AppSupport.writeres(answers, file_path, donefile_path)
     else:
