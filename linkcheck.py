@@ -160,7 +160,6 @@ class LinkCheck(LinkCheckLib):
 
 
     def main(self, a_site="a"):
-        ## reset globals
         self.err_links.clear()
         self.done_ln_gl_sing.clear()
         self.any_link_glob.clear()
@@ -172,8 +171,6 @@ class LinkCheck(LinkCheckLib):
         self.myprint("Starting main with: " + a_site)
         base_only_plain_repeat = 0
         new_base_links_one = 0
-        # for i in globals():
-        #     print(str(i))
         full_addy = ''
         full_addy = self.ckaddymore(a_site)
         new_sorted, repeats, the_len = [], 0, 0
@@ -183,7 +180,8 @@ class LinkCheck(LinkCheckLib):
             #############---------step ONE:
             base_only_plain_repeat = self.get_links(full_addy, full_addy)  #first set of base
             #self.myprint("Step One Done")   ##first time:  HOME PAGE ONLY  ##first time
-            the_len = len(base_only_plain_repeat)
+            if base_only_plain_repeat:
+                the_len = len(base_only_plain_repeat)
             new_base_links_two, new_sorted, new_base_links_one= [], [], base_only_plain_repeat
 
             while the_len and repeats < 6:
