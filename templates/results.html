@@ -11,52 +11,33 @@
 </style>
 </head>
 
-
-<body onload="bodyReady();" style="{padding-left:5em; }" >
-        <!--script src="/templates/varsenv.js" >-->
-<script>
-
-
-</script>
-
+<style>body {padding-left:10em;}</style>
+<body" >
 
 <br>
 <p></p>
-
-
 
 <p></p>
 
 
 <h4>  Click the link below to check your results:</h4>
-<br>
+
 <script>
 var fname = '{{ name }} ';
 var df = document.referrer;
 var statd = "static/"
-var newURL = "<a href=" + df + statd + fname + ">Check for Results</a>";
-document.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+var divy = "<div style=padding-left:2em;>";
+var newURL = "<h1><a href=" + df + statd + fname + ">Click Here for Results</a></h1>";
+document.write(divy);
 
 document.write(newURL);
-document.write("<br>");
+document.write("</div>");
 document.write("<p></p>");
-document.write(homeURL);
 </script>
 
-
-
-<script>
-
-
-</script>
-
-
-
-<br>
-
-
-   <h4> This might take up to 10+ mins for larger websites.</h4>
-
+<div style=padding-left:5em;>
+   <h4><i> This might take up to 10+ mins for larger websites.</i></h4>
+</div>
 
 </body>
 
@@ -64,7 +45,6 @@ document.write(homeURL);
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="-1" />
-
 
 </head>
 
