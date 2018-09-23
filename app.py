@@ -54,6 +54,7 @@ def create_app():
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     osroot = app.root_path  # os path
 
+
     # just_name, just_stat, donefile, file_path, donefile_path = AppSupport.make_filenames(app, osroot )
     #
     # pc.set_just_name(just_name)
@@ -154,6 +155,10 @@ def results():
     just_name = pc.get_just_name()
     return render_template('results.html', name = just_name)  ## has a form
 
+# @app.after_request
+# def apply_caching(response):
+#     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+#     return response
 
 
 import socket
@@ -165,7 +170,6 @@ HOSTPORT = os.getenv('HOSTPORT', default=8080)
 HOSTPORT = 8080
 print("hostip: " + HOSTIP + "  HOSTPORT: ", HOSTPORT)
 debugnow = os.getenv('debug', default=False)
-
-
 app.run(host=HOSTIP, port=HOSTPORT, debug=True)
+
 
