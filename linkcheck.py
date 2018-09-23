@@ -12,12 +12,11 @@ class LinkCheck(LinkCheckLib):
     def __init__(self):
         super().__init__()
         datet = datetime.now()
-        base_lnks_g = []
-        self.base_lnks_g = base_lnks_g
-        self.err_links.clear()
-        self.done_ln_gl_sing.clear()
-        self.any_link_glob.clear()
-        self.base_lnks_g.clear()
+        self.base_lnks_g = None
+        self.err_links = None
+        self.done_ln_gl_sing = None
+        self.any_link_glob = None
+        self.base_lnks_g = None
 
 
     def get_simple_response(self, lin_and_par_tup):
@@ -45,7 +44,7 @@ class LinkCheck(LinkCheckLib):
     #---------------------------------------------------------------------------------------
     def add_any_bse_g(self, zlink, parent_local):  # Adding this base link to base glob
 
-        if self.base_lnks_g == 0:
+        if self.base_lnks_g == None:
             self.base_lnks_g = []
         try:
             if self.base_lnks_g:
@@ -62,7 +61,7 @@ class LinkCheck(LinkCheckLib):
     #---------------------------------------------------------------------------------------
     def add_any(self, tlink, parent_local, any_link_loc=0):  # Adding this base link to any glob
         global any_link_glob
-        if any_link_loc == 0:
+        if any_link_loc == None:
             any_link_loc = []
         try:
             if any_link_glob:  # don'w_thread try without something there
@@ -167,8 +166,8 @@ class LinkCheck(LinkCheckLib):
         global any_link_glob
         global done_ln_gl_sing
 
-        done_ln_gl_sing.clear()
-        any_link_glob.clear()
+        done_ln_gl_sing = None
+        any_link_glob = None
 
         self.myprint("Starting main with: " + a_site)
         base_only_plain_repeat = 0
@@ -218,7 +217,7 @@ class LinkCheck(LinkCheckLib):
         tup = ()
         try:
             #self.myprint("Step Two Done")
-            any_link_to_check = 0
+            any_link_to_check = []
             any_link_to_check = list(any_link_glob)
 
             any_link_to_check = list(set(any_link_to_check))
@@ -227,12 +226,14 @@ class LinkCheck(LinkCheckLib):
             for tup in self.base_lnks_g:
                 self.get_simple_response(tup)
 
+        except TypeError:
+            pass
+        except IndexError:
+            pass
         except Exception as e:
             self.handle_exc(e, tup[0] ,tup[1])
 
         finlist = self.print_errs()
-        # self.write_some_contents(self.base_lnks_g, "self.base_lnks_g")
-        #self.write_some_contents(self.done_ln_gl_sing, "done_ln_gl_sing")
         #self.myprint("totalTime: " + str(perf_counter() - tstart_main))
         #x = len(self.done_ln_gl_sing)
         #self.myprint("errors: " + str(x))

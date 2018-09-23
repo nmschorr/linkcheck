@@ -1,3 +1,3 @@
 # python 3
-done_ln_gl_sing = []
+done_ln_gl_sing = None
 

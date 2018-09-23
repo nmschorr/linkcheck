@@ -60,12 +60,9 @@ class AppSupport:
 
     @classmethod
     def not_ready_msg(cls, gsite):
-        usr_msg3 = "Results not ready yet." + '<p></p>' + "You entered: " + gsite + '<p></p>' + \
-                 "Page will automatically reload until results appear." + '<p></p>'
 
         arf1 = "<a href="
         jst2 = "javascript:location.reload(true)"
-        refresh4 = arf1 + jst2 + ">Refresh this page</a>"
 
         sc1 = "<!DOCTYPE html><html><head>"
         sc2 = '<script src=./jscript.js></script>'
@@ -75,13 +72,16 @@ class AppSupport:
         sc6 = ' var rel=doesFileExist(dname); '
         sc7 = " if (rel==true) { location.reload(true); }}</script>"
         sc7b = "<title>Not Ready</title>"
-        headr0 = sc1 + sc2 + sc3 + sc4 + sc5 + sc6 + sc7 + sc7b
+        toppt = sc1 + sc2 + sc3 + sc4 + sc5 + sc6 + sc7 + sc7b
 
         st1 = "<style>body {padding-left:10em;}</style></head>"
         st2 = "<body>   "
-        st2b = "<script>setInterval(checkDoneFile, 2000);</script>"
-        newst = headr0 + st1 + st2 + st2b + usr_msg3 + refresh4 + "</body></html>"
-        return newst
+        st3 = "<script>setInterval(checkDoneFile, 2000);</script>"
+        st4 = "Results not ready yet." + '<p></p>' + "You entered: " + gsite + '<p></p>' + \
+                   "Page will automatically reload until results appear." + '<p></p>'
+        refrsh_pg = arf1 + jst2 + ">Refresh this page</a>"
+        whole_page = toppt + st1 + st2 + st3 + st4 + refrsh_pg + "</body></html>"
+        return whole_page
 
     @classmethod
     def make_filenames(cls, app, osroot):

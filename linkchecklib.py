@@ -1,34 +1,23 @@
 
 from urllib.parse import urlsplit
 from requests_html import HTMLSession
+import logging
 
-any_link_glob=[]
-done_ln_gl_sing = []
+#any_link_glob=[]
+#done_ln_gl_sing = []
 _MYDEBUG = 1
 
 class LinkCheckLib(object):
-    ###from config import any_link_glob, err_links, _MYDEBUG
 
     def __init__(self):
-        #print("yes")
-        err_links = []
-        self.err_links = err_links
-        self.base_lnks_g = []
-        self.done_ln_gl_sing = []
-        tlds_list = []
-        self.tlds_list = tlds_list
-        self.done_ln_gl_sing = done_ln_gl_sing
-        self.done_ln_gl_sing = []
-        self.any_link_glob = any_link_glob
-        self.any_link_glob = []
+        self.err_links = None
+        self.base_lnks_g = None
+        self.tlds_list = None
+        self.done_ln_gl_sing = None
+        self.any_link_glob = None
 
-        self.err_links.clear()
-        self.done_ln_gl_sing.clear()
-        self.any_link_glob.clear()
-        self.base_lnks_g.clear()
 
     #-----------------------------------------------------------------------------
-
 
     @classmethod
     def ispar(cls, thisln, par_loc):   # is it a parent? part of the main website?
@@ -68,7 +57,7 @@ class LinkCheckLib(object):
     
     def print_errs(self):
 
-        if self.err_links == 0:
+        if self.err_links == None:
             self.err_links = []
         if self.err_links:
             answer_string, e, fin_list = '', '', []
@@ -97,7 +86,7 @@ class LinkCheckLib(object):
     # -----------------------------------------------------------------------
     @classmethod
     def ck_base(cls, this_link, thebase_part, base_links_local=0):
-        if base_links_local == 0:
+        if base_links_local == None:
             base_links_local = []
         _IS_BASE = False
         in_base_loc = False
@@ -155,31 +144,8 @@ class LinkCheckLib(object):
         return good_or_bad, good_suffix
 
     # #-----------------------------------------------------------------------------
-    # def websocket_done_msg(self):
-    #     from websocket import create_connection
-    #     ws = create_connection("ws://localhost:8080/results")
-    #     print("sending done via websocket")
-    #     ws.send("done")
-    #     result = ws.recv()
-    #     print("Received '%s'" % result)
-    #     ws.close()
-    # #-----------------------------------------------------------------------------
 
-    #def check_for_bad_data(cls, alink, done_lnks_gl=0):
     def check_for_bad_data(self, alink):
-        # global done_ln_gl_sing
-        #
-        # if self.done_ln_gl_sing == 0:
-        #     done_ln_gl_sing = []
-        #     self.myprint("!!!!!=============inside check_for_bad_data. val of link: " + alink)
-        # try:
-        #     if done_ln_gl_sing:
-        #         done_ln_gl_sing.append(alink)  ## add to main done list
-        #
-        #     else:
-        #         done_ln_gl_sing = [alink]
-        # except Exception as e:
-        #     self.myprint("Exception check_for_bad_data: " + str(e))
         print("")
         return
     #-----------------------------------------------------------------------------
@@ -204,15 +170,22 @@ class LinkCheckLib(object):
 
     def myprint(self, print_str):
         global _MYDEBUG
-        if _MYDEBUG:
-            print(print_str)
+        if not _MYDEBUG:
+            logging.info(print_str)
+        else:
+            logging.debug(print_str)
+
+
     #-----------------------------------------------------------------------------
 
     @classmethod
     def myprinter(cls, print_str):
         global _MYDEBUG
-        if _MYDEBUG:
-            print(print_str)
+        if not _MYDEBUG:
+            logging.info(print_str)
+        else:
+            logging.debug(print_str)
+
     #-----------------------------------------------------------------------------
 
     def load_tlds(self):
