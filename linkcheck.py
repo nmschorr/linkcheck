@@ -14,6 +14,10 @@ class LinkCheck(LinkCheckLib):
         datet = datetime.now()
         base_lnks_g = []
         self.base_lnks_g = base_lnks_g
+        self.err_links.clear()
+        self.done_ln_gl_sing.clear()
+        self.any_link_glob.clear()
+        self.base_lnks_g.clear()
 
 
     def get_simple_response(self, lin_and_par_tup):
@@ -160,14 +164,12 @@ class LinkCheck(LinkCheckLib):
 
 
     def main(self, a_site="a"):
-        self.err_links.clear()
-        self.done_ln_gl_sing.clear()
-        self.any_link_glob.clear()
         global any_link_glob
         global done_ln_gl_sing
-        self.base_lnks_g.clear()
+
         done_ln_gl_sing.clear()
         any_link_glob.clear()
+
         self.myprint("Starting main with: " + a_site)
         base_only_plain_repeat = 0
         new_base_links_one = 0

@@ -54,14 +54,22 @@ def create_app():
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     osroot = app.root_path  # os path
 
-    just_name, just_stat, donefile, file_path, donefile_path = AppSupport.make_filenames(app, osroot )
-
-    pc.set_just_name(just_name)
-    pc.set_just_stat(just_stat)
-    pc.set_donefile(donefile)
-    pc.set_file_path(file_path)
-    pc.set_donefile_path(donefile_path)
+    # just_name, just_stat, donefile, file_path, donefile_path = AppSupport.make_filenames(app, osroot )
+    #
+    # pc.set_just_name(just_name)
+    # pc.set_just_stat(just_stat)
+    # pc.set_donefile(donefile)
+    # pc.set_file_path(file_path)
+    # pc.set_donefile_path(donefile_path)
     return app
+
+def cleanup():
+    pc.set_just_name("empty")
+    pc.set_just_stat("empty")
+    pc.set_donefile("empty")
+    pc.set_file_path("empty")
+    pc.set_donefile_path("empty")
+    pc.set_site("empty")
 
 app = create_app()
 
@@ -90,13 +98,14 @@ def write_no_err_pg(ste):
 def worker1():   # run LinkCheck and print to console
     from app_support_code import AppSupport
     lc = linkcheck.LinkCheck()
+    lc.__init__()
     file_path = pc.get_file_path()
     donefile_path = pc.get_donefile_path()
     print("donefile in worker1: ", donefile_path)
     site = pc.get_site()
     print("inside worker1 thread. you entered: ", site)
     answers = lc.main(site)
-    time.sleep(2)
+    time.sleep(4)
     if len(answers) > 0:
         AppSupport.writeres(answers, file_path, donefile_path)
     else:
@@ -104,6 +113,9 @@ def worker1():   # run LinkCheck and print to console
         write_no_err_pg()
     dt = str(datetime.datetime.now())
     print(dt + "  worker1 done")
+    cleanup()
+    file_path = pc.get_file_path()
+    print("at end value of file_path: ", file_path)
 
     #-----------------------------------------------------------------------------
 
@@ -111,6 +123,17 @@ def worker1():   # run LinkCheck and print to console
 # def add_header(response):
 #     return response
     #-----------------------------------------------------------------------------
+def set_names(site):
+    pc.set_site(site)
+    osroot = app.root_path  # os path
+
+    just_name, just_stat, donefile, file_path, donefile_path = AppSupport.make_filenames(app, osroot)
+    pc.set_just_name(just_name)
+    pc.set_just_stat(just_stat)
+    pc.set_donefile(donefile)
+    pc.set_file_path(file_path)
+    pc.set_donefile_path(donefile_path)
+
 
 @app.route('/')
 def index():
@@ -120,14 +143,13 @@ def index():
 @nocache             # very important so client server doesn'w_thread cache results
 def results():
     site = request.form['name']
-    pc.set_site(site)
+    set_names(site)
     notreadyyet(site)
-
     threads = []
     w_thread = threading.Thread(target=worker1)
     threads.append(w_thread)
     w_thread.start()
-    print("just started thread. root path: " + app.root_path + " you entered: ", site)
+    print("just started thread. You entered: ", site)
 
     just_name = pc.get_just_name()
     return render_template('results.html', name = just_name)  ## has a form

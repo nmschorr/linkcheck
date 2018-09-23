@@ -13,10 +13,20 @@ class LinkCheckLib(object):
         #print("yes")
         err_links = []
         self.err_links = err_links
+        self.base_lnks_g = []
+        self.done_ln_gl_sing = []
         tlds_list = []
         self.tlds_list = tlds_list
         self.done_ln_gl_sing = done_ln_gl_sing
+        self.done_ln_gl_sing = []
         self.any_link_glob = any_link_glob
+        self.any_link_glob = []
+
+        self.err_links.clear()
+        self.done_ln_gl_sing.clear()
+        self.any_link_glob.clear()
+        self.base_lnks_g.clear()
+
     #-----------------------------------------------------------------------------
 
 
