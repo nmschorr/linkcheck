@@ -1,8 +1,6 @@
 from os import path
 from datetime import datetime
 import app_support_conf
-from flask import g
-
 
 class AppSupport:
 

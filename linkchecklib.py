@@ -7,15 +7,25 @@ import logging
 #done_ln_gl_sing = []
 _MYDEBUG = 1
 
+
+class mem(object):
+    err_links = None
+    done_ln_gl_sing = None
+    any_link_glob = None
+    base_lnks_g = None
+
 class LinkCheckLib(object):
 
     def __init__(self):
-        self.err_links = None
-        self.base_lnks_g = None
-        self.tlds_list = None
-        self.done_ln_gl_sing = None
-        self.any_link_glob = None
+        memg = mem()
+        self.memg = memg
+        tlds_list = None
 
+        self.memg.err_links = memg.err_links
+        self.memg.done_ln_gl_sing = memg.done_ln_gl_sing
+        self.memg.any_link_glob = memg.any_link_glob
+        self.memg.base_lnks_g = memg.base_lnks_g
+        self.tlds_list = tlds_list
 
     #-----------------------------------------------------------------------------
 
@@ -27,8 +37,8 @@ class LinkCheckLib(object):
             return False # is it the parent?
 
     #-----------------------------------------------------------------------------
-
-    def write_some_contents(self, contnt, nme):
+    @staticmethod
+    def write_some_contents(contnt, nme):
         fname = str(nme) + ".log"
         wf = open(fname, "w")
         for i in contnt:
@@ -38,15 +48,13 @@ class LinkCheckLib(object):
 
 
     def ck_g(self, this_link):
-        global any_link_glob
-        return bool(this_link in [i[0] for i in any_link_glob])
+        return bool(this_link in [i[0] for i in self.memg.any_link_glob])
 
     #-----------------------------------------------------------------------------
 
      
     def _DONE_YET(self, this_link):
-        global done_ln_gl_sing
-        return bool(this_link in done_ln_gl_sing)
+        return bool(this_link in self.memg.done_ln_gl_sing)
     #-----------------------------------------------------------------------------
 
     @classmethod
@@ -57,16 +65,16 @@ class LinkCheckLib(object):
     
     def print_errs(self):
 
-        if self.err_links == None:
-            self.err_links = []
-        if self.err_links:
+        if self.memg.err_links is None:
+            self.memg.err_links = []
+        if self.memg.err_links:
             answer_string, e, fin_list = '', '', []
             try:
-                if self.err_links:
-                    errs = list(set(self.err_links))
+                if self.memg.err_links:
+                    errs = list(set(self.memg.err_links))
                     er_len = len(errs)
                     nstring = "\nTotal errors: " + str(er_len) + " Here are the errors ---:"
-                    self.myprint(nstring)
+                    LinkCheckLib.myprint(nstring)
                     errs22 = sorted(errs, key=lambda x: x[0])  # sort on first
                     errs2 = set(errs22)
                     for e in errs2:
@@ -74,11 +82,11 @@ class LinkCheckLib(object):
 
                         answer_string = [an0, an1, an2]
                         fin_list.append(answer_string)
-                        self.myprint(str(answer_string))
+                        LinkCheckLib.myprint(str(answer_string))
                 else:
                     fin_list = [answer_string]
             except Exception as e:
-                self.myprint('Exception print_errs: ' + str(e))
+                LinkCheckLib.myprint('Exception print_errs: ' + str(e))
             return fin_list
         else:
             return []
@@ -86,7 +94,7 @@ class LinkCheckLib(object):
     # -----------------------------------------------------------------------
     @classmethod
     def ck_base(cls, this_link, thebase_part, base_links_local=0):
-        if base_links_local == None:
+        if base_links_local is None:
             base_links_local = []
         _IS_BASE = False
         in_base_loc = False
@@ -107,14 +115,12 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------
 
     def do_response(self, a_link, p_link):
-        global done_ln_gl_sing
         t_err = 0
-        #resp = rt.HTMLResponse
         resp = "0"
         try:
-            if a_link not in done_ln_gl_sing:
-                self.myprint("-starting-get_home_links - just got this link: " + str(a_link))
-                done_ln_gl_sing.append(a_link)  ## add to main done list
+            if a_link not in self.memg.done_ln_gl_sing:
+                LinkCheckLib.myprint("-starting-get_home_links - just got this link: " + str(a_link))
+                self.memg.done_ln_gl_sing.append(a_link)  ## add to main done list
                 session = HTMLSession()
                 resp = session.get(a_link)
                 t_err = self.ck_status_code(resp, a_link)  ## if there's    an error
@@ -122,14 +128,14 @@ class LinkCheckLib(object):
 
         except Exception as e:
             self.handle_exc(e, a_link, p_link)
-            self.myprint("GOT AN EXCEPTION inside do_response")
+            LinkCheckLib.myprint("GOT AN EXCEPTION inside do_response")
             return resp, t_err
         return resp, t_err
 
     #----------------------------------------------------------------------get_links-
 
     def ck_bad_data(self, dlink):
-        self.myprint("!!!!!=============inside ck_bad_data. val of link: " + dlink)
+        LinkCheckLib.myprint("!!!!!=============inside ck_bad_data. val of link: " + dlink)
         good_or_bad = 0
         mylist = ['#', 'tel:+']
         try:
@@ -137,17 +143,17 @@ class LinkCheckLib(object):
                 if item in dlink:
                     good_or_bad += 1
         except Exception as e:
-            self.myprint("Exception ck_bad_data: " + str(e))
+            LinkCheckLib.myprint("Exception ck_bad_data: " + str(e))
 
         good_suffix = self.has_correct_suffix(dlink)  # check suffix
-        self.myprint("!inside ck_bad_data: " + str(good_or_bad) + ' ' + str(good_suffix))
+        LinkCheckLib.myprint("!inside ck_bad_data: " + str(good_or_bad) + ' ' + str(good_suffix))
         return good_or_bad, good_suffix
 
     # #-----------------------------------------------------------------------------
 
-    def check_for_bad_data(self, alink):
-        print("")
-        return
+    # def check_for_bad_data(self, alink):
+    #     print("")
+    #     return
     #-----------------------------------------------------------------------------
 
     def has_correct_suffix(self, link):
@@ -164,11 +170,12 @@ class LinkCheckLib(object):
             if answ == True or answ2 == True:
                 final_answer = True
         except Exception as e:
-            self.myprint("Exception in has_correct_suffix: " + str(e))
+            LinkCheckLib.myprint("Exception in has_correct_suffix: " + str(e))
         return final_answer
     #-----------------------------------------------------------------------------
 
-    def myprint(self, print_str):
+    @staticmethod
+    def myprint(print_str):
         global _MYDEBUG
         if not _MYDEBUG:
             logging.info(print_str)
@@ -178,13 +185,13 @@ class LinkCheckLib(object):
 
     #-----------------------------------------------------------------------------
 
-    @classmethod
-    def myprinter(cls, print_str):
-        global _MYDEBUG
-        if not _MYDEBUG:
-            logging.info(print_str)
-        else:
-            logging.debug(print_str)
+    # @classmethod
+    # def myprinter(cls, print_str):
+    #     global _MYDEBUG
+    #     if not _MYDEBUG:
+    #         logging.info(print_str)
+    #     else:
+    #         logging.debug(print_str)
 
     #-----------------------------------------------------------------------------
 
@@ -205,13 +212,13 @@ class LinkCheckLib(object):
 
     def handle_exc( self, e, link, plink):
         tempstr = str(e)
-        self.myprint('!!!!! Inside handle_exc. Error------------------\n' + tempstr)
+        LinkCheckLib.myprint('!!!!! Inside handle_exc. Error------------------\n' + tempstr)
         if "Document is empty" in tempstr:  # for mp3 and similar files
             return
         if "object has no attribute" in tempstr:  # for mp3 and similar files
             return
-        elif link not in self.err_links:
-            self.err_links.append((link, tempstr[:42], plink))
+        elif link not in self.memg.err_links:
+            self.memg.err_links.append((link, tempstr[:42], plink))
     #-----------------------------------------------------------------------------
 
 
@@ -220,12 +227,12 @@ class LinkCheckLib(object):
             tlink = response.html.url
             err_codes = [400, 404, 408, 409]
             if response.status_code in err_codes:
-                if tlink not in self.err_links:
-                    self.err_links.append((tlink, response.status_code, tpar))
+                if tlink not in self.memg.err_links:
+                    self.memg.err_links.append((tlink, response.status_code, tpar))
                 return 1
             else: return 0  # ok
         except Exception as e:
-            self.myprint("Exception in ck_status_code: " + str(e))
+            LinkCheckLib.myprint("Exception in ck_status_code: " + str(e))
 
     #-----------------------------------------------------------------------------
 
@@ -269,11 +276,11 @@ class LinkCheckLib(object):
             if thebase_part_local.startswith('www'):
                 thebase_part_local = thebase_part_local[4:]
         except Exception as e:
-            cls.myprinter('Exception divide_url: ' + str(e))
+            LinkCheckLib.myprint('Exception divide_url: ' + str(e))
 
         return thebase_part_local
 
     # def reset_timer( name, tstart):
-    #     self.myprint(name, perf_counter() - tstart)
+    #     LinkCheckLib.myprint(name, perf_counter() - tstart)
     #     #tstart = perf_counter()
     #     return tstart
