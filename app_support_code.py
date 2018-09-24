@@ -57,7 +57,7 @@ class AppSupport:
 
 
     @classmethod
-    def not_ready_msg(cls, gsite):
+    def not_ready_msg(cls, gsite, dname):
 
         arf1 = "<a href="
         jst2 = "javascript:location.reload(true)"
@@ -66,7 +66,9 @@ class AppSupport:
         sc2 = '<script src=./jscript.js></script>'
         sc3 = '<script>   '
         sc4 = ' function checkDoneFile(){ '
-        sc5 = ' var dname=window.location.href + "done";  '
+        #sc5 = ' var dname=window.location.href + "done";  '
+
+        sc5 = ' var dname=' + dname
         sc6 = ' var rel=doesFileExist(dname); '
         sc7 = " if (rel==true) { location.reload(true); }}</script>"
         sc7b = "<title>Not Ready</title>"

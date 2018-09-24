@@ -41,10 +41,9 @@ env = Environment(
     autoescape=select_autoescape(['html', 'xml']),
 )
 
-def notreadyyet(ste, pc):
-    newst= AppSupport.not_ready_msg(ste)
-    just_stat = pc.get_just_stat()
-
+def notreadyyet(ste, just_stat):
+    ### start here
+    newst= AppSupport.not_ready_msg(ste, )
     fj = open(just_stat, "w")
     fj.write(newst)
     fj.close()
@@ -62,29 +61,32 @@ def worker1(site, timestmp, jname):   # run LinkCheck and print to console
 
     pc = createpc()
     set_names(pc, site, timestmp, jname)
-    notreadyyet(site, pc)
+    just_stat = pc.just_stat
+    notreadyyet(site, just_stat)
 
     lc = linkcheck.LinkCheck()
-    #lc.__init__()
+    lc.__init__()
     file_path = pc.get_file_path()
     donefile_path = pc.get_donefile_path()
     print("donefile:", donefile_path)
    # logging.debug("donefile in worker1: " + donefile_path)
     #logging.debug("inside worker1 thread. you entered: " + site)
     answers = lc.main(site)
-    time.sleep(2)
+    time.sleep(1)
     if len(answers) > 0:
         AppSupport.writeres(answers, file_path, donefile_path)
     else:
         #logging.debug("no errors found")
         write_no_err_pg("no errors found", pc)
-    #dt = str(datetime.datetime.now())
-    #logging.debug( dt + "  worker1 done")
+    dt = str(datetime.datetime.now())
+    print( dt + "  worker1 done")
     #cleanup(pc)
+    #time.sleep(5)
+    #lc.__init__()
+
     #file_path = pc.get_file_path()
     #print("at end value of file_path: " + file_path)
-    #del lc
-    #del pc
+
 
     #-----------------------------------------------------------------------------
 

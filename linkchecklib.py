@@ -14,10 +14,17 @@ class mem(object):
     any_link_glob = []
     base_lnks_g = []
 
+    def __init__(self):
+        err_links = []
+        done_ln_gl_sing = []
+        any_link_glob = []
+        base_lnks_g = []
+
 class LinkCheckLib(object):
 
     def __init__(self):
         memg = mem()
+        memg.__init__()
         self.memg = memg
         tlds_list = []
 
