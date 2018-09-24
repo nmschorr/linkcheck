@@ -13,9 +13,9 @@ class LinkCheck(LinkCheckLib):
         super().__init__()
         datet = datetime.now()
         #self.err_links = None
-        self.memg.done_ln_gl_sing = None
-        self.memg.any_link_glob = None
-        self.memg.base_lnks_g = None
+        self.memg.done_ln_gl_sing = []
+        self.memg.any_link_glob = []
+        self.memg.base_lnks_g = []
 
 
     def get_simple_response(self, lin_and_par_tup):
@@ -161,11 +161,11 @@ class LinkCheck(LinkCheckLib):
 
     def main(self, a_site="a.htm"):
         LinkCheckLib.myprint("Starting main with: " + a_site)
-        base_only_plain_repeat = None
-        new_base_links_one = None
-        full_addy = None
+        base_only_plain_repeat = []
+        new_base_links_one = []
+        full_addy = []
         full_addy = self.ckaddymore(a_site)
-        new_sorted, repeats, the_len = [], 0, None
+        new_sorted, repeats, the_len = [], 0, 0
         #tstart_main = perf_counter()
         LinkCheckLib.myprint('In main() STARTING OVER Getting first address: ' + full_addy)
         try:

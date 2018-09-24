@@ -68,6 +68,7 @@ def worker1(site, timestmp, jname):   # run LinkCheck and print to console
     #lc.__init__()
     file_path = pc.get_file_path()
     donefile_path = pc.get_donefile_path()
+    print("donefile:", donefile_path)
    # logging.debug("donefile in worker1: " + donefile_path)
     #logging.debug("inside worker1 thread. you entered: " + site)
     answers = lc.main(site)
@@ -91,13 +92,13 @@ def worker1(site, timestmp, jname):   # run LinkCheck and print to console
 # def add_header(response):
 #     return response
     #-----------------------------------------------------------------------------
-def set_names(pc, site, justn, timestp4):
+def set_names(pc, site, timestp4, justn):
     just_name = justn
     pc.set_timestp(timestp4)
     pc.set_site(site)
     pc.set_just_name(just_name)
     osroot = app.root_path  # os path
-    just_stat, donefile, file_path, donefile_path = AppSupport.make_filenames(osroot, pc)
+    just_stat, donefile, file_path, donefile_path = AppSupport.make_filenames(osroot, timestp4, just_name)
     pc.set_just_stat(just_stat)
     pc.set_donefile(donefile)
     pc.set_file_path(file_path)
@@ -118,7 +119,7 @@ def results():
         threads = []
         timestp1 = format(datetime.datetime.now(), '%Y%m%d%H%M%S')
         just_name = "res" + timestp1 + ".html"
-        w_thread = threading.Thread(target=worker1, args=(site,just_name, timestp1))
+        w_thread = threading.Thread(target=worker1, args=(site,timestp1, just_name))
         threads.append(w_thread)
         w_thread.start()
         print("just started thread. You entered: " + site)

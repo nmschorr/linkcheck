@@ -82,13 +82,13 @@ class AppSupport:
         return whole_page
 
     @classmethod
-    def make_filenames(cls, osroot, pc):
+    def make_filenames(cls, osroot, timestp, just_name2):
         stat = "static"
-        just_stat = path.join(stat, pc.just_name)
-        donef_name =  "res" + pc.timestp + ".htmldone"
+        just_stat = path.join(stat, just_name2)
+        donef_name =  "res" + timestp + ".htmldone"
 
         os_path_plus_stat = path.join(osroot, stat)
-        file_os_path_all = path.join(os_path_plus_stat, pc.just_name)
+        file_os_path_all = path.join(os_path_plus_stat, just_name2)
         os_donefile_path = path.join(os_path_plus_stat, donef_name)
         print("make_filenames os_donefile_path: ", os_donefile_path)
         return just_stat, donef_name, file_os_path_all, os_donefile_path

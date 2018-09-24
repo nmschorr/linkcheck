@@ -9,17 +9,17 @@ _MYDEBUG = 1
 
 
 class mem(object):
-    err_links = None
-    done_ln_gl_sing = None
-    any_link_glob = None
-    base_lnks_g = None
+    err_links = []
+    done_ln_gl_sing = []
+    any_link_glob = []
+    base_lnks_g = []
 
 class LinkCheckLib(object):
 
     def __init__(self):
         memg = mem()
         self.memg = memg
-        tlds_list = None
+        tlds_list = []
 
         self.memg.err_links = memg.err_links
         self.memg.done_ln_gl_sing = memg.done_ln_gl_sing
@@ -93,7 +93,7 @@ class LinkCheckLib(object):
 
     # -----------------------------------------------------------------------
     @classmethod
-    def ck_base(cls, this_link, thebase_part, base_links_local=0):
+    def ck_base(cls, this_link, thebase_part, base_links_local=None):
         if base_links_local is None:
             base_links_local = []
         _IS_BASE = False
@@ -181,6 +181,7 @@ class LinkCheckLib(object):
             logging.info(print_str)
         else:
             logging.debug(print_str)
+            print(print_str)
 
 
     #-----------------------------------------------------------------------------
