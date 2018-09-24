@@ -1,5 +1,5 @@
 from os import path
-from datetime import datetime
+import datetime
 import app_support_conf
 
 class AppSupport:
@@ -82,20 +82,16 @@ class AppSupport:
         return whole_page
 
     @classmethod
-    def make_filenames(cls, app, osroot):
+    def make_filenames(cls, osroot, pc):
         stat = "static"
-        timestp = format(datetime.now(), '%Y%m%d%H%M%S')
-        fname_only = "res" + timestp + ".html"
-        with app.app_context():
-            just_name = "res" + timestp + ".html"
-            just_stat = path.join(stat, just_name)
-            donef_name =  "res" + timestp + ".htmldone"
+        just_stat = path.join(stat, pc.just_name)
+        donef_name =  "res" + pc.timestp + ".htmldone"
 
-            os_path_plus_stat = path.join(osroot, stat)
-            file_os_path_all = path.join(os_path_plus_stat, fname_only)
-            os_donefile_path = path.join(os_path_plus_stat, donef_name)
-            print("make_filenames os_donefile_path: ", os_donefile_path)
-            return just_name, just_stat, donef_name, file_os_path_all, os_donefile_path
+        os_path_plus_stat = path.join(osroot, stat)
+        file_os_path_all = path.join(os_path_plus_stat, pc.just_name)
+        os_donefile_path = path.join(os_path_plus_stat, donef_name)
+        print("make_filenames os_donefile_path: ", os_donefile_path)
+        return just_stat, donef_name, file_os_path_all, os_donefile_path
 
 
     @classmethod

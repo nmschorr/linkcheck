@@ -7,6 +7,7 @@ class ProdConfig(object):
     donefile_path = "empty"
     donefile = "empty"
     file_path = "empty"
+    timestp = "empty"
 
     def set_site(self, site):
         self.site = site
@@ -32,3 +33,7 @@ class ProdConfig(object):
         self.donefile_path = donefile_path
     def get_donefile_path(self):
         return self.donefile_path
+    def set_timestp(self, timestp):
+        self.donefile_path = timestp
+    def get_timestp(self):
+        return self.timestp
