@@ -54,6 +54,8 @@ def notreadyyet(ste, just_stat):
 def write_no_err_pg(ste, pc):
     just_stat = pc.get_just_stat()
     newstt = AppSupport.fin_msg(ste)
+
+    newstt = AppSupport.fin_msg(ste)
     fjj = open(just_stat, "w")
     fjj.write(newstt)
     fjj.close()
@@ -122,6 +124,7 @@ def index():
 @nocache             # very important so client server doesn'w_thread cache results
 def results():
     with app.app_context():
+        just_name = ''
         try:
             site = request.form['name']
             threads = []

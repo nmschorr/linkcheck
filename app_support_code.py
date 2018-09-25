@@ -2,7 +2,7 @@ from os import path
 import datetime
 import app_support_conf
 
-class AppSupport():
+class AppSupport:
 
     @staticmethod
     def fin_msg(asite):

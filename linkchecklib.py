@@ -2,7 +2,7 @@
 from urllib.parse import urlsplit
 from requests_html import HTMLSession
 import logging
-import app_main
+
 #any_link_glob=[]
 #done_ln_gl_sing = []
 _MYDEBUG = 1
@@ -20,7 +20,7 @@ class mem(object):
         any_link_glob = []
         base_lnks_g = []
 
-class LinkCheckLib(app_main):
+class LinkCheckLib(object):
 
     def __init__(self):
         memg = mem()
@@ -33,6 +33,7 @@ class LinkCheckLib(app_main):
         self.memg.any_link_glob = memg.any_link_glob
         self.memg.base_lnks_g = memg.base_lnks_g
         self.tlds_list = tlds_list
+
 
     #-----------------------------------------------------------------------------
 
@@ -70,8 +71,7 @@ class LinkCheckLib(app_main):
     #-----------------------------------------------------------------------------
 
     
-    def print_errs(self):
-
+    def return_errors(self):
 
         finlist = []
         if self.memg.err_links is None:
