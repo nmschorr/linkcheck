@@ -6,7 +6,7 @@ from time import sleep
 #import logging
 
 
-_MYDEBUG = 0
+_MYDEBUG = 1
 
 
 class LinkCheckLib(object):

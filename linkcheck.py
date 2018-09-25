@@ -2,22 +2,13 @@
 # Nancy Schorr, 2018
 # this file is in active development
 #from time import perf_counter
-#import requests_html as rt
-
 from linkchecklib import *
 import requests
-
-
-
 
 class LinkCheck(LinkCheckLib):
 
     def __init__(self):
         super().__init__()
-        # done_ln_gl_sing = []
-        # any_link_glob = []
-        # base_lnks_g = []
-
 
     def get_simple_response(self, lin_and_par_tup):
         link_count, stat = 0, 0
@@ -32,7 +23,6 @@ class LinkCheck(LinkCheckLib):
         except Exception as e:
             #LinkCheckLib.myprint("Exception inside get_simple_response: " + str(e))
             self.handle_exc(e, link_to_ck, parent)
-
 
     #---------------------------------------------------------------------------------------
     def add_any_bse_g(self, zlink, parent_local):  # Adding this base link to base glob

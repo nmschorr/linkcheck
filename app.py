@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template
-import linkcheck
+from linkchecklib import l
+from linkcheck import LinkCheck as LinC
 from time import sleep
 from threading import Thread
 from jinja2 import Environment, PackageLoader, select_autoescape
@@ -33,20 +34,20 @@ def write_no_err_pg(ste):
     fjj.close()
 
 def worker1(site, timestmp, jname):   # run LinkCheck and print to console
-    print("running worker1 thread")
+    myprint("running worker1 thread")
     set_names(site, timestmp, jname)
     just_stat = pcf.get_just_stat()
     notreadyyet(site, just_stat)
-    lc = linkcheck.LinkCheck()
+    lc = LinC.LinkCheck()
     lc.__init__()
     file_path = pcf.get_file_path()
     answers = lc.main(site)
     donefile_path = pcf.get_donefile_path()
-    print("donefile:", donefile_path)
+    myprint("donefile:", donefile_path)
     sleep(1)
 
-    # logging.debug("donefile in worker1: " + donefile_path)
-    print("!!!!!!!!!!==---- len of answers: " + str(len(answers)))
+    myprint("donefile in worker1: " + donefile_path)
+    myprint("!!!!!!!!!!==---- len of answers: " + str(len(answers)))
     if len(answers) > -1:
         ac.writeres(answers, file_path, donefile_path)
     else:
@@ -54,7 +55,7 @@ def worker1(site, timestmp, jname):   # run LinkCheck and print to console
         write_no_err_pg("no errors found", pcf)
 
     dt = str(datetime.now())
-    print( dt + "  worker1 done")
+    myprint( dt + "  worker1 done")
 
 
     #-----------------------------------------------------------------------------
@@ -90,9 +91,9 @@ def results():
         w_thread = Thread(target=worker1, args=(site,timestp1, just_name))
         threads.append(w_thread)
         w_thread.start()
-        print("just started thread. You entered: " + site)
+        myprint("just started thread. You entered: " + site)
     except Exception as e:
-        print(str(e))
+        myprint(str(e))
     return render_template('results.html', name = just_name)  ## has a form
 
 # from socket import gethostname
