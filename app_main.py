@@ -8,7 +8,7 @@ import datetime
 from prodconf import ProdConfig
 import logging
 from app_support_code import AppSupport
-from  werkzeug.debug import get_current_traceback
+# from  werkzeug.debug import get_current_traceback
 
 rootloglev = 30
 
@@ -135,10 +135,11 @@ def results():
             w_thread.start()
             print("just started thread. You entered: " + site)
         except Exception as e:
-            track = get_current_traceback(skip=1, show_hidden_frames=True,
-                                          ignore_system_exceptions=False)
-            t = str(track)
-            print(t)
+            print(str(e))
+            # track = get_current_traceback(skip=1, show_hidden_frames=True,
+            #                               ignore_system_exceptions=False)
+            # t = str(track)
+            # print(t)
         return render_template('results.html', name = just_name)  ## has a form
 
 @app.teardown_appcontext
@@ -155,15 +156,15 @@ def teardown(exception):
 #print("hostip: " + HOSTIP + "  HOSTPORT: ", HOSTPORT)
 #use_debugger = True
 #app.run(host='127.0.0.1', port=8080,use_debugger=use_debugger, debug=app.debug,use_reloader=False )
-try:
+# try:
 
-    app.run(host='127.0.0.1', port=8099, use_reloader=False )
+app.run(host='127.0.0.1', port=8080, use_reloader=False )
 
-except Exception as e:
-    track = get_current_traceback(skip=1, show_hidden_frames=True, ignore_system_exceptions=False)
-    # track.log()
-    t = str(track)
-    print(t)
+# except Exception as e:
+#     track = get_current_traceback(skip=1, show_hidden_frames=True, ignore_system_exceptions=False)
+#     # track.log()
+#     t = str(track)
+#     print(t)
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5000, use_reloader=False)
