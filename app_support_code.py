@@ -2,7 +2,7 @@ from os import path
 import datetime
 import app_support_conf
 
-class AppSupport:
+class AppSupport():
 
     @staticmethod
     def fin_msg(asite):
@@ -15,7 +15,7 @@ class AppSupport:
         return newstt
 
     @classmethod
-    def datalines(cls, f,data):
+    def datalines(cls, f, data):
         thishost = app_support_conf.thishost
         home_url =  "&nbsp;&nbsp;&nbsp;&nbsp;" +  "&nbsp;&nbsp;&nbsp;&nbsp;" + \
                 "<h2><a href=" + thishost + ">Start Over</a></h2><p></p>"
@@ -96,17 +96,22 @@ class AppSupport:
         return just_stat, donef_name, file_os_path_all, os_donefile_path
 
 
-    @staticmethod
-    def writeres(data, fnfull, osdonefile_loc):
-            print("INSIDE WRITERES!!!!!-----------------------")
-            print("osdonefile_loc WRITERES!!!!!-----------------------" + osdonefile_loc)
-            f = open(fnfull, "w")
-            f.write('<p></p>')
-            app_support_conf.datalines(f,data)
-            f.close() # file is not immediately deleted because we
-            print("reg_os_file_path named: ", fnfull , "f.name: ", f.name)
-            print("osdonef in writeres: ", osdonefile_loc)
-            fd = open(osdonefile_loc,"w")
-            fd.write("done")
-            fd.close() # file is not immediately deleted because we
+    @classmethod
+    def writeres(cls, data, fnfull, osdonefile_loc):
+        print("INSIDE WRITERES!!!!!-----------------------")
+        print("osdonefile_loc WRITERES!!!!!-----------------------" + osdonefile_loc)
+        f = open(fnfull, "w")
+        f.write('<p></p>')
+        cls.datalines(f,data)
 
+        f.close() # file is not immediately deleted because we
+        print("reg_os_file_path named: ", fnfull , "f.name: ", f.name)
+        print("osdonef in writeres: ", osdonefile_loc)
+        fd = open(osdonefile_loc,"w")
+        fd.write("done")
+        fd.close() # file is not immediately deleted because we
+       # app_support_conf.
+
+    # def method(self):
+    #     ret = self.StaticMethod._stat_func() + app_support_conf.d
+    #     return ret

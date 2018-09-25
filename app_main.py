@@ -29,7 +29,7 @@ def createpc():
         pc = ProdConfig()
         return pc
 
-app = Flask(__name__)
+app = Flask('linkcheck')
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config.FLASK_ENV='development'
