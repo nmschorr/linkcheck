@@ -2,47 +2,46 @@
 from urllib.parse import urlsplit
 from requests_html import HTMLSession, HTMLResponse
 from random import random
-
+from time import sleep
 #import logging
 
 
 _MYDEBUG = 0
 
 
-# class mem(object):
-#     def __init__(self):
-#         self.done_ln_gl_sing = None
-#         self.any_link_glob = None
-#         self.base_lnks_g = None
-
-import time
-
 class LinkCheckLib(object):
  
     def __init__(self):
-        #self.memg = mem()
-        tlds_list = []
-    
-        self.re = random()
-        time.sleep(.2)
-        self.rd = random()
-        time.sleep(.2)
-        self.ra = random()
-        time.sleep(.2)
-        self.rb = random()
+        rand = str(random())
+        re = "re_" + rand
+        rd = "rd_" + rand
+        ra = "ra_" + rand
+        rb = "rb_" + rand
+        self.re = re
+        self.rd = rd
+        self.ra = ra
+        self.rb = rb
 
-        self.base = dict()
+        base = dict()
+
+        self.base = base
+
+
         err_links = []
         done_ln_gl_sing = []
         any_link_glob = []
         base_lnks_g = []
+        baseurl = "baseurl" + rand
 
-        self.tlds_list = []
+        tlds_list = []
+        self.tlds_list = tlds_list
+        self.base.update({baseurl: None})
+        self.base.update({re: err_links})
+        self.base.update({rd: done_ln_gl_sing})
+        self.base.update({ra: any_link_glob})
+        self.base.update({rb: base_lnks_g})
 
-        self.base.update({self.re: err_links})
-        self.base.update({self.rd: done_ln_gl_sing})
-        self.base.update({self.ra: any_link_glob})
-        self.base.update({self.rb: base_lnks_g})
+
 
     #-----------------------------------------------------------------------------
 
@@ -143,7 +142,6 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------
 
     def do_response(self, a_link, p_link):
-        err_links = self.base.get(self.re)
         done_ln_gl_sing = self.base.get(self.rd)
         t_err = 0
         resp = None
@@ -152,9 +150,9 @@ class LinkCheckLib(object):
                 LinkCheckLib.myprint("-starting-get_home_links - just got this link: " + str(a_link))
                 done_ln_gl_sing.append(a_link)  ## add to main done list
                 session = HTMLSession()
-
                 resp = session.get(a_link)
-                t_err = self.ck_status_code(resp, a_link)  ## if there's    an error
+                code = resp.status_code
+                t_err = self.ck_status_code(a_link, p_link, code)  ## if there's    an error
                 session.close()
 
         except Exception as e:
@@ -231,8 +229,8 @@ class LinkCheckLib(object):
     def load_tlds(self):
         with open('tlds-alpha-by-domain.txt', 'r') as filehandle:
             for line in filehandle:
-                currentPlace = line[:-1]
-                self.tlds_list.append((currentPlace.lower()))
+                current_place = line[:-1]
+                self.tlds_list.append((current_place.lower()))
     #-----------------------------------------------------------------------------
 
     def check_sufx(self, sufx):
@@ -256,7 +254,7 @@ class LinkCheckLib(object):
             err_links.append((link, tempstr[:42], plink))
         self.base.update({self.re:err_links})
     #-----------------------------------------------------------------------------
-    def ck_status_code_simple(self, stat, tlink, tpar):
+    def ck_status_code_simple(self, tlink, tpar, stat):
         err_links = self.base.get(self.re)
         try:
             err_codes = [400, 404, 408, 409]
@@ -272,14 +270,13 @@ class LinkCheckLib(object):
         self.base.update({self.re:err_links})
     #-----------------------------------------------------------------------------
 
-    def ck_status_code(self, response, tpar):
+    def ck_status_code(self, t_link, tpar, st_code):
         err_links = self.base.get(self.re)
         try:
-            tlink = response.html.url
             err_codes = [400, 404, 408, 409]
-            if response.status_code in err_codes:
-                if tlink not in err_links:
-                    err_links.append((tlink, response.status_code, tpar))
+            if st_code in err_codes:
+                if t_link not in err_links:
+                    err_links.append((t_link, st_code, tpar))
                 return 1
             else: return 0  # ok
         except Exception as e:

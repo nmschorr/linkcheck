@@ -9,8 +9,8 @@ class AppSupport:
         print("inside hc. ")
         outst1 = "<!DOCTYPE html><html><head><title>No Broken Links</title></head><body>"
         answer2 =  "No broken links found for " + asite +". Thanks for using LinkCheck."
-        homeURL4 = "<a href=" + thishost + ">Start Over</a>"
-        newstt = outst1 + answer2 + '<p></p>' + homeURL4 + "</body></html>"
+        home_url = "<a href=" + thishost + ">Start Over</a>"
+        newstt = outst1 + answer2 + '<p></p>' + home_url + "</body></html>"
         return newstt
 
     @classmethod

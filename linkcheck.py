@@ -20,27 +20,14 @@ class LinkCheck(LinkCheckLib):
 
 
     def get_simple_response(self, lin_and_par_tup):
-        link_count = 0
-        er, response = "0", "0"
-        link_to_ck, parent,  = lin_and_par_tup[0], lin_and_par_tup[1]
+        link_count, stat = 0, 0
+        #er, response = "0", "0"
+        link_to_ck, parent = lin_and_par_tup[0], lin_and_par_tup[1]
         link_count += 1
         LinkCheckLib.myprint("Checking this link: " + link_to_ck )
-        stat = 0
         try:
             stat = requests.get(link_to_ck).status_code
-            er = self.ck_status_code_simple(link_to_ck, parent, stat)
-
-            #print ("test response: ", resp)
-            #session = rt.HTMLSession()
-            #response = session.get(link_to_ck)
-
-            #er = self.ck_status_code(stat, link_to_ck, parent)
-
-            #session.close()
-
-        # except HTTPSConnectionPool as he:
-        #     print("HTTPSConnectionPool Exception inside get_simple_response: " + str(he))
-        #     return
+            self.ck_status_code_simple(link_to_ck, parent, stat)
 
         except Exception as e:
             #LinkCheckLib.myprint("Exception inside get_simple_response: " + str(e))
@@ -67,7 +54,7 @@ class LinkCheck(LinkCheckLib):
 
         self.base.update({self.rb: base_lnks_g})
     #---------------------------------------------------------------------------------------
-    def add_any(self, tlink, parent_local, any_link_loc=0):  # Adding this base link to any glob
+    def add_any(self, tlink, parent_local, any_link_loc=None):  # Adding this base link to any glob
         any_link_glob = self.base.get(self.ra)
         if any_link_loc is None:
             any_link_loc = []
@@ -78,11 +65,11 @@ class LinkCheck(LinkCheckLib):
                     any_link_glob.append((tlink, parent_local))  # add if not there
                     any_link_loc.append((tlink, parent_local))
             else:
-                any_link_glob = [(tlink, parent_local)]  # make it if starting empty
-                any_link_loc = [(tlink, parent_local)]
+                any_link_glob.append((tlink, parent_local))  # make it if starting empty
+                any_link_loc.append((tlink, parent_local))
+            self.base.update({self.ra: any_link_glob})
         except Exception as e:
             LinkCheckLib.myprint("exception in add_any: " + str(e))
-        self.base.update({self.ra: any_link_glob})
 
         return any_link_loc
 
@@ -91,12 +78,12 @@ class LinkCheck(LinkCheckLib):
     def get_links(self, mainlin, _plin):
         done_ln_gl_sing = self.base.get(self.rd)
         any_link_glob= self.base.get(self.ra)
-        import time
+        from time import sleep
 
         LinkCheckLib.myprint("-------------Starting get_links with: " + mainlin)
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], "0", []
         response, resp_err = self.do_response(mainlin, _plin)
-        time.sleep(.05)
+        sleep(.05)
         is_bool = True
         good_suffix = True
         has_bad = False
@@ -122,8 +109,7 @@ class LinkCheck(LinkCheckLib):
             for THIS_LN in new_lnks_loc:
                 if THIS_LN not in done_ln_gl_sing:
                     LinkCheckLib.myprint("THIS_LN " + THIS_LN)
-                    #_IS_PARENT = False
-                    _IS_PARENT = self.ispar(THIS_LN, _plin)
+                    #_IS_PARENT = self.ispar(THIS_LN, _plin)
 
                     _IN_AN_LOC = self.ck_loc(THIS_LN, any_lnk_loc)
                     if not _IN_AN_LOC and not self._DONE_YET(THIS_LN):    #NOT done yet  cg = check glob
@@ -139,7 +125,9 @@ class LinkCheck(LinkCheckLib):
                         try:
                             if self.ispar(THIS_LN, _plin) or has_bad:
                                 continue
-                            _IS_BASE, in_base_local = self.ck_base(THIS_LN, self.divide_url(_plin), base_lnks_loc)
+                                baseurl = self.base.get(self.baseurl)
+
+                            _IS_BASE, in_base_local = self.ck_base(THIS_LN, baseurl, base_lnks_loc)
 
                             if _IS_BASE and good_suffix:  # IS base type
                                 if not in_base_local:
@@ -180,10 +168,13 @@ class LinkCheck(LinkCheckLib):
     def main(self, a_site="a.htm"):
         base_lnks_g = self.base.get(self.rb)
         any_link_glob= self.base.get(self.ra)
+
+        baseurl = LinkCheckLib.divide_url(a_site)
+        self.base.update({baseurl: baseurl})
+
         LinkCheckLib.myprint("Starting main with: " + a_site)
         base_only_plain_repeat = []
         new_base_links_one = []
-        full_addy = []
         full_addy = self.ckaddymore(a_site)
         new_sorted, repeats, the_len = [], 0, 0
         #tstart_main = perf_counter()
