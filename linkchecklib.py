@@ -72,6 +72,8 @@ class LinkCheckLib(object):
     
     def print_errs(self):
 
+
+        finlist = []
         if self.memg.err_links is None:
             self.memg.err_links = []
         if self.memg.err_links:
@@ -79,11 +81,16 @@ class LinkCheckLib(object):
             try:
                 if self.memg.err_links:
                     errs = list(set(self.memg.err_links))
+                    self.memg.err_links.clear()
                     er_len = len(errs)
                     nstring = "\nTotal errors: " + str(er_len) + " Here are the errors ---:"
                     LinkCheckLib.myprint(nstring)
                     errs22 = sorted(errs, key=lambda x: x[0])  # sort on first
+                    errs.clear()
+
                     errs2 = set(errs22)
+                    errs22.clear()
+                    self.memg.err_links.clear()
                     for e in errs2:
                         an0, an1, an2 = str(e[0]), str(e[1]), str(e[2])
 
@@ -92,9 +99,12 @@ class LinkCheckLib(object):
                         LinkCheckLib.myprint(str(answer_string))
                 else:
                     fin_list = [answer_string]
+                    finlist = fin_list
+                    del fin_list
+                errs2.clear()
             except Exception as e:
                 LinkCheckLib.myprint('Exception print_errs: ' + str(e))
-            return fin_list
+            return finlist
         else:
             return []
 

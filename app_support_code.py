@@ -57,7 +57,7 @@ class AppSupport:
 
 
     @classmethod
-    def not_ready_msg(cls, gsite, dname):
+    def not_ready_msg(cls, gsite):
 
         arf1 = "<a href="
         jst2 = "javascript:location.reload(true)"
@@ -66,9 +66,9 @@ class AppSupport:
         sc2 = '<script src=./jscript.js></script>'
         sc3 = '<script>   '
         sc4 = ' function checkDoneFile(){ '
-        #sc5 = ' var dname=window.location.href + "done";  '
+        sc5 = ' var dname=window.location.href + "done";  '
 
-        sc5 = ' var dname=' + dname
+        # sc5 = ' var dname=' + dname
         sc6 = ' var rel=doesFileExist(dname); '
         sc7 = " if (rel==true) { location.reload(true); }}</script>"
         sc7b = "<title>Not Ready</title>"
@@ -96,15 +96,17 @@ class AppSupport:
         return just_stat, donef_name, file_os_path_all, os_donefile_path
 
 
-    @classmethod
-    def writeres(cls, data, fnfull, osdonefile_loc):
-        f = open(fnfull, "w")
-        f.write('<p></p>')
-        cls.datalines(f,data)
-        f.close() # file is not immediately deleted because we
-        print("reg_os_file_path named: ", fnfull , "f.name: ", f.name)
-        print("osdonef in writeres: ", osdonefile_loc)
-        fd = open(osdonefile_loc,"w")
-        fd.write("done")
-        fd.close() # file is not immediately deleted because we
+    @staticmethod
+    def writeres(data, fnfull, osdonefile_loc):
+            print("INSIDE WRITERES!!!!!-----------------------")
+            print("osdonefile_loc WRITERES!!!!!-----------------------" + osdonefile_loc)
+            f = open(fnfull, "w")
+            f.write('<p></p>')
+            app_support_conf.datalines(f,data)
+            f.close() # file is not immediately deleted because we
+            print("reg_os_file_path named: ", fnfull , "f.name: ", f.name)
+            print("osdonef in writeres: ", osdonefile_loc)
+            fd = open(osdonefile_loc,"w")
+            fd.write("done")
+            fd.close() # file is not immediately deleted because we
 

@@ -225,6 +225,8 @@ class LinkCheck(LinkCheckLib):
             self.handle_exc(e, tup[0] ,tup[1])
 
         finlist = self.print_errs()
+
+
         #LinkCheckLib.myprint("totalTime: " + str(perf_counter() - tstart_main))
         #x = len(self.self.memg.done_ln_gl_sing)
         #LinkCheckLib.myprint("errors: " + str(x))
