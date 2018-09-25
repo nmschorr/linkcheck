@@ -5,32 +5,15 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 # from nocache import nocache
 #from app_support_code import AppSupport
 import datetime
-from prodconf import ProdConfig
-#import logging
+import prodconf as pc
 from app_support_code import AppSupport
 # from  werkzeug.debug import get_current_traceback
 
 # rootloglev = 30
 
 
-# def cleanup(pc):
-#     with app.app_context():
-#         #app.template_global(pc)
-#         pc.set_just_name("empty")
-#         pc.set_just_stat("empty")
-#         pc.set_donefile("empty")
-#         pc.set_file_path("empty")
-#         pc.set_donefile_path("empty")
-#         pc.set_site("empty")
-
-
-def createpc():
-   # with app.app_context():
-    pc = ProdConfig()
-    return pc
-
 app = Flask('linkcheck')
-#app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
 
 #app.config['PROPAGATE_EXCEPTIONS'] = True
 #app.config.FLASK_ENV='development'
@@ -64,10 +47,9 @@ def write_no_err_pg(ste, pc):
 def worker1(site, timestmp, jname):   # run LinkCheck and print to console
     #with app.app_context():
     print("running worker1 thread")
-    pc = createpc()
     answers = []
-    set_names(pc, site, timestmp, jname)
-    just_stat = pc.just_stat
+    set_names(site, timestmp, jname)
+    just_stat = pc.get_just_stat()
     notreadyyet(site, just_stat)
     lc = linkcheck.LinkCheck()
     lc.__init__()
@@ -102,7 +84,7 @@ def worker1(site, timestmp, jname):   # run LinkCheck and print to console
 # def add_header(response):
 #     return response
     #-----------------------------------------------------------------------------
-def set_names(pc, site, timestp4, justn):
+def set_names(site, timestp4, justn):
     just_name = justn
     pc.set_timestp(timestp4)
     pc.set_site(site)
