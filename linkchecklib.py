@@ -1,38 +1,48 @@
 
 from urllib.parse import urlsplit
-from requests_html import HTMLSession
+from requests_html import HTMLSession, HTMLResponse
+from random import random
+
 #import logging
 
 
 _MYDEBUG = 0
 
 
-class mem(object):
-    err_links = None
-    done_ln_gl_sing = None
-    any_link_glob = None
-    base_lnks_g = None
+# class mem(object):
+#     def __init__(self):
+#         self.done_ln_gl_sing = None
+#         self.any_link_glob = None
+#         self.base_lnks_g = None
 
+import time
+
+class LinkCheckLib(object):
+ 
     def __init__(self):
+        #self.memg = mem()
+        tlds_list = []
+    
+        self.re = random()
+        time.sleep(.2)
+        self.rd = random()
+        time.sleep(.2)
+        self.ra = random()
+        time.sleep(.2)
+        self.rb = random()
+
+        self.base = dict()
         err_links = []
         done_ln_gl_sing = []
         any_link_glob = []
         base_lnks_g = []
 
-class LinkCheckLib(object):
+        self.tlds_list = []
 
-    def __init__(self):
-        memg = mem()
-        #memg.__init__()
-        self.memg = memg
-        tlds_list = []
-
-        self.memg.err_links = memg.err_links
-        self.memg.done_ln_gl_sing = memg.done_ln_gl_sing
-        self.memg.any_link_glob = memg.any_link_glob
-        self.memg.base_lnks_g = memg.base_lnks_g
-        self.tlds_list = tlds_list
-
+        self.base.update({self.re: err_links})
+        self.base.update({self.rd: done_ln_gl_sing})
+        self.base.update({self.ra: any_link_glob})
+        self.base.update({self.rb: base_lnks_g})
 
     #-----------------------------------------------------------------------------
 
@@ -55,13 +65,16 @@ class LinkCheckLib(object):
 
 
     def ck_g(self, this_link):
-        return bool(this_link in [i[0] for i in self.memg.any_link_glob])
+        any_link_glob = self.base.get(self.ra)
+        return bool(this_link in [i[0] for i in any_link_glob])
 
     #-----------------------------------------------------------------------------
 
      
     def _DONE_YET(self, this_link):
-        return bool(this_link in self.memg.done_ln_gl_sing)
+        done_ln_gl_sing = self.base.get(self.rd)
+
+        return bool(this_link in done_ln_gl_sing)
     #-----------------------------------------------------------------------------
 
     @classmethod
@@ -73,23 +86,23 @@ class LinkCheckLib(object):
     def return_errors(self):
 
         finlist = []
-        if self.memg.err_links is None:
-            self.memg.err_links = []
-        if self.memg.err_links:
+        err_links = self.base.get(self.re)
+        
+        if err_links is None:
+            err_links = []
+        if err_links:
             answer_string, e, fin_list = '', '', []
             try:
-                if self.memg.err_links:
-                    errs = list(set(self.memg.err_links))
-                    self.memg.err_links.clear()
+                if err_links:
+                    errs = list(set(err_links))
+                    err_links.clear()
                     er_len = len(errs)
                     nstring = "\nTotal errors: " + str(er_len) + " Here are the errors ---:"
                     LinkCheckLib.myprint(nstring)
-                    errs22 = sorted(errs, key=lambda x: x[0])  # sort on first
-                    errs.clear()
+                    errs2 = sorted(errs, key=lambda x: x[0])  # sort on first
 
-                    errs2 = set(errs22)
-                    errs22.clear()
-                    self.memg.err_links.clear()
+                    errs2 = set(errs2)
+                    err_links.clear()
                     for e in errs2:
                         an0, an1, an2 = str(e[0]), str(e[1]), str(e[2])
 
@@ -98,11 +111,8 @@ class LinkCheckLib(object):
                         finlist = fin_list.copy()
                         LinkCheckLib.myprint(str(answer_string))
                 else:
-                    fin_list = [answer_string]
-                    finlist = fin_list.copy()
-                    print("len of finlist: ", str(len(finlist)))
-                    del fin_list
-                errs2.clear()
+                    finlist = [answer_string]
+                    #print("len of finlist: ", str(len(finlist)))
             except Exception as e:
                 LinkCheckLib.myprint('Exception print_errs: ' + str(e))
             return finlist
@@ -133,13 +143,16 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------
 
     def do_response(self, a_link, p_link):
+        err_links = self.base.get(self.re)
+        done_ln_gl_sing = self.base.get(self.rd)
         t_err = 0
-        resp = "0"
+        resp = None
         try:
-            if a_link not in self.memg.done_ln_gl_sing:
+            if a_link not in done_ln_gl_sing:
                 LinkCheckLib.myprint("-starting-get_home_links - just got this link: " + str(a_link))
-                self.memg.done_ln_gl_sing.append(a_link)  ## add to main done list
+                done_ln_gl_sing.append(a_link)  ## add to main done list
                 session = HTMLSession()
+
                 resp = session.get(a_link)
                 t_err = self.ck_status_code(resp, a_link)  ## if there's    an error
                 session.close()
@@ -231,28 +244,48 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------------
 
     def handle_exc( self, e, link, plink):
+        err_links = self.base.get(self.re)
+
         tempstr = str(e)
         LinkCheckLib.myprint('!!!!! Inside handle_exc. Error------------------\n' + tempstr)
         if "Document is empty" in tempstr:  # for mp3 and similar files
             return
         if "object has no attribute" in tempstr:  # for mp3 and similar files
             return
-        elif link not in self.memg.err_links:
-            self.memg.err_links.append((link, tempstr[:42], plink))
+        elif link not in err_links:
+            err_links.append((link, tempstr[:42], plink))
+        self.base.update({self.re:err_links})
+    #-----------------------------------------------------------------------------
+    def ck_status_code_simple(self, stat, tlink, tpar):
+        err_links = self.base.get(self.re)
+        try:
+            err_codes = [400, 404, 408, 409]
+            if stat in err_codes:
+                if tlink not in err_links:
+                    err_links.append((tlink, stat, tpar))
+                return 1
+            else:
+                return 0  # ok
+        except Exception as e:
+            LinkCheckLib.myprint("Exception in ck_status_code: " + str(e))
+            pass
+        self.base.update({self.re:err_links})
     #-----------------------------------------------------------------------------
 
-
     def ck_status_code(self, response, tpar):
+        err_links = self.base.get(self.re)
         try:
             tlink = response.html.url
             err_codes = [400, 404, 408, 409]
             if response.status_code in err_codes:
-                if tlink not in self.memg.err_links:
-                    self.memg.err_links.append((tlink, response.status_code, tpar))
+                if tlink not in err_links:
+                    err_links.append((tlink, response.status_code, tpar))
                 return 1
             else: return 0  # ok
         except Exception as e:
             LinkCheckLib.myprint("Exception in ck_status_code: " + str(e))
+            pass
+        self.base.update({self.re:err_links})
 
     #-----------------------------------------------------------------------------
 

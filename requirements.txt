@@ -4,3 +4,4 @@ Gunicorn==19.9.0
 validators==0.12.2
 jinja2==2.10
 urllib3==1.23
+requests=2.19.1

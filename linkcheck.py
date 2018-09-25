@@ -2,30 +2,41 @@
 # Nancy Schorr, 2018
 # this file is in active development
 #from time import perf_counter
-import requests_html as rt
+#import requests_html as rt
+
 from linkchecklib import *
+import requests
+
+
+
 
 class LinkCheck(LinkCheckLib):
 
     def __init__(self):
         super().__init__()
-        self.memg.done_ln_gl_sing = []
-        self.memg.any_link_glob = []
-        self.memg.base_lnks_g = []
+        # done_ln_gl_sing = []
+        # any_link_glob = []
+        # base_lnks_g = []
 
 
     def get_simple_response(self, lin_and_par_tup):
         link_count = 0
-
         er, response = "0", "0"
         link_to_ck, parent,  = lin_and_par_tup[0], lin_and_par_tup[1]
         link_count += 1
         LinkCheckLib.myprint("Checking this link: " + link_to_ck )
+        stat = 0
         try:
-            session = rt.HTMLSession()
-            response = session.get(link_to_ck)
-            er = self.ck_status_code(response, parent)
-            session.close()
+            stat = requests.get(link_to_ck).status_code
+            er = self.ck_status_code_simple(link_to_ck, parent, stat)
+
+            #print ("test response: ", resp)
+            #session = rt.HTMLSession()
+            #response = session.get(link_to_ck)
+
+            #er = self.ck_status_code(stat, link_to_ck, parent)
+
+            #session.close()
 
         # except HTTPSConnectionPool as he:
         #     print("HTTPSConnectionPool Exception inside get_simple_response: " + str(he))
@@ -38,41 +49,48 @@ class LinkCheck(LinkCheckLib):
 
     #---------------------------------------------------------------------------------------
     def add_any_bse_g(self, zlink, parent_local):  # Adding this base link to base glob
+        base_lnks_g = self.base.get(self.rb)
 
-        if self.memg.base_lnks_g is None:
-            self.memg.base_lnks_g = []
+        if base_lnks_g is None:
+            base_lnks_g = []
         try:
-            if self.memg.base_lnks_g:
-                _IN_BASE_GLOB = bool(zlink in [i[0] for i in self.memg.base_lnks_g])
+            if base_lnks_g:
+                _IN_BASE_GLOB = bool(zlink in [i[0] for i in base_lnks_g])
                 if not _IN_BASE_GLOB:  # if not already in this
-                    self.memg.base_lnks_g.append((zlink, parent_local))
+                    base_lnks_g.append((zlink, parent_local))
                     LinkCheckLib.myprint("Adding this BASE LINK to base glob: " + zlink)
             else:
-                self.memg.base_lnks_g = [(zlink, parent_local)]
+                base_lnks_g = [(zlink, parent_local)]
 
         except Exception as e:
             LinkCheckLib.myprint("Exception add_any_bse_g: " + str(e))
 
+        self.base.update({self.rb: base_lnks_g})
     #---------------------------------------------------------------------------------------
     def add_any(self, tlink, parent_local, any_link_loc=0):  # Adding this base link to any glob
+        any_link_glob = self.base.get(self.ra)
         if any_link_loc is None:
             any_link_loc = []
         try:
-            if self.memg.any_link_glob:  # don'w_thread try without something there
-                glob_bool = bool(tlink in [i[0] for i in self.memg.any_link_glob])
+            if any_link_glob:  # don'w_thread try without something there
+                glob_bool = bool(tlink in [i[0] for i in any_link_glob])
                 if not glob_bool:
-                    self.memg.any_link_glob.append((tlink, parent_local))  # add if not there
+                    any_link_glob.append((tlink, parent_local))  # add if not there
                     any_link_loc.append((tlink, parent_local))
             else:
-                self.memg.any_link_glob = [(tlink, parent_local)]  # make it if starting empty
+                any_link_glob = [(tlink, parent_local)]  # make it if starting empty
                 any_link_loc = [(tlink, parent_local)]
         except Exception as e:
             LinkCheckLib.myprint("exception in add_any: " + str(e))
+        self.base.update({self.ra: any_link_glob})
+
         return any_link_loc
 
 
     # #----------------------------------------------------------------------get_links-
     def get_links(self, mainlin, _plin):
+        done_ln_gl_sing = self.base.get(self.rd)
+        any_link_glob= self.base.get(self.ra)
         import time
 
         LinkCheckLib.myprint("-------------Starting get_links with: " + mainlin)
@@ -102,7 +120,7 @@ class LinkCheck(LinkCheckLib):
 
             LinkCheckLib.myprint("Starting Main Check" + mainlin)
             for THIS_LN in new_lnks_loc:
-                if THIS_LN not in self.memg.done_ln_gl_sing:
+                if THIS_LN not in done_ln_gl_sing:
                     LinkCheckLib.myprint("THIS_LN " + THIS_LN)
                     #_IS_PARENT = False
                     _IS_PARENT = self.ispar(THIS_LN, _plin)
@@ -139,6 +157,9 @@ class LinkCheck(LinkCheckLib):
 
             LinkCheckLib.myprint('---returning base_links_local: ' + str(base_lnks_loc))
             LinkCheckLib.myprint('!! NEW----end get_home_links \n\n')
+            self.base.update({self.rd: done_ln_gl_sing})
+            self.base.update({self.ra: any_link_glob})
+
             return list(set(base_lnks_loc))
 
 
@@ -146,16 +167,19 @@ class LinkCheck(LinkCheckLib):
     #############----------------------------------MAIN--------------------------
       #############----------------------------------MAIN-------------------------
     def rem_errs(self, tlinks=None):
+        done_ln_gl_sing = self.base.get(self.rd)
         if tlinks is None:
             tlinks = []
         for link in tlinks:
-            if link in self.memg.done_ln_gl_sing:
+            if link in done_ln_gl_sing:
                 tlinks.remove(link)
         return tlinks
 
 
 
     def main(self, a_site="a.htm"):
+        base_lnks_g = self.base.get(self.rb)
+        any_link_glob= self.base.get(self.ra)
         LinkCheckLib.myprint("Starting main with: " + a_site)
         base_only_plain_repeat = []
         new_base_links_one = []
@@ -187,7 +211,7 @@ class LinkCheck(LinkCheckLib):
             LinkCheckLib.myprint("Exception inside main_run: " + str(e))
 
         try:
-            base_glob_now = self.memg.base_lnks_g
+            base_glob_now = base_lnks_g
             new_base_links_here, the_len_b = [], len(base_glob_now)
             while the_len_b and repeats < 6:
 
@@ -205,12 +229,12 @@ class LinkCheck(LinkCheckLib):
         try:
             #LinkCheckLib.myprint("Step Two Done")
             any_link_to_check = []
-            any_link_to_check = list(self.memg.any_link_glob)
+            any_link_to_check = list(any_link_glob)
 
             any_link_to_check = list(set(any_link_to_check))
             for tup in any_link_to_check:    #check non-base links
                 self.get_simple_response(tup)
-            for tup in self.memg.base_lnks_g:
+            for tup in base_lnks_g:
                 self.get_simple_response(tup)
 
         # except TypeError:
@@ -227,7 +251,7 @@ class LinkCheck(LinkCheckLib):
         finlist = self.return_errors()
         #self.print_errs.del_finlist()
         #LinkCheckLib.myprint("totalTime: " + str(perf_counter() - tstart_main))
-        #x = len(self.self.memg.done_ln_gl_sing)
+        #x = len(self.done_ln_gl_sing)
         #LinkCheckLib.myprint("errors: " + str(x))
         return finlist
 

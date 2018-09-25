@@ -162,8 +162,8 @@ print(thehost)
 # else:
 #     HOST='0.0.0.0'
 
-app.run(host='0.0.0.0', port=8080)
-#app.run(host='127.0.0.1', port=8080, debug=True)
+#app.run(host='0.0.0.0', port=8080)
+app.run(host='127.0.0.1', port=8080, debug=True)
 
 # except Exception as e:
 #     track = get_current_traceback(skip=1, show_hidden_frames=True, ignore_system_exceptions=False)
