@@ -3,16 +3,12 @@
 # this file is in active development
 #from time import perf_counter
 import requests_html as rt
-from datetime import datetime
 from linkchecklib import *
-from urllib3 import HTTPSConnectionPool
 
 class LinkCheck(LinkCheckLib):
 
     def __init__(self):
         super().__init__()
-        datet = datetime.now()
-        #self.err_links = None
         self.memg.done_ln_gl_sing = []
         self.memg.any_link_glob = []
         self.memg.base_lnks_g = []
@@ -36,7 +32,7 @@ class LinkCheck(LinkCheckLib):
         #     return
 
         except Exception as e:
-            LinkCheckLib.myprint("Exception inside get_simple_response: " + str(e))
+            #LinkCheckLib.myprint("Exception inside get_simple_response: " + str(e))
             self.handle_exc(e, link_to_ck, parent)
 
 
@@ -108,7 +104,7 @@ class LinkCheck(LinkCheckLib):
             for THIS_LN in new_lnks_loc:
                 if THIS_LN not in self.memg.done_ln_gl_sing:
                     LinkCheckLib.myprint("THIS_LN " + THIS_LN)
-                    _IS_PARENT = False
+                    #_IS_PARENT = False
                     _IS_PARENT = self.ispar(THIS_LN, _plin)
 
                     _IN_AN_LOC = self.ck_loc(THIS_LN, any_lnk_loc)
@@ -224,7 +220,7 @@ class LinkCheck(LinkCheckLib):
             #print(str(IndexError))
             pass
         except Exception as e:
-            print(str(e))
+            #print(str(e))
             self.handle_exc(e, tup[0] ,tup[1])
             pass
 

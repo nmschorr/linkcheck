@@ -2,7 +2,7 @@ from flask import Flask, request, render_template
 import linkcheck
 import threading, time
 from jinja2 import Environment, PackageLoader, select_autoescape
-from nocache import nocache
+# from nocache import nocache
 #from app_support_code import AppSupport
 import datetime
 from prodconf import ProdConfig
@@ -10,27 +10,28 @@ from prodconf import ProdConfig
 from app_support_code import AppSupport
 # from  werkzeug.debug import get_current_traceback
 
-rootloglev = 30
+# rootloglev = 30
 
 
-def cleanup(pc):
-    with app.app_context():
-        #app.template_global(pc)
-        pc.set_just_name("empty")
-        pc.set_just_stat("empty")
-        pc.set_donefile("empty")
-        pc.set_file_path("empty")
-        pc.set_donefile_path("empty")
-        pc.set_site("empty")
+# def cleanup(pc):
+#     with app.app_context():
+#         #app.template_global(pc)
+#         pc.set_just_name("empty")
+#         pc.set_just_stat("empty")
+#         pc.set_donefile("empty")
+#         pc.set_file_path("empty")
+#         pc.set_donefile_path("empty")
+#         pc.set_site("empty")
 
 
 def createpc():
-    with app.app_context():
-        pc = ProdConfig()
-        return pc
+   # with app.app_context():
+    pc = ProdConfig()
+    return pc
 
 app = Flask('linkcheck')
-app.config['TEMPLATES_AUTO_RELOAD'] = True
+#app.config['TEMPLATES_AUTO_RELOAD'] = True
+
 #app.config['PROPAGATE_EXCEPTIONS'] = True
 #app.config.FLASK_ENV='development'
 #app.config['FLASK_ENV'] ='development'
@@ -61,32 +62,32 @@ def write_no_err_pg(ste, pc):
     fjj.close()
 
 def worker1(site, timestmp, jname):   # run LinkCheck and print to console
-    with app.app_context():
-        print("running worker1 thread")
-        pc = createpc()
-        answers = []
-        set_names(pc, site, timestmp, jname)
-        just_stat = pc.just_stat
-        notreadyyet(site, just_stat)
-        lc = linkcheck.LinkCheck()
-        lc.__init__()
-        file_path = pc.get_file_path()
-        answers = lc.main(site)
-        donefile_path = pc.get_donefile_path()
-        print("donefile:", donefile_path)
-        time.sleep(1)
+    #with app.app_context():
+    print("running worker1 thread")
+    pc = createpc()
+    answers = []
+    set_names(pc, site, timestmp, jname)
+    just_stat = pc.just_stat
+    notreadyyet(site, just_stat)
+    lc = linkcheck.LinkCheck()
+    lc.__init__()
+    file_path = pc.get_file_path()
+    answers = lc.main(site)
+    donefile_path = pc.get_donefile_path()
+    print("donefile:", donefile_path)
+    time.sleep(1)
 
-        # logging.debug("donefile in worker1: " + donefile_path)
-        # logging.debug("inside worker1 thread. you entered: " + site)
-        print("!!!!!!!!!!==---- len of answers: " + str(len(answers)))
-        if len(answers) > 0:
-            AppSupport.writeres(answers, file_path, donefile_path)
-        else:
-            #logging.debug("no errors found")
-            write_no_err_pg("no errors found", pc)
+    # logging.debug("donefile in worker1: " + donefile_path)
+    # logging.debug("inside worker1 thread. you entered: " + site)
+    print("!!!!!!!!!!==---- len of answers: " + str(len(answers)))
+    if len(answers) > -1:
+        AppSupport.writeres(answers, file_path, donefile_path)
+    else:
+        #logging.debug("no errors found")
+        write_no_err_pg("no errors found", pc)
 
-        dt = str(datetime.datetime.now())
-        print( dt + "  worker1 done")
+    dt = str(datetime.datetime.now())
+    print( dt + "  worker1 done")
         #cleanup(pc)
     #time.sleep(5)
     #lc.__init__()
@@ -121,26 +122,26 @@ def index():
 
 
 @app.route('/results', methods = ['POST','GET'])
-@nocache             # very important so client server doesn'w_thread cache results
+# @nocache             # very important so client server doesn'w_thread cache results
 def results():
-    with app.app_context():
-        just_name = ''
-        try:
-            site = request.form['name']
-            threads = []
-            timestp1 = format(datetime.datetime.now(), '%Y%m%d%H%M%S')
-            just_name = "res" + timestp1 + ".html"
-            w_thread = threading.Thread(target=worker1, args=(site,timestp1, just_name))
-            threads.append(w_thread)
-            w_thread.start()
-            print("just started thread. You entered: " + site)
-        except Exception as e:
-            print(str(e))
-            # track = get_current_traceback(skip=1, show_hidden_frames=True,
-            #                               ignore_system_exceptions=False)
-            # t = str(track)
-            # print(t)
-        return render_template('results.html', name = just_name)  ## has a form
+    #with app.app_context():
+    just_name = ''
+    try:
+        site = request.form['name']
+        threads = []
+        timestp1 = format(datetime.datetime.now(), '%Y%m%d%H%M%S')
+        just_name = "res" + timestp1 + ".html"
+        w_thread = threading.Thread(target=worker1, args=(site,timestp1, just_name))
+        threads.append(w_thread)
+        w_thread.start()
+        print("just started thread. You entered: " + site)
+    except Exception as e:
+        print(str(e))
+        # track = get_current_traceback(skip=1, show_hidden_frames=True,
+        #                               ignore_system_exceptions=False)
+        # t = str(track)
+        # print(t)
+    return render_template('results.html', name = just_name)  ## has a form
 
 # @app.teardown_appcontext
 # def teardown(exception):
@@ -160,7 +161,9 @@ print(thehost)
 #     HOST='127.0.0.1'
 # else:
 #     HOST='0.0.0.0'
+
 app.run(host='0.0.0.0', port=8080)
+#app.run(host='127.0.0.1', port=8080, debug=True)
 
 # except Exception as e:
 #     track = get_current_traceback(skip=1, show_hidden_frames=True, ignore_system_exceptions=False)
