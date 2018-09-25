@@ -5,7 +5,7 @@ import logging
 
 #any_link_glob=[]
 #done_ln_gl_sing = []
-_MYDEBUG = 1
+_MYDEBUG = 0
 
 
 class mem(object):

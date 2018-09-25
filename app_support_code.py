@@ -1,5 +1,4 @@
 from os import path
-import datetime
 import app_support_conf
 
 class AppSupport:

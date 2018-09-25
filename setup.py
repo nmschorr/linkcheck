@@ -14,5 +14,7 @@ setup(
             'requests_html',
             'gunicorn',
             'validators',
+            'jinja2',
+            'urllib3',
       ],
       )

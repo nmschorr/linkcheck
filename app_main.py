@@ -1,12 +1,12 @@
-from flask import Flask, request, render_template, views
+from flask import Flask, request, render_template
 import linkcheck
-import threading, time, os
+import threading, time
 from jinja2 import Environment, PackageLoader, select_autoescape
 from nocache import nocache
-from app_support_code import AppSupport
+#from app_support_code import AppSupport
 import datetime
 from prodconf import ProdConfig
-import logging
+#import logging
 from app_support_code import AppSupport
 # from  werkzeug.debug import get_current_traceback
 
@@ -31,9 +31,9 @@ def createpc():
 
 app = Flask('linkcheck')
 app.config['TEMPLATES_AUTO_RELOAD'] = True
-app.config['PROPAGATE_EXCEPTIONS'] = True
-app.config.FLASK_ENV='development'
-app.config['FLASK_ENV'] ='development'
+#app.config['PROPAGATE_EXCEPTIONS'] = True
+#app.config.FLASK_ENV='development'
+#app.config['FLASK_ENV'] ='development'
 #roote = logging.getLogger()
 #roote.setLevel(rootloglev)
 
@@ -142,9 +142,9 @@ def results():
             # print(t)
         return render_template('results.html', name = just_name)  ## has a form
 
-@app.teardown_appcontext
-def teardown(exception):
-    None
+# @app.teardown_appcontext
+# def teardown(exception):
+#     None
 
 
 from socket import gethostname
@@ -156,19 +156,19 @@ print(thehost)
 #use_debugger = True
 #app.run(host='127.0.0.1', port=8080,use_debugger=use_debugger, debug=app.debug,use_reloader=False )
 
-if thehost == "Delia":
-    HOST='127.0.0.1'
-else:
-    HOST='0.0.0.0'
-app.run(host=HOST, port=8080, use_reloader=False )
+# if thehost == "Delia":
+#     HOST='127.0.0.1'
+# else:
+#     HOST='0.0.0.0'
+app.run(host='0.0.0.0', port=8080)
 
 # except Exception as e:
 #     track = get_current_traceback(skip=1, show_hidden_frames=True, ignore_system_exceptions=False)
 #     # track.log()
 #     t = str(track)
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, use_reloader=False)
+# if __name__ == "__main__":
+#     app.run(host='0.0.0.0', port=8080)
 
 
 
