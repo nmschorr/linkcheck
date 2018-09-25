@@ -145,29 +145,30 @@ def results():
 @app.teardown_appcontext
 def teardown(exception):
     None
-    #db = getattr(g, '_database', None)
-    #if db is not None:
-        #db.close()
-#from socket import gethostbyaddr, gethostname
+
+
+from socket import gethostname
+thehost = gethostname()
+print(thehost)
+
 #print(gethostbyaddr(gethostname())[0])
 #HOSTIP = os.getenv('HOSTIP')
-#HOSTIP='127.0.0.1'
-#HOSTPORT = 8080
-#print("hostip: " + HOSTIP + "  HOSTPORT: ", HOSTPORT)
 #use_debugger = True
 #app.run(host='127.0.0.1', port=8080,use_debugger=use_debugger, debug=app.debug,use_reloader=False )
-# try:
 
-app.run(host='127.0.0.1', port=8080, use_reloader=False )
+if thehost == "Delia":
+    HOST='127.0.0.1'
+else:
+    HOST='0.0.0.0'
+app.run(host=HOST, port=8080, use_reloader=False )
 
 # except Exception as e:
 #     track = get_current_traceback(skip=1, show_hidden_frames=True, ignore_system_exceptions=False)
 #     # track.log()
 #     t = str(track)
-#     print(t)
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=5000, use_reloader=False)
+    app.run(host='0.0.0.0', port=5000, use_reloader=False)
 
 
 
