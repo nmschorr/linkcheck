@@ -27,10 +27,10 @@ def notreadyyet(ste, just_stat):
     fj.write(newst)
     fj.close()
 
-def write_no_err_pg(ste):
+def write_no_err_pg(asited):
     just_stat = pcf.get_just_stat()
     print("just_stat: ", just_stat)
-    newstt = ac.fin_msg(ste)
+    newstt = ac.fin_msg(asited)
     fjj = open(just_stat, "w")
     fjj.write(newstt)
     fjj.close()
@@ -54,7 +54,7 @@ def worker1(site, timestmp, jname):   # run LinkCheck and print to console
         ac.writeres(answers, file_path, donefile_path)
     else:
         #logging.debug("no errors found")
-        write_no_err_pg("no errors found", pcf)
+        write_no_err_pg(site)
 
     dt = str(datetime.now())
     ac.myprint( dt + "  worker1 done")

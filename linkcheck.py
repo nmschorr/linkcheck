@@ -115,7 +115,6 @@ class LinkCheck(LinkCheckLib):
                         try:
                             if self.ispar(THIS_LN, _plin) or has_bad:
                                 continue
-                                baseurl = self.base.get(self.baseurl)
 
                             _IS_BASE, in_base_local = self.ck_base(THIS_LN, self.divide_url(_plin), base_lnks_loc)
 
