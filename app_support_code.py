@@ -102,7 +102,7 @@ class AppSupport:
     @classmethod
     def make_filenames(cls, osroot, timestp, just_name2):
         stat = "static"
-        just_stat = path.join(stat, just_name2)
+        just_stat = "./static/" + just_name2
         donef_name =  "res" + timestp + ".htmldone"
 
         os_path_plus_stat = path.join(osroot, stat)

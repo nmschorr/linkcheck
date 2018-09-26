@@ -1,21 +1,26 @@
+
+
+BIND = '0.0.0.0:8080'
+bind = '0.0.0.0.0:8080'
+PYTHONUNBUFFERED = 'True'
+PORT = '8080'
+GUNICORN_CMD_ARGS="-b 0.0.0.0:8080 --env PYTHONUNBUFFERED = 'True'"
+
+
+
+
+
+
+
+
 #import multiprocessing
 #import os
 
 #BIND = '127.0.0.1:8080'
-BIND = '0.0.0.0:8080'
-
-#bind = BIND
-bind = '0.0.0.0.0:8080'
-
-PYTHONUNBUFFERED = 'True'
-
-PORT = '8080'
-
 #PORT = int(os.environ.get('OPENSHIFT_PYTHON_PORT', 8080))
 
 #GUNICORN_CMD_ARGS="-b 127.0.0.1:8080 --env PYTHONUNBUFFERED = 'True'"
 
-GUNICORN_CMD_ARGS="-b 0.0.0.0:8080 --env PYTHONUNBUFFERED = 'True'"
 
 
 #workers = multiprocessing.cpu_count() * 2 + 1

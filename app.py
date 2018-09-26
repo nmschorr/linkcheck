@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, url_for
 
 from linkcheck import LinkCheck
 from time import sleep
@@ -19,10 +19,11 @@ env = Environment(
     autoescape=select_autoescape(['html', 'xml']),
 )
 
-def notreadyyet(ste, just_stat):
+def notreadyyet(ste, jname):
     newst= ac.not_ready_msg(ste)
-    print("just_stat: ", just_stat)
-    fj = open(just_stat, "w")
+    js = './static/' + jname
+    print("just_stat: ", js)
+    fj = open(js, "w")
     fj.write(newst)
     fj.close()
 
@@ -38,7 +39,7 @@ def worker1(site, timestmp, jname):   # run LinkCheck and print to console
     ac.myprint("running worker1 thread")
     set_names(site, timestmp, jname)
     just_stat = pcf.get_just_stat()
-    notreadyyet(site, just_stat)
+    notreadyyet(site, jname)
     lc = LinkCheck()
     lc.__init__()
     answers = lc.main(site)
