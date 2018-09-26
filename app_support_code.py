@@ -2,11 +2,11 @@ from os import path, getenv
 import app_support_conf
 
 class AppSupport:
+    _DEBUG = 0
 
-    _DEBUG = getenv('_DEBUG')
+    # _DEBUG = getenv('_DEBUG')
 
     def __init__(cls):
-        #_DEBUG =  getenv('_DEBUG')
         cls._DEBUG = AppSupport._DEBUG
 
 

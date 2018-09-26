@@ -80,23 +80,23 @@ def set_names(site, timestp4, justn):
 def index():
     return render_template('index.html')  ## has a form
 
+# @nocache             # very important so client server doesn'w_thread cache results
 
 @app.route('/results', methods = ['POST','GET'])
-# @nocache             # very important so client server doesn'w_thread cache results
 def results():
-    threads = []
     #try:
     site = request.form['name']
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
-    justname = "res" + timestp1 + ".html"
-    w_thread = Thread(target=worker1, args=(site,timestp1, justname))
+    name = "res" + timestp1 + ".html"
+    threads = []
+    w_thread = Thread(target=worker1, args=(site,timestp1, name))
     threads.append(w_thread)
     w_thread.start()
-    sleep(3)
+    #sleep(3)
     #ac.myprint("just started thread. You entered: " + site)
     #except Exception as e:
         #ac.myprint(str(e))
-    return render_template('results.html', name = justname)  ## has a form
+    return render_template('results.html', name = name)  ## has a form
 
 # from socket import gethostname
 # thehost = gethostname()
@@ -106,6 +106,6 @@ _DEBUG = 0
 #'127.0.0.1'
 #HOSTIP = '0.0.0.0'
 #app.run(host=HOSTIP, port=8080)
-app.run(host='0.0.0.0', port=8080)
+app.run(host='0.0.0.0', port=8080, debug=True)
 
 
