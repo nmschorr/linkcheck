@@ -2,9 +2,9 @@
 
 BIND = '0.0.0.0:8080'
 bind = '0.0.0.0.0:8080'
-PYTHONUNBUFFERED = 'True'
+PYTHONUNBUFFERED = 1
 PORT = '8080'
-GUNICORN_CMD_ARGS="-b 0.0.0.0:8080 --env PYTHONUNBUFFERED = 'True'"
+GUNICORN_CMD_ARGS="-b 0.0.0.0:8080 --env PYTHONUNBUFFERED = 1"
 
 
 
@@ -24,7 +24,6 @@ GUNICORN_CMD_ARGS="-b 0.0.0.0:8080 --env PYTHONUNBUFFERED = 'True'"
 
 
 #workers = multiprocessing.cpu_count() * 2 + 1
-
 
 errorlog = '-'
 loglevel = 'debug'
