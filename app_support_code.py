@@ -79,7 +79,7 @@ class AppSupport:
         jst2 = "javascript:location.reload(true)"
 
         sc1 = "<!DOCTYPE html><html><head>"
-        sc2 = '<script src=./templates/linkjscript.js></script>'
+        sc2 = '<script src=./linkjscript.js></script>'
         sc3 = '<script>   '
         sc4 = ' function checkDoneFile(){ '
         sc5 = ' var dname=window.location.href + "done";  '
