@@ -8,10 +8,13 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from datetime import datetime
 import prodconf as pcf
 from app_support_code import AppSupport as ac
+from werkzeug.debug import get_current_traceback
 
 # rootloglev = 30
 
-app = Flask(__name__, instance_relative_config=True)
+#app = Flask(__name__, instance_relative_config=True)
+application = Flask(__name__)
+
 #app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
 env = Environment(
     loader=PackageLoader('linkcheck', 'templates'),
@@ -66,7 +69,7 @@ def set_names(site, timestp4, justn):
     pcf.set_timestp(timestp4)
     pcf.set_site(site)
     pcf.set_just_name(just_name)
-    osroot = app.root_path  # os path
+    osroot = application.root_path  # os path
     just_stat, donefile, file_path, donefile_path = ac.make_filenames(osroot, timestp4, just_name)
     pcf.set_just_stat(just_stat)
     pcf.set_donefile(donefile)
@@ -75,13 +78,13 @@ def set_names(site, timestp4, justn):
 
 
 
-@app.route('/')
+@application.route('/')
 def index():
     return render_template('index.html')  ## has a form
 
 # @nocache             # very important so client server doesn'w_thread cache results
 
-@app.route('/results', methods = ['POST','GET'])
+@application.route('/results', methods = ['POST','GET'])
 def results():
     #try:
     site = request.form['name']
@@ -109,9 +112,20 @@ def results():
 
 #app.run('127.0.0.1', 8080, debug=True)
 
-app.run('0.0.0.0', 8080, debug=True)
+application.config['PROPAGATE_EXCEPTIONS'] = True
+
+try: {
+    application.run('0.0.0.0', 8080, debug=True)
+    #application.run('127.0.0.1', 8080, debug=True)
+
+}
+except Exception as e:
+    track = get_current_traceback(skip=1, show_hidden_frames=True, ignore_system_exceptions=False)
+    # track.log()
+    t = str(track)
+    print(t)
 
 if __name__ == '__main__':
     #app = create_app()
     #app.run('127.0.0.1', 8080)
-    app.run('0.0.0.0', 8080)
+    application.run('0.0.0.0', 8080, debug=True)
