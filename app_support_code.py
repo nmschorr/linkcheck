@@ -2,7 +2,7 @@ from os import path, getenv
 import app_support_conf
 
 class AppSupport:
-    _DEBUG = 0
+    _DEBUG = 1
 
     # _DEBUG = getenv('_DEBUG')
 
@@ -11,7 +11,7 @@ class AppSupport:
 
 
     @staticmethod
-    def myprint(print_str):
+    def myprint(print_str,_DEBUG=1 ):
         if not AppSupport._DEBUG:
             None
             #print(print_str)

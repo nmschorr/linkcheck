@@ -4,7 +4,7 @@ from linkcheck import LinkCheck
 from time import sleep
 from threading import Thread
 from jinja2 import Environment, PackageLoader, select_autoescape
-from os import getenv
+#from os import getenv
 # from nocache import nocache
 from datetime import datetime
 import prodconf as pcf
@@ -12,9 +12,8 @@ from app_support_code import AppSupport as ac
 
 # rootloglev = 30
 
-app = Flask(__name__)
+app = Flask(__name__, instance_relative_config=True)
 #app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
-
 env = Environment(
     loader=PackageLoader('linkcheck', 'templates'),
     autoescape=select_autoescape(['html', 'xml']),
@@ -101,11 +100,18 @@ def results():
 # from socket import gethostname
 # thehost = gethostname()
 #_DEBUG = getenv('_DEBUG')
-_DEBUG = 0
+#_DEBUG = 0
 #HOSTIP = getenv('HOSTIP')
 #'127.0.0.1'
 #HOSTIP = '0.0.0.0'
 #app.run(host=HOSTIP, port=8080)
-app.run(host='0.0.0.0', port=8080, debug=True)
+#app.run('0.0.0.0', 8080, debug=True)
 
+#app.run('127.0.0.1', 8080, debug=True)
 
+app.run('0.0.0.0', 8080, debug=True)
+
+if __name__ == '__main__':
+    #app = create_app()
+    #app.run('127.0.0.1', 8080)
+    app.run('0.0.0.0', 8080)

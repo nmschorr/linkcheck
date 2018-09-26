@@ -6,8 +6,8 @@ from time import sleep
 #import logging
 from os import getenv
 
-_MYDEBUG = getenv('_DEBUG')
-
+#_MYDEBUG = getenv('_DEBUG')
+_MYDEBUG=1
 
 class LinkCheckLib(object):
  
@@ -45,6 +45,18 @@ class LinkCheckLib(object):
 
     #-----------------------------------------------------------------------------
 
+    @staticmethod
+    def myprint(print_str,_MYDEBUG=1 ):
+        _MYDEBUG = 1
+        if not _MYDEBUG:
+            print(print_str)
+            #logging.info(print_str)
+        else:
+            #logging.debug(print_str)
+            print(print_str)
+
+
+    #-----------------------------------------------------------------------------
     @classmethod
     def ispar(cls, thisln, par_loc):   # is it a parent? part of the main website?
         if par_loc in thisln:
@@ -205,18 +217,6 @@ class LinkCheckLib(object):
         return final_answer
     #-----------------------------------------------------------------------------
 
-    @staticmethod
-    def myprint(print_str):
-        global _MYDEBUG
-        if not _MYDEBUG:
-            print(print_str)
-            #logging.info(print_str)
-        else:
-            #logging.debug(print_str)
-            print(print_str)
-
-
-    #-----------------------------------------------------------------------------
 
     # @classmethod
     # def myprinter(cls, print_str):

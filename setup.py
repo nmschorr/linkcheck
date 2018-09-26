@@ -7,7 +7,7 @@ setup(
       author='Nancy Schorr',
       author_email='nancyschorr@yahoo.com',
       packages=find_packages(),
-      url='http://schorrmedia.com',
+      url='http://linkcheckpy-linkcheckpy.7e14.starter-us-west-2.openshiftapps.com',
       include_package_data=True,
       install_requires=[
             'flask',
@@ -15,7 +15,5 @@ setup(
             'gunicorn',
             'validators',
             'jinja2',
-            'urllib3',
-            'requests',
       ],
       )
