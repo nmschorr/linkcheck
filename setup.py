@@ -16,6 +16,6 @@ setup(
             'validators',
             'jinja2',
             'urllib3',
-            'requests'
+            'requests',
       ],
       )
