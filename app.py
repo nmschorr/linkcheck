@@ -12,8 +12,8 @@ from app_support_code import AppSupport as ac
 
 # rootloglev = 30
 
-app = Flask('linkcheck')
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
+app = Flask('__name__')
+#app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
 
 env = Environment(
     loader=PackageLoader('linkcheck', 'templates'),
@@ -98,8 +98,10 @@ def results():
 # from socket import gethostname
 # thehost = gethostname()
 _DEBUG = getenv('_DEBUG')
+_DEBUG = 1
+#HOSTIP = getenv('HOSTIP')
 
-HOSTIP = getenv('HOSTIP')
-app.run(host=HOSTIP, port=8080, debug=True)
+HOSTIP = '0.0.0.0'
+app.run(host=HOSTIP, port=5000)
 
 
