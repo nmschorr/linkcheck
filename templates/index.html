@@ -8,20 +8,7 @@
       type="image/png"
       href="http://example.com/myicon.png">
 
-
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-
-
-<style>
-h4 {text-align:center;}
-p {text-align:center;}
-form { text-align: left; }
-body {padding-left:5em; }
-.space { margin-left:75px;}
-input99 {  margin-left:45px  }
-</style>
-
 <title>Welcome to LinkCheck</title>
 
 </head>
@@ -36,18 +23,19 @@ input99 {  margin-left:45px  }
 
 <p></p>
 
-<form action = "results" method ="POST">
-Enter website or webpage <br>
-you want to LinkCheck here:<br>
-(no http prefix needed) http://
-<input type = "text" size="55" name = "name" />
-    <br>&nbsp;
-      <div class="space">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-         <input type = "submit" value = "       Submit       "/> </div>
+<form action="results" method ="POST">
+    <div style="padding-left:5em;" }>
+Enter website or webpage<br>
+you want to LinkCheck here<br>
+(no http prefix needed)  http://
+<input type="text" size="55" name="name"><br>
+        &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;
+        &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;
+        <br>&nbsp;
+<input type="submit" value="     Submit     ">
+</div>
 </form>
-
+<p></p>
 <p>&nbsp;</p>
 
 </body>
