@@ -4,7 +4,6 @@ from linkcheck import LinkCheck
 from time import sleep
 from threading import Thread
 from jinja2 import Environment, PackageLoader, select_autoescape
-#from os import getenv
 # from nocache import nocache
 from datetime import datetime
 import prodconf as pcf
