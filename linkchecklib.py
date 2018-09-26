@@ -150,7 +150,9 @@ class LinkCheckLib(object):
                 LinkCheckLib.myprint("-starting-get_home_links - just got this link: " + str(a_link))
                 done_ln_gl_sing.append(a_link)  ## add to main done list
                 session = HTMLSession()
+
                 resp = session.get(a_link)
+
                 code = resp.status_code
                 t_err = self.ck_status_code(a_link, p_link, code)  ## if there's    an error
                 session.close()

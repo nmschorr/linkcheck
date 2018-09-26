@@ -106,6 +106,6 @@ _DEBUG = 0
 #'127.0.0.1'
 #HOSTIP = '0.0.0.0'
 #app.run(host=HOSTIP, port=8080)
-app.run(host='0.0.0.0', port=8089)
+app.run(host='0.0.0.0', port=8080)
 
 
