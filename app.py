@@ -12,7 +12,7 @@ from app_support_code import AppSupport as ac
 
 # rootloglev = 30
 
-app = Flask('__name__')
+app = Flask(__name__)
 #app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
 
 env = Environment(
@@ -98,10 +98,10 @@ def results():
 # from socket import gethostname
 # thehost = gethostname()
 _DEBUG = getenv('_DEBUG')
-_DEBUG = 1
+_DEBUG = 0
 #HOSTIP = getenv('HOSTIP')
 
 HOSTIP = '0.0.0.0'
-app.run(host=HOSTIP, port=5000)
+app.run(host=HOSTIP, port=8080)
 
 
