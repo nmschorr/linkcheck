@@ -4,9 +4,9 @@ from requests_html import HTMLSession, HTMLResponse
 from random import random
 from time import sleep
 #import logging
+from os import getenv
 
-
-_MYDEBUG = 1
+_MYDEBUG = getenv('_DEBUG')
 
 
 class LinkCheckLib(object):

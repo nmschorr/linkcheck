@@ -1,12 +1,30 @@
-from os import path
+from os import path, getenv
 import app_support_conf
 
 class AppSupport:
 
+    _DEBUG = getenv('_DEBUG')
+
+    def __init__(cls):
+        #_DEBUG =  getenv('_DEBUG')
+        cls._DEBUG = AppSupport._DEBUG
+
+
+    @staticmethod
+    def myprint(print_str):
+        if not AppSupport._DEBUG:
+            None
+            #print(print_str)
+            #logging.info(print_str)
+        else:
+            #logging.debug(print_str)
+            print(print_str)
+            
+            
     @staticmethod
     def fin_msg(asite):
         thishost = app_support_conf.thishost
-        print("inside hc. ")
+        AppSupport.myprint("inside hc. ")
         outst1 = "<!DOCTYPE html><html><head><title>No Broken Links</title></head><body>"
         answer2 =  "No broken links found for " + asite +". Thanks for using LinkCheck."
         home_url = "<a href=" + thishost + ">Start Over</a>"
@@ -54,7 +72,6 @@ class AppSupport:
         f.write(git_url)
         f.write("</div>" + "</body></html>")
 
-
     @classmethod
     def not_ready_msg(cls, gsite):
 
@@ -62,7 +79,7 @@ class AppSupport:
         jst2 = "javascript:location.reload(true)"
 
         sc1 = "<!DOCTYPE html><html><head>"
-        sc2 = '<script src=./jscript.js></script>'
+        sc2 = '<script src=./templates/linkjscript.js></script>'
         sc3 = '<script>   '
         sc4 = ' function checkDoneFile(){ '
         sc5 = ' var dname=window.location.href + "done";  '
@@ -91,26 +108,21 @@ class AppSupport:
         os_path_plus_stat = path.join(osroot, stat)
         file_os_path_all = path.join(os_path_plus_stat, just_name2)
         os_donefile_path = path.join(os_path_plus_stat, donef_name)
-        print("make_filenames os_donefile_path: ", os_donefile_path)
+        AppSupport.myprint("make_filenames os_donefile_path: " + os_donefile_path)
         return just_stat, donef_name, file_os_path_all, os_donefile_path
 
 
     @classmethod
     def writeres(cls, data, fnfull, osdonefile_loc):
-        print("INSIDE WRITERES!!!!!-----------------------")
-        print("osdonefile_loc WRITERES!!!!!-----------------------" + osdonefile_loc)
+        AppSupport.myprint("INSIDE WRITERES!!!!!-----------------------")
+        AppSupport.myprint("osdonefile_loc WRITERES!!!!!-----------------------" + osdonefile_loc)
         f = open(fnfull, "w")
         f.write('<p></p>')
         cls.datalines(f,data)
 
         f.close() # file is not immediately deleted because we
-        print("reg_os_file_path named: ", fnfull , "f.name: ", f.name)
-        print("osdonef in writeres: ", osdonefile_loc)
+        AppSupport.myprint("reg_os_file_path named: " + fnfull + "f.name: " + f.name)
+        AppSupport.myprint("osdonef in writeres: " + osdonefile_loc)
         fd = open(osdonefile_loc,"w")
         fd.write("done")
         fd.close() # file is not immediately deleted because we
-       # app_support_conf.
-
-    # def method(self):
-    #     ret = self.StaticMethod._stat_func() + app_support_conf.d
-    #     return ret

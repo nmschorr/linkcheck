@@ -117,7 +117,7 @@ class LinkCheck(LinkCheckLib):
                                 continue
                                 baseurl = self.base.get(self.baseurl)
 
-                            _IS_BASE, in_base_local = self.ck_base(THIS_LN, baseurl, base_lnks_loc)
+                            _IS_BASE, in_base_local = self.ck_base(THIS_LN, self.divide_url(_plin), base_lnks_loc)
 
                             if _IS_BASE and good_suffix:  # IS base type
                                 if not in_base_local:

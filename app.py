@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template
-from linkchecklib import l
-from linkcheck import LinkCheck as LinC
+
+from linkcheck import LinkCheck
 from time import sleep
 from threading import Thread
 from jinja2 import Environment, PackageLoader, select_autoescape
@@ -34,20 +34,20 @@ def write_no_err_pg(ste):
     fjj.close()
 
 def worker1(site, timestmp, jname):   # run LinkCheck and print to console
-    myprint("running worker1 thread")
+    ac.myprint("running worker1 thread")
     set_names(site, timestmp, jname)
     just_stat = pcf.get_just_stat()
     notreadyyet(site, just_stat)
-    lc = LinC.LinkCheck()
+    lc = LinkCheck()
     lc.__init__()
-    file_path = pcf.get_file_path()
     answers = lc.main(site)
     donefile_path = pcf.get_donefile_path()
-    myprint("donefile:", donefile_path)
+    ac.myprint("donefile:" + donefile_path)
     sleep(1)
 
-    myprint("donefile in worker1: " + donefile_path)
-    myprint("!!!!!!!!!!==---- len of answers: " + str(len(answers)))
+    ac.myprint("donefile in worker1: " + donefile_path)
+    ac.myprint("!!!!!!!!!!==---- len of answers: " + str(len(answers)))
+    file_path = pcf.get_file_path()
     if len(answers) > -1:
         ac.writeres(answers, file_path, donefile_path)
     else:
@@ -55,7 +55,7 @@ def worker1(site, timestmp, jname):   # run LinkCheck and print to console
         write_no_err_pg("no errors found", pcf)
 
     dt = str(datetime.now())
-    myprint( dt + "  worker1 done")
+    ac.myprint( dt + "  worker1 done")
 
 
     #-----------------------------------------------------------------------------
@@ -83,21 +83,21 @@ def index():
 # @nocache             # very important so client server doesn'w_thread cache results
 def results():
     threads = []
-    just_name = ''
-    try:
-        site = request.form['name']
-        timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
-        just_name = "res" + timestp1 + ".html"
-        w_thread = Thread(target=worker1, args=(site,timestp1, just_name))
-        threads.append(w_thread)
-        w_thread.start()
-        myprint("just started thread. You entered: " + site)
-    except Exception as e:
-        myprint(str(e))
-    return render_template('results.html', name = just_name)  ## has a form
+    #try:
+    site = request.form['name']
+    timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
+    justname = "res" + timestp1 + ".html"
+    w_thread = Thread(target=worker1, args=(site,timestp1, justname))
+    threads.append(w_thread)
+    w_thread.start()
+    #ac.myprint("just started thread. You entered: " + site)
+    #except Exception as e:
+        #ac.myprint(str(e))
+    return render_template('results.html', name = justname)  ## has a form
 
 # from socket import gethostname
 # thehost = gethostname()
+_DEBUG = getenv('_DEBUG')
 
 HOSTIP = getenv('HOSTIP')
 app.run(host=HOSTIP, port=8080, debug=True)
