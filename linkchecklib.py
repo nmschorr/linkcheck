@@ -152,7 +152,8 @@ class LinkCheckLib(object):
             if base_links_local:
                 in_base_loc = bool(this_link in [i for i in base_links_local])
         except Exception as e:
-            print("Exception ck_base: " + str(e))
+            None
+            #print("Exception ck_base: " + str(e))
         return _IS_BASE, in_base_loc
     #-----------------------------------------------------------------------
 
@@ -315,7 +316,7 @@ class LinkCheckLib(object):
     
     @classmethod
     def has_early_dollar( cls, clink, base_p):
-        print("in hasearlydollar: ", clink, " ", base_p)
+        LinkCheckLib.myprint("in hasearlydollar: ", clink, " ", base_p)
         bp = clink.index(base_p)
         if "$" or "?" or "#" in clink:
             if (clink.index("$") < bp) or (clink.index("?") < bp) or (clink.index("#") < bp):
