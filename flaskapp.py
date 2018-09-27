@@ -115,8 +115,8 @@ def results():
 application.config['PROPAGATE_EXCEPTIONS'] = True
 
 try: {
-    application.run('0.0.0.0', 8080, debug=True)
-    #application.run('127.0.0.1', 8080, debug=True)
+    #application.run('0.0.0.0', 8080, debug=True)
+    application.run('127.0.0.1', 8080, debug=True)
 
 }
 except Exception as e:
@@ -127,5 +127,5 @@ except Exception as e:
 
 if __name__ == '__main__':
     #app = create_app()
-    #app.run('127.0.0.1', 8080)
-    application.run('0.0.0.0', 8080, debug=True)
+    application.run('127.0.0.1', 8080)
+    #application.run('0.0.0.0', 8080, debug=True)

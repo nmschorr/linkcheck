@@ -15,26 +15,21 @@
 
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-
-<style>
-body { padding-left:10em;}
-h4 {color:purple;}
-</style>
 </head>
 
 
-<body>
+<body style="{ padding-left:10em; }" >
+<div style="{ padding-left:10em; color:purple; }">
 
 <br>
-<p></p>
-
-<p></p>
+<p>&nbsp;</p>
 
 
-<h4>  Click the link below to check your results:</h4>
 
-<script type="text/javascript"></script>
-<script>
+<h4> &nbsp;&nbsp;&nbsp;&nbsp; Click the link below to check your results:</h4>
+
+
+<script type="text/javascript">
 var fname = '{{ name }}';
 var df = document.referrer;
 var statd = "static/";
@@ -47,14 +42,21 @@ document.write("</div>");
 document.write("<p></p>");
 </script>
 
-<div style=padding-left:5em;>
-    <h4><i> This might take up to 10+ mins for larger websites.</i>
-
-<p>&nbsp;</p>
-<p>&nbsp;</p></h4>
 </div>
+<div style="{ padding-left:10em; color:purple;}">
+    <h4 style="color:purple;"><i>
+        &ensp; &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;
+        This might take up to 10+ mins for larger websites.</i>
+    </h4>
+
+</div>
+
 <div>
-</div></body>
+    <p>&nbsp;</p>
+
+</div>
+
+</body>
 
 <head>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />

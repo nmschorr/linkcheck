@@ -6,8 +6,8 @@ class AppSupport:
 
     # _DEBUG = getenv('_DEBUG')
 
-    def __init__(cls):
-        cls._DEBUG = AppSupport._DEBUG
+    def __init__(self):
+        self._DEBUG = AppSupport._DEBUG
 
 
     @staticmethod
@@ -91,7 +91,7 @@ class AppSupport:
         toppt = sc1 + sc2 + sc3 + sc4 + sc5 + sc6 + sc7 + sc7b
 
         st1 = "<style>body {padding-left:10em;}</style></head>"
-        st2 = "<body>   "
+        st2 = "<body style='{padding-left:10em;}'> "
         st3 = "<script>setInterval(checkDoneFile, 2000);</script>"
         st4 = "Results not ready yet." + '<p></p>' + "You entered: " + gsite + '<p></p>' + \
                    "Page will automatically reload until results appear." + '<p></p>'
