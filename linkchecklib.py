@@ -76,14 +76,16 @@ class LinkCheckLib(object):
 
 
     def ck_g(self, this_link):
-        any_link_glob = self.base.get(self.ra)
+        ra = self.ra
+        any_link_glob = self.base.get(ra)
         return bool(this_link in [i[0] for i in any_link_glob])
 
     #-----------------------------------------------------------------------------
 
      
     def _DONE_YET(self, this_link):
-        done_ln_gl_sing = self.base.get(self.rd)
+        rd = self.rd
+        done_ln_gl_sing = self.base.get(rd)
 
         return bool(this_link in done_ln_gl_sing)
     #-----------------------------------------------------------------------------
@@ -97,7 +99,8 @@ class LinkCheckLib(object):
     def return_errors(self):
 
         finlist = []
-        err_links = self.base.get(self.re)
+        re = self.re
+        err_links = self.base.get(re)
         
         if err_links is None:
             err_links = []
@@ -154,7 +157,8 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------
 
     def do_response(self, a_link, p_link):
-        done_ln_gl_sing = self.base.get(self.rd)
+        rd = self.rd
+        done_ln_gl_sing = self.base.get(rd)
         t_err = 0
         resp = None
         try:
@@ -244,7 +248,8 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------------
 
     def handle_exc( self, e, link, plink):
-        err_links = self.base.get(self.re)
+        re = self.re
+        err_links = self.base.get(re)
 
         tempstr = str(e)
         LinkCheckLib.myprint('!!!!! Inside handle_exc. Error------------------\n' + tempstr)
@@ -254,10 +259,11 @@ class LinkCheckLib(object):
             return
         elif link not in err_links:
             err_links.append((link, tempstr[:42], plink))
-        self.base.update({self.re:err_links})
+        self.base.update({re:err_links})
     #-----------------------------------------------------------------------------
     def ck_status_code_simple(self, tlink, tpar, stat):
-        err_links = self.base.get(self.re)
+        re = self.re
+        err_links = self.base.get(re)
         try:
             err_codes = [400, 404, 408, 409]
             if stat in err_codes:
@@ -269,11 +275,12 @@ class LinkCheckLib(object):
         except Exception as e:
             LinkCheckLib.myprint("Exception in ck_status_code: " + str(e))
             pass
-        self.base.update({self.re:err_links})
+        self.base.update({re:err_links})
     #-----------------------------------------------------------------------------
 
     def ck_status_code(self, t_link, tpar, st_code):
-        err_links = self.base.get(self.re)
+        re = self.re
+        err_links = self.base.get(re)
         try:
             err_codes = [400, 404, 408, 409]
             if st_code in err_codes:
@@ -284,7 +291,7 @@ class LinkCheckLib(object):
         except Exception as e:
             LinkCheckLib.myprint("Exception in ck_status_code: " + str(e))
             pass
-        self.base.update({self.re:err_links})
+        self.base.update({re:err_links})
 
     #-----------------------------------------------------------------------------
 

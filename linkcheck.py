@@ -26,7 +26,8 @@ class LinkCheck(LinkCheckLib):
 
     #---------------------------------------------------------------------------------------
     def add_any_bse_g(self, zlink, parent_local):  # Adding this base link to base glob
-        base_lnks_g = self.base.get(self.rb)
+        rb = self.rb
+        base_lnks_g = self.base.get(rb)
 
         if base_lnks_g is None:
             base_lnks_g = []
@@ -42,10 +43,11 @@ class LinkCheck(LinkCheckLib):
         except Exception as e:
             LinkCheckLib.myprint("Exception add_any_bse_g: " + str(e))
 
-        self.base.update({self.rb: base_lnks_g})
+        self.base.update({rb: base_lnks_g})
     #---------------------------------------------------------------------------------------
     def add_any(self, tlink, parent_local, any_link_loc=None):  # Adding this base link to any glob
-        any_link_glob = self.base.get(self.ra)
+        ra = self.ra
+        any_link_glob = self.base.get(ra)
         if any_link_loc is None:
             any_link_loc = []
         try:
@@ -57,7 +59,7 @@ class LinkCheck(LinkCheckLib):
             else:
                 any_link_glob.append((tlink, parent_local))  # make it if starting empty
                 any_link_loc.append((tlink, parent_local))
-            self.base.update({self.ra: any_link_glob})
+            self.base.update({ra: any_link_glob})
         except Exception as e:
             LinkCheckLib.myprint("exception in add_any: " + str(e))
 
@@ -66,8 +68,10 @@ class LinkCheck(LinkCheckLib):
 
     # #----------------------------------------------------------------------get_links-
     def get_links(self, mainlin, _plin):
-        done_ln_gl_sing = self.base.get(self.rd)
-        any_link_glob= self.base.get(self.ra)
+        ra = self.ra
+        rd = self.rd
+        done_ln_gl_sing = self.base.get(rd)
+        any_link_glob= self.base.get(ra)
         from time import sleep
 
         LinkCheckLib.myprint("-------------Starting get_links with: " + mainlin)
@@ -134,8 +138,8 @@ class LinkCheck(LinkCheckLib):
 
             LinkCheckLib.myprint('---returning base_links_local: ' + str(base_lnks_loc))
             LinkCheckLib.myprint('!! NEW----end get_home_links \n\n')
-            self.base.update({self.rd: done_ln_gl_sing})
-            self.base.update({self.ra: any_link_glob})
+            self.base.update({rd: done_ln_gl_sing})
+            self.base.update({ra: any_link_glob})
 
             return list(set(base_lnks_loc))
 
@@ -144,7 +148,8 @@ class LinkCheck(LinkCheckLib):
     #############----------------------------------MAIN--------------------------
       #############----------------------------------MAIN-------------------------
     def rem_errs(self, tlinks=None):
-        done_ln_gl_sing = self.base.get(self.rd)
+        rd = self.rd
+        done_ln_gl_sing = self.base.get(rd)
         if tlinks is None:
             tlinks = []
         for link in tlinks:
@@ -155,8 +160,10 @@ class LinkCheck(LinkCheckLib):
 
 
     def main(self, a_site="a.htm"):
-        base_lnks_g = self.base.get(self.rb)
-        any_link_glob= self.base.get(self.ra)
+        ra = self.ra
+        rb = self.rb
+        base_lnks_g = self.base.get(rb)
+        any_link_glob= self.base.get(ra)
 
         baseurl = LinkCheckLib.divide_url(a_site)
         self.base.update({baseurl: baseurl})

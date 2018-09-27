@@ -1,4 +1,5 @@
-from flask import Flask, request, render_template, url_for
+from flask import Flask, request, render_template
+import logging
 
 from linkcheck import LinkCheck
 from time import sleep
@@ -10,10 +11,14 @@ import prodconf as pcf
 from app_support_code import AppSupport as ac
 from werkzeug.debug import get_current_traceback
 
-# rootloglev = 30
+
+logr = logging.getLogger('werkzeug').setLevel(logging.DEBUG)
+
+
+#rootloglev = 40
 
 #app = Flask(__name__, instance_relative_config=True)
-application = Flask(__name__)
+app = Flask(__name__)
 
 #app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
 env = Environment(
@@ -69,7 +74,7 @@ def set_names(site, timestp4, justn):
     pcf.set_timestp(timestp4)
     pcf.set_site(site)
     pcf.set_just_name(just_name)
-    osroot = application.root_path  # os path
+    osroot = app.root_path  # os path
     just_stat, donefile, file_path, donefile_path = ac.make_filenames(osroot, timestp4, just_name)
     pcf.set_just_stat(just_stat)
     pcf.set_donefile(donefile)
@@ -78,13 +83,13 @@ def set_names(site, timestp4, justn):
 
 
 
-@application.route('/')
+@app.route('/')
 def index():
     return render_template('index.html')  ## has a form
 
 # @nocache             # very important so client server doesn'w_thread cache results
 
-@application.route('/results', methods = ['POST','GET'])
+@app.route('/results', methods = ['POST', 'GET'])
 def results():
     #try:
     site = request.form['name']
@@ -112,11 +117,11 @@ def results():
 
 #app.run('127.0.0.1', 8080, debug=True)
 
-application.config['PROPAGATE_EXCEPTIONS'] = True
+app.config['PROPAGATE_EXCEPTIONS'] = True
 
 try: {
-    #application.run('0.0.0.0', 8080, debug=True)
-    application.run('127.0.0.1', 8080, debug=True)
+    #app.run('0.0.0.0', 8080, debug=True)
+    app.run('127.0.0.1', 8080, debug=True)
 
 }
 except Exception as e:
@@ -127,5 +132,5 @@ except Exception as e:
 
 if __name__ == '__main__':
     #app = create_app()
-    application.run('127.0.0.1', 8080)
-    #application.run('0.0.0.0', 8080, debug=True)
+    app.run('127.0.0.1', 8080)
+    #app.run('0.0.0.0', 8080, debug=True)
