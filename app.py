@@ -47,7 +47,6 @@ def worker1(site, timestmp, jname):   # run LinkCheck and print to console
     answers = lc.main(site)
     donefile_path = pcf.get_donefile_path()
     ac.myprint("donefile:" + donefile_path)
-    sleep(1)
 
     ac.myprint("donefile in worker1: " + donefile_path)
     ac.myprint("!!!!!!!!!!==---- len of answers: " + str(len(answers)))
@@ -58,6 +57,7 @@ def worker1(site, timestmp, jname):   # run LinkCheck and print to console
         #logging.debug("no errors found")
         write_no_err_pg(site)
 
+    sleep(1)
     dt = str(datetime.now())
     ac.myprint( dt + "  worker1 done")
 
@@ -94,7 +94,7 @@ def results():
     w_thread = Thread(target=worker1, args=(site,timestp1, name))
     threads.append(w_thread)
     w_thread.start()
-    sleep(2)
+    sleep(5)
     print("just started thread. You entered: " + site)
     #except Exception as e:
         #ac.myprint(str(e))
@@ -125,6 +125,7 @@ def results():
 #     print(t)
 
 app.run('0.0.0.0', 8080)
+#app.run('127.0.0.1', 8080)
 
 if __name__ == '__main__':
     app.run('0.0.0.0', 8080)
