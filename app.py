@@ -12,10 +12,13 @@ from app_support_code import AppSupport as ac
 from werkzeug.debug import get_current_traceback
 
 
-logr = logging.getLogger('werkzeug').setLevel(logging.DEBUG)
+#logr = logging.getLogger('werkzeug').setLevel(logging.DEBUG)
+import sys
 
+#fsock = open('error.log', 'w')               1
+sys.stderr = sys.stdout
 
-#rootloglev = 40
+rootloglev = 40
 
 #app = Flask(__name__, instance_relative_config=True)
 app = Flask(__name__)
@@ -120,8 +123,8 @@ def results():
 app.config['PROPAGATE_EXCEPTIONS'] = True
 
 try: {
-    #app.run('0.0.0.0', 8080, debug=True)
-    app.run('127.0.0.1', 8080, debug=True)
+    app.run('0.0.0.0', 8080, debug=True)
+    #app.run('127.0.0.1', 8080, debug=True)
 
 }
 except Exception as e:
@@ -132,5 +135,5 @@ except Exception as e:
 
 if __name__ == '__main__':
     #app = create_app()
-    app.run('127.0.0.1', 8080)
-    #app.run('0.0.0.0', 8080, debug=True)
+    app.run('0.0.0.0', 8080)
+    #app.run('127.0.0.1', 8080, debug=True)
