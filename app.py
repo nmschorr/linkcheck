@@ -24,14 +24,13 @@ env = Environment(
 def notreadyyet(ste, jname):
     newst= ac.not_ready_msg(ste)
     js = './static/' + jname
-    #print("just_stat: ", js)
+    just_stat = pcf.set_just_stat(js)
     fj = open(js, "w")
     fj.write(newst)
     fj.close()
 
 def write_no_err_pg(asited):
     just_stat = pcf.get_just_stat()
-    #print("just_stat: ", just_stat)
     newstt = ac.fin_msg(asited)
     fjj = open(just_stat, "w")
     fjj.write(newstt)
@@ -40,7 +39,6 @@ def write_no_err_pg(asited):
 def worker1(site, timestmp, jname):   # run LinkCheck and print to console
     ac.myprint("running worker1 thread")
     set_names(site, timestmp, jname)
-    just_stat = pcf.get_just_stat()
     notreadyyet(site, jname)
     lc = LinkCheck()
     lc.__init__()
@@ -86,7 +84,6 @@ def index():
 
 @app.route('/results', methods = ['POST', 'GET'])
 def results():
-    #try:
     site = request.form['name']
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     name = "res" + timestp1 + ".html"
@@ -96,36 +93,10 @@ def results():
     w_thread.start()
     sleep(5)
     print("just started thread. You entered: " + site)
-    #except Exception as e:
-        #ac.myprint(str(e))
     return render_template('results.html', name = name)  ## has a form
 
-# from socket import gethostname
-# thehost = gethostname()
-#_DEBUG = getenv('_DEBUG')
-#_DEBUG = 0
-#HOSTIP = getenv('HOSTIP')
-#'127.0.0.1'
-#HOSTIP = '0.0.0.0'
-#app.run(host=HOSTIP, port=8080)
-#app.run('0.0.0.0', 8080, debug=True)
-
-#app.run('127.0.0.1', 8080, debug=True)
-
-# app.config['PROPAGATE_EXCEPTIONS'] = True
-#
-# try: {
-#     #app.run('127.0.0.1', 8080, debug=True)
-#
-# }
-# except Exception as e:
-#     track = get_current_traceback(skip=1, show_hidden_frames=True, ignore_system_exceptions=False)
-#     # track.log()
-#     t = str(track)
-#     print(t)
-
 #app.run('0.0.0.0', 8080)
-app.run('127.0.0.1', 8080)
+app.run('127.0.0.1', 5000)
 
 if __name__ == '__main__':
     app.run('0.0.0.0', 8080)
