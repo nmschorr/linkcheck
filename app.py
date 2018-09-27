@@ -1,5 +1,4 @@
 from flask import Flask, request, render_template
-#import logging
 
 from linkcheck import LinkCheck
 from time import sleep
@@ -10,20 +9,13 @@ from datetime import datetime
 import prodconf as pcf
 from app_support_code import AppSupport as ac
 #from werkzeug.debug import get_current_traceback
-# this comment is new
 
-#logr = logging.getLogger('werkzeug').setLevel(logging.DEBUG)
-#import sys
 
-#fsock = open('error.log', 'w')               1
 #sys.stderr = sys.stdout
-
 #rootloglev = 40
 
-#app = Flask(__name__, instance_relative_config=True)
 app = Flask(__name__)
 
-#app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
 env = Environment(
     loader=PackageLoader('linkcheck', 'templates'),
     autoescape=select_autoescape(['html', 'xml']),
@@ -32,14 +24,14 @@ env = Environment(
 def notreadyyet(ste, jname):
     newst= ac.not_ready_msg(ste)
     js = './static/' + jname
-    print("just_stat: ", js)
+    #print("just_stat: ", js)
     fj = open(js, "w")
     fj.write(newst)
     fj.close()
 
 def write_no_err_pg(asited):
     just_stat = pcf.get_just_stat()
-    print("just_stat: ", just_stat)
+    #print("just_stat: ", just_stat)
     newstt = ac.fin_msg(asited)
     fjj = open(just_stat, "w")
     fjj.write(newstt)
@@ -102,8 +94,8 @@ def results():
     w_thread = Thread(target=worker1, args=(site,timestp1, name))
     threads.append(w_thread)
     w_thread.start()
-    #sleep(3)
-    #ac.myprint("just started thread. You entered: " + site)
+    sleep(2)
+    print("just started thread. You entered: " + site)
     #except Exception as e:
         #ac.myprint(str(e))
     return render_template('results.html', name = name)  ## has a form

@@ -7,7 +7,7 @@ from time import sleep
 from os import getenv
 
 #_MYDEBUG = getenv('_DEBUG')
-_MYDEBUG=1
+_MYDEBUG=0
 
 class LinkCheckLib(object):
  
@@ -46,14 +46,14 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------------
 
     @staticmethod
-    def myprint(print_str,_MYDEBUG=1 ):
-        _MYDEBUG = 1
-        if not _MYDEBUG:
+    def myprint(print_str,_MYDEBUG=0 ):
+        _MYDEBUG = 0
+        if _MYDEBUG:
             print(print_str)
             #logging.info(print_str)
         else:
             #logging.debug(print_str)
-            print(print_str)
+            None
 
 
     #-----------------------------------------------------------------------------
