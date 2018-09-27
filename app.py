@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template
-import logging
+#import logging
 
 from linkcheck import LinkCheck
 from time import sleep
@@ -9,16 +9,16 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from datetime import datetime
 import prodconf as pcf
 from app_support_code import AppSupport as ac
-from werkzeug.debug import get_current_traceback
+#from werkzeug.debug import get_current_traceback
 
 
 #logr = logging.getLogger('werkzeug').setLevel(logging.DEBUG)
-import sys
+#import sys
 
 #fsock = open('error.log', 'w')               1
-sys.stderr = sys.stdout
+#sys.stderr = sys.stdout
 
-rootloglev = 40
+#rootloglev = 40
 
 #app = Flask(__name__, instance_relative_config=True)
 app = Flask(__name__)
@@ -120,20 +120,19 @@ def results():
 
 #app.run('127.0.0.1', 8080, debug=True)
 
-app.config['PROPAGATE_EXCEPTIONS'] = True
+# app.config['PROPAGATE_EXCEPTIONS'] = True
+#
+# try: {
+#     #app.run('127.0.0.1', 8080, debug=True)
+#
+# }
+# except Exception as e:
+#     track = get_current_traceback(skip=1, show_hidden_frames=True, ignore_system_exceptions=False)
+#     # track.log()
+#     t = str(track)
+#     print(t)
 
-try: {
-    app.run('0.0.0.0', 8080, debug=True)
-    #app.run('127.0.0.1', 8080, debug=True)
-
-}
-except Exception as e:
-    track = get_current_traceback(skip=1, show_hidden_frames=True, ignore_system_exceptions=False)
-    # track.log()
-    t = str(track)
-    print(t)
+app.run('0.0.0.0', 8080)
 
 if __name__ == '__main__':
-    #app = create_app()
     app.run('0.0.0.0', 8080)
-    #app.run('127.0.0.1', 8080, debug=True)
