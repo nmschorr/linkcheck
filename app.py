@@ -14,7 +14,7 @@ from waitress import serve
 #sys.stderr = sys.stdout
 #rootloglev = 40
 
-app = Flask(__name__)
+appf = Flask(__name__)
 
 env = Environment(
     loader=PackageLoader('linkcheck', 'templates'),
@@ -67,7 +67,7 @@ def set_names(site, timestp4, justn):
     pcf.set_timestp(timestp4)
     pcf.set_site(site)
     pcf.set_just_name(just_name)
-    osroot = app.root_path  # os path
+    osroot = appf.root_path  # os path
     just_stat, donefile, file_path, donefile_path = ac.make_filenames(osroot, timestp4, just_name)
     pcf.set_just_stat(just_stat)
     pcf.set_donefile(donefile)
@@ -76,13 +76,13 @@ def set_names(site, timestp4, justn):
 
 
 
-@app.route('/')
+@appf.route('/')
 def index():
     return render_template('index.html')  ## has a form
 
 # @nocache             # very important so client server doesn'w_thread cache results
 
-@app.route('/results', methods = ['POST', 'GET'])
+@appf.route('/results', methods = ['POST', 'GET'])
 def results():
     site = request.form['name']
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
@@ -98,11 +98,11 @@ def results():
 
 
 
-#serve(app, listen='0.0.0.0:8080')
-#serve(app, host='0.0.0.0', port=8080)
-serve(app, host='0.0.0.0', port=8080)
+#serve(appf, listen='0.0.0.0:8080')
+#serve(appf, host='0.0.0.0', port=8080)
+#serve(appf, listen="0.0.0.0:8080 [::1]:8080")
 
 if __name__ == '__main__':
-    #serve(app)
-    #serve(app, listen="127.0.0.1:8080 [::1]:8080")
-    serve(app, host='0.0.0.0', port=8080)
+    #serve(appf)
+    #serve(appf, listen="127.0.0.1:8080 [::1]:8080")
+    serve(appf, listen="0.0.0.0:8080")
