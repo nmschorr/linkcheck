@@ -1,18 +1,14 @@
 
 from urllib.parse import urlsplit
-from requests_html import HTMLSession, HTMLResponse
+from requests_html import HTMLSession
 from random import random
-from time import sleep
-#import logging
-from os import getenv
-
-#_MYDEBUG = getenv('_DEBUG')
-_MYDEBUG=0
 
 class LinkCheckLib(object):
- 
-    def __init__(self):
-        rand = str(random())
+
+    def __init__(self, timestmp):
+        self.base = dict()
+        rand = timestmp
+
         re = "re_" + rand
         rd = "rd_" + rand
         ra = "ra_" + rand
@@ -22,9 +18,6 @@ class LinkCheckLib(object):
         self.ra = ra
         self.rb = rb
 
-        base = dict()
-
-        self.base = base
 
 
         err_links = []
@@ -46,9 +39,10 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------------
 
     @staticmethod
-    def myprint(print_str,_MYDEBUG=0 ):
-        _MYDEBUG = 0
-        if _MYDEBUG:
+    def myprint(print_str, mdebug=0 ):
+
+        mdebug = 0
+        if mdebug:
             print(print_str)
             #logging.info(print_str)
         else:
@@ -221,16 +215,6 @@ class LinkCheckLib(object):
             LinkCheckLib.myprint("Exception in has_correct_suffix: " + str(e))
         return final_answer
     #-----------------------------------------------------------------------------
-
-
-    # @classmethod
-    # def myprinter(cls, print_str):
-    #     global _MYDEBUG
-    #     if not _MYDEBUG:
-    #         logging.info(print_str)
-    #     else:
-    #         logging.debug(print_str)
-
     #-----------------------------------------------------------------------------
 
     def load_tlds(self):
@@ -316,7 +300,7 @@ class LinkCheckLib(object):
     
     @classmethod
     def has_early_dollar( cls, clink, base_p):
-        LinkCheckLib.myprint("in hasearlydollar: ", clink, " ", base_p)
+        LinkCheckLib.myprint("in hasearlydollar: " + clink + " " + base_p)
         bp = clink.index(base_p)
         if "$" or "?" or "#" in clink:
             if (clink.index("$") < bp) or (clink.index("?") < bp) or (clink.index("#") < bp):
