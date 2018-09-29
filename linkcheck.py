@@ -7,8 +7,8 @@ import requests
 
 class LinkCheck(LinkCheckLib):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, timestmp):
+        super().__init__(timestmp)
 
     def get_simple_response(self, lin_and_par_tup):
         link_count, stat = 0, 0
@@ -159,7 +159,7 @@ class LinkCheck(LinkCheckLib):
 
 
 
-    def main(self, a_site="a.htm"):
+    def main(self, a_site="a.htm", timest='12345'):
         ra = self.ra
         rb = self.rb
         base_lnks_g = self.base.get(rb)

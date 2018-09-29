@@ -4,11 +4,11 @@ from linkcheck import LinkCheck
 from time import sleep
 from threading import Thread
 from jinja2 import Environment, PackageLoader, select_autoescape
-# from nocache import nocache
 from datetime import datetime
 import prodconf as pcf
 from app_support_code import AppSupport as ac
-#from werkzeug.debug import get_current_traceback
+# from nocache import nocache
+from waitress import serve
 
 
 #sys.stderr = sys.stdout
@@ -24,7 +24,7 @@ env = Environment(
 def notreadyyet(ste, jname):
     newst= ac.not_ready_msg(ste)
     js = './static/' + jname
-    just_stat = pcf.set_just_stat(js)
+    pcf.set_just_stat(js)
     fj = open(js, "w")
     fj.write(newst)
     fj.close()
@@ -40,9 +40,9 @@ def worker1(site, timestmp, jname):   # run LinkCheck and print to console
     ac.myprint("running worker1 thread")
     set_names(site, timestmp, jname)
     notreadyyet(site, jname)
-    lc = LinkCheck()
-    lc.__init__()
-    answers = lc.main(site)
+    lc = LinkCheck(timestmp)
+    #lc.__init__()
+    answers = lc.main(site, timestmp)
     donefile_path = pcf.get_donefile_path()
     ac.myprint("donefile:" + donefile_path)
 
@@ -91,12 +91,17 @@ def results():
     w_thread = Thread(target=worker1, args=(site,timestp1, name))
     threads.append(w_thread)
     w_thread.start()
-    sleep(5)
+    sleep(4)
     print("just started thread. You entered: " + site)
     return render_template('results.html', name = name)  ## has a form
 
-#app.run('0.0.0.0', 8080)
-app.run('127.0.0.1', 5000)
+
+
+
+#serve(app, listen='0.0.0.0:8080')
+#serve(app, host='0.0.0.0', port=8080)
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', 8080)
+    #serve(app)
+    #serve(app, listen="127.0.0.1:8080 [::1]:8080")
+    serve(app, host='0.0.0.0', port=8080)

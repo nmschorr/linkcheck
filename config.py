@@ -4,7 +4,8 @@
 # bind = '0.0.0.0.0:8080'
 # PYTHONUNBUFFERED = 1
 # PORT = '8080'
-GUNICORN_CMD_ARGS="--bind=0.0.0.0:8080"
+#GUNICORN_CMD_ARGS="--bind=0.0.0.0:8080"
+#GUNICORN_CMD_ARGS="--bind=127.0.0.1:8089 app:app"
 
 
 
