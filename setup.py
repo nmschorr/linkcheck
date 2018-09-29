@@ -12,8 +12,9 @@ setup(
       install_requires=[
             'flask',
             'requests_html',
-            'gunicorn',
             'validators',
             'jinja2',
+            'waitress',
+            'requests',
       ],
       )
