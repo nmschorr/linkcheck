@@ -8,7 +8,7 @@ from app_support_code import AppSupport as ac
 from time import sleep
 # from nocache import nocache
 from linkcheck import LinkCheck
-
+import requests
 
 #sys.stderr = sys.stdout
 #rootloglev = 40
@@ -35,12 +35,21 @@ def write_no_err_pg(asited):
     fjj.write(newstt)
     fjj.close()
 
-def worker1(site, timestmp, jname):   # run LinkCheck and print to console
-    ac.myprint("running worker1 thread")
+def worker1(df):
+    stat = '0'
+    df = "http://Delia:8080/static/" + df + "done"
+    print("checking: " + df)
+    while stat != 200:
+        stat = requests.head(df).status_code
+        print("file not done yet ", stat)
+        sleep(1)
+    print("worker1 done")
+
+def worker2(site, timestmp, jname):   # run LinkCheck and print to console
+    ac.myprint("running worker2 thread")
     set_names(site, timestmp, jname)
     notreadyyet(site, jname)
     lc = LinkCheck()
-    #lc.__init__()
     answers = lc.main(site)
     donefile_path = pcf.get_donefile_path()
     ac.myprint("donefile:" + donefile_path)
@@ -56,7 +65,7 @@ def worker1(site, timestmp, jname):   # run LinkCheck and print to console
 
     sleep(1)
     dt = str(datetime.now())
-    ac.myprint( dt + "  worker1 done")
+    ac.myprint( dt + "  worker2 done")
 
 
     #-----------------------------------------------------------------------------
@@ -85,18 +94,26 @@ def index():
 def results():
     site = request.form['name']
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
-    name = "res" + timestp1 + ".html"
+    rfname = "res" + timestp1 + ".html"
     threads = []
-    w_thread = Thread(target=worker1, args=(site,timestp1, name))
-    threads.append(w_thread)
-    w_thread.start()
-    sleep(4)
+    w1_thread = Thread(target=worker1, args=(rfname,))
+    w1_thread.setDaemon(True)
+                #Instead, you should provide args a tuple:
+    print('rfname: ', rfname)
+
+    w2_thread = Thread(target=worker2, args=(site,timestp1, rfname))
+    threads.append(w1_thread)
+    threads.append(w2_thread)
+    w1_thread.start()
+
+    w2_thread.start()
+    sleep(3)
     print("just started thread. You entered: " + site)
-    return render_template('results.html', name = name)  ## has a form
+    return render_template('results.html', name = rfname)  ## has a form
 
 
 #serve(app, listen="127.0.0.1:8080")
 
 if __name__ == '__main__':
-    serve(app)
+    serve(app, channel_timeout=360)
     #app.run(host='127.0.0.1', port=5000, debug=True)
