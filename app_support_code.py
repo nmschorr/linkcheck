@@ -1,15 +1,17 @@
 from os import path
 import app_support_conf
+from config import conf_debug
 
 class AppSupport:
-    _DEBUG = 0
-    # _DEBUG = getenv('_DEBUG')
+    _DEBUG = conf_debug
+
     def __init__(self):
-        self._DEBUG = AppSupport._DEBUG
+        self.conf_debug = conf_debug
 
     @staticmethod
     def myprint(print_str,_DEBUG=0 ):
-        if AppSupport._DEBUG:
+
+        if conf_debug:
             None
             print(print_str)
             #logging.info(print_str)

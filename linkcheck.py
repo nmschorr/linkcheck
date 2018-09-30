@@ -6,6 +6,7 @@
 import requests
 import linkchecklib
 from linkchecklib import LinkCheckLib
+from urllib.parse import urlparse
 
 class LinkCheck(LinkCheckLib):
 
@@ -17,19 +18,19 @@ class LinkCheck(LinkCheckLib):
         #er, response = "0", "0"
         link_to_ck, parent = lin_and_par_tup[0], lin_and_par_tup[1]
         link_count += 1
-        LinkCheckLib.myprint("Checking this link: " + link_to_ck )
+        self.myprint("Checking this link: " + link_to_ck )
         try:
             stat = requests.get(link_to_ck).status_code
             self.ck_status_code_simple(link_to_ck, parent, stat)
 
         except Exception as e:
-            #LinkCheckLib.myprint("Exception inside get_simple_response: " + str(e))
+            #self.myprint("Exception inside get_simple_response: " + str(e))
             self.handle_exc(e, link_to_ck, parent)
 
     #---------------------------------------------------------------------------------------
-    def add_any_bse_g(self, zlink, parent_local):  # Adding this base link to base glob
+    def add_any_bse_g(self, zlink, parent_local):  # Adding this MAIN_DICT link to MAIN_DICT glob
         rb = self.rb
-        base_lnks_g = self.base.get(rb)
+        base_lnks_g = self.MAIN_DICT.get(rb)
 
         if base_lnks_g is None:
             base_lnks_g = []
@@ -38,18 +39,18 @@ class LinkCheck(LinkCheckLib):
                 _IN_BASE_GLOB = bool(zlink in [i[0] for i in base_lnks_g])
                 if not _IN_BASE_GLOB:  # if not already in this
                     base_lnks_g.append((zlink, parent_local))
-                    LinkCheckLib.myprint("Adding this BASE LINK to base glob: " + zlink)
+                    self.myprint("Adding this BASE LINK to MAIN_DICT glob: " + zlink)
             else:
                 base_lnks_g = [(zlink, parent_local)]
 
         except Exception as e:
-            LinkCheckLib.myprint("Exception add_any_bse_g: " + str(e))
+            self.myprint("Exception add_any_bse_g: " + str(e))
 
-        self.base.update({rb: base_lnks_g})
+        self.MAIN_DICT.update({rb: base_lnks_g})
     #---------------------------------------------------------------------------------------
-    def add_any(self, tlink, parent_local, any_link_loc=None):  # Adding this base link to any glob
+    def add_any(self, tlink, parent_local, any_link_loc=None):  # Adding this MAIN_DICT link to any glob
         ra = self.ra
-        any_link_glob = self.base.get(ra)
+        any_link_glob = self.MAIN_DICT.get(ra)
         if any_link_loc is None:
             any_link_loc = []
         try:
@@ -61,24 +62,24 @@ class LinkCheck(LinkCheckLib):
             else:
                 any_link_glob.append((tlink, parent_local))  # make it if starting empty
                 any_link_loc.append((tlink, parent_local))
-            self.base.update({ra: any_link_glob})
+            self.MAIN_DICT.update({ra: any_link_glob})
         except Exception as e:
-            LinkCheckLib.myprint("exception in add_any: " + str(e))
+            self.myprint("exception in add_any: " + str(e))
 
         return any_link_loc
 
 
     # #----------------------------------------------------------------------get_links-
-    def get_links(self, mainlin, _plin):
+    def get_links(self, mainlin, par_link):
         ra = self.ra
         rd = self.rd
-        done_ln_gl_sing = self.base.get(rd)
-        any_link_glob= self.base.get(ra)
+        done_ln_gl_sing = self.MAIN_DICT.get(rd)
+        any_link_glob= self.MAIN_DICT.get(ra)
         from time import sleep
 
-        LinkCheckLib.myprint("-------------Starting get_links with: " + mainlin)
+        self.myprint("-------------Starting get_links with: " + mainlin)
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], "0", []
-        response, resp_err = self.do_response(mainlin, _plin)
+        response, resp_err = self.do_response(mainlin, par_link)
         sleep(.05)
         is_bool = True
         good_suffix = True
@@ -87,10 +88,10 @@ class LinkCheck(LinkCheckLib):
 
         try:
             if response.status_code != "0":
-                LinkCheckLib.myprint("Status code: " + str(response.status_code))
+                self.myprint("Status code: " + str(response.status_code))
         except Exception as e:
-            LinkCheckLib.myprint("Exception no valid response from: " + mainlin)
-            #self.handle_exc(e, mainlin, _plin)
+            self.myprint("Exception no valid response from: " + mainlin)
+            #self.handle_exc(e, mainlin, par_link)
             return
 
         if resp_err == 0 and is_bool is True:  ## if there's an error  - 0 is good to continue
@@ -98,52 +99,52 @@ class LinkCheck(LinkCheckLib):
                 ab_links = response.html.absolute_links
                 new_lnks_loc = [ab for ab in ab_links]
             except Exception as e:
-                LinkCheckLib.myprint("Exception inside get_links: " + str(e))
+                self.myprint("Exception inside get_links: " + str(e))
                 return
 
-            LinkCheckLib.myprint("Starting Main Check" + mainlin)
+            self.myprint("Starting Main Check" + mainlin)
             for THIS_LN in new_lnks_loc:
                 if THIS_LN not in done_ln_gl_sing:
-                    LinkCheckLib.myprint("THIS_LN " + THIS_LN)
-                    #_IS_PARENT = self.ispar(THIS_LN, _plin)
+                    self.myprint("THIS_LN " + THIS_LN)
+                    #_IS_PARENT = self.ispar(THIS_LN, par_link)
 
                     _IN_AN_LOC = self.ck_loc(THIS_LN, any_lnk_loc)
                     if not _IN_AN_LOC and not self._DONE_YET(THIS_LN):    #NOT done yet  cg = check glob
 
                         try:
-                            LinkCheckLib.myprint("new_lnks_loc === going to check bad data next: " + str(THIS_LN))
+                            self.myprint("new_lnks_loc === going to check bad data next: " + str(THIS_LN))
                             has_bad, good_suffix = self.ck_bad_data(THIS_LN)  # check for bad data
                             #self.check_for_bad_data(THIS_LN)
                         except Exception as e:
-                            self.handle_exc(e, THIS_LN, _plin)
+                            self.handle_exc(e, THIS_LN, par_link)
                             continue
 
                         try:
-                            if self.ispar(THIS_LN, _plin) or has_bad:
+                            if self.ispar(THIS_LN, par_link) or has_bad:
                                 continue
 
-                            divurl = self.divide_url(_plin)
+                            #divurl = self.divide_url(par_link)
 
                             _IS_BASE, in_base_local = self.ck_base(THIS_LN, divurl, base_lnks_loc)
 
-                            if _IS_BASE and good_suffix:  # IS base type
+                            if _IS_BASE and good_suffix:  # IS MAIN_DICT type
                                 if not in_base_local:
                                     base_lnks_loc.append(THIS_LN)
 
-                                self.add_any_bse_g(THIS_LN, _plin)
+                                self.add_any_bse_g(THIS_LN, par_link)
                             else:                   #if not a home based link
                                 if not self.ck_g(THIS_LN):  ## add bad suffix here too
-                                    any_lnk_loc = self.add_any(THIS_LN, _plin)  #does global too
+                                    any_lnk_loc = self.add_any(THIS_LN, par_link)  #does global too
                                     continue
 
                         except Exception as e:
-                            self.handle_exc(e, THIS_LN, _plin)
+                            self.handle_exc(e, THIS_LN, par_link)
                             continue
 
-            LinkCheckLib.myprint('---returning base_links_local: ' + str(base_lnks_loc))
-            LinkCheckLib.myprint('!! NEW----end get_home_links \n\n')
-            self.base.update({rd: done_ln_gl_sing})
-            self.base.update({ra: any_link_glob})
+            self.myprint('---returning base_links_local: ' + str(base_lnks_loc))
+            self.myprint('!! NEW----end get_home_links \n\n')
+            self.MAIN_DICT.update({rd: done_ln_gl_sing})
+            self.MAIN_DICT.update({ra: any_link_glob})
 
             return list(set(base_lnks_loc))
 
@@ -153,7 +154,7 @@ class LinkCheck(LinkCheckLib):
       #############----------------------------------MAIN-------------------------
     def rem_errs(self, tlinks=None):
         rd = self.rd
-        done_ln_gl_sing = self.base.get(rd)
+        done_ln_gl_sing = self.MAIN_DICT.get(rd)
         if tlinks is None:
             tlinks = []
         for link in tlinks:
@@ -166,32 +167,35 @@ class LinkCheck(LinkCheckLib):
     def main(self, a_site="a.htm"):
         ra = self.ra
         rb = self.rb
-        base_lnks_g = self.base.get(rb)
-        any_link_glob= self.base.get(ra)
+        base_lnks_g = self.MAIN_DICT.get(rb)
+        any_link_glob= self.MAIN_DICT.get(ra)
 
-        baseurl = LinkCheckLib.divide_url(a_site)
-        self.base.update({baseurl: baseurl})
+        parsed = urlparse(a_site)
+        BASE_PARSED = str(parsed.netloc)
+        BASENAME = self.BASENAME
+        self.MAIN_DICT.update({ BASENAME: BASE_PARSED })
 
-        LinkCheckLib.myprint("Starting main with: " + a_site)
+
+        self.myprint("Starting main with: " + a_site)
         base_only_plain_repeat = []
         new_base_links_one = []
         full_addy = self.ckaddymore(a_site)
         new_sorted, repeats, the_len = [], 0, 0
         #tstart_main = perf_counter()
-        LinkCheckLib.myprint('In main() STARTING OVER Getting first address: ' + full_addy)
+        self.myprint('In main() STARTING OVER Getting first address: ' + full_addy)
         try:
             #############---------step ONE:
-            base_only_plain_repeat = self.get_links(full_addy, full_addy)  #first set of base
-            #LinkCheckLib.myprint("Step One Done")   ##first time:  HOME PAGE ONLY  ##first time
+            base_only_plain_repeat = self.get_links(full_addy, full_addy)  #first set of MAIN_DICT
+            #self.myprint("Step One Done")   ##first time:  HOME PAGE ONLY  ##first time
             if base_only_plain_repeat:
                 the_len = len(base_only_plain_repeat)
             new_base_links_two, new_sorted, new_base_links_one= [], [], base_only_plain_repeat
 
             while the_len and repeats < 6:
                 repeats += 1
-                LinkCheckLib.myprint("repeats: " + str(repeats) + "-------------------!!In main loop ")
+                self.myprint("repeats: " + str(repeats) + "-------------------!!In main loop ")
                 for baselink in new_base_links_one:
-                    new_base_links_tmp = self.get_links(baselink, full_addy)  # first set of base
+                    new_base_links_tmp = self.get_links( baselink, full_addy)  # first set of MAIN_DICT
                     new_base_links_two = self.rem_errs(new_base_links_tmp)
 
                 the_len = len(new_base_links_two)
@@ -199,7 +203,7 @@ class LinkCheck(LinkCheckLib):
                     new_base_links_one = new_base_links_two
 
         except Exception as e:
-            LinkCheckLib.myprint("Exception inside main_run: " + str(e))
+            self.myprint("Exception inside main_run: " + str(e))
 
         try:
             base_glob_now = base_lnks_g
@@ -207,23 +211,23 @@ class LinkCheck(LinkCheckLib):
             while the_len_b and repeats < 6:
 
                 repeats += 1
-                #LinkCheckLib.myprint("repeats: " + str(repeats) + "-------------------!!In main loop")
+                #self.myprint("repeats: " + str(repeats) + "-------------------!!In main loop")
                 for baselink in base_glob_now:
-                    base_lin, parent_lin = baselink[0], baselink[1]
-                    new_base_links_here = self.get_links(base_lin, parent_lin)  # first set of base
+                    base_lin, BASE_URL = baselink[0], baselink[1]
+                    new_base_links_here = self.get_links(base_lin, BASE_URL)  # first set of MAIN_DICT
                 the_len_b, base_glob_now = len(new_base_links_here), new_base_links_here
 
         except Exception as e:
-            LinkCheckLib.myprint("Exception after baselink in base_glob_now: " + str(e))
+            self.myprint("Exception after baselink in base_glob_now: " + str(e))
 
         tup = ()
         try:
-            #LinkCheckLib.myprint("Step Two Done")
+            #self.myprint("Step Two Done")
             any_link_to_check = []
             any_link_to_check = list(any_link_glob)
 
             any_link_to_check = list(set(any_link_to_check))
-            for tup in any_link_to_check:    #check non-base links
+            for tup in any_link_to_check:    #check non-MAIN_DICT links
                 self.get_simple_response(tup)
             for tup in base_lnks_g:
                 self.get_simple_response(tup)
@@ -241,9 +245,9 @@ class LinkCheck(LinkCheckLib):
 
         finlist = self.return_errors()
         #self.print_errs.del_finlist()
-        #LinkCheckLib.myprint("totalTime: " + str(perf_counter() - tstart_main))
+        #self.myprint("totalTime: " + str(perf_counter() - tstart_main))
         #x = len(self.done_ln_gl_sing)
-        #LinkCheckLib.myprint("errors: " + str(x))
+        #self.myprint("errors: " + str(x))
         return finlist
 
 

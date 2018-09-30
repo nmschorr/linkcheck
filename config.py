@@ -1,1 +1,1 @@
-_mydebug = 0
+conf_debug = 1

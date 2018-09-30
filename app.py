@@ -12,6 +12,7 @@ import requests
 
 #sys.stderr = sys.stdout
 #rootloglev = 40
+from config import conf_debug
 
 app = Flask(__name__)
 
@@ -38,21 +39,23 @@ def write_no_err_pg(asited):
 def worker1(df):
     stat = '0'
     df = "http://Delia:8080/static/" + df + "done"
+    dfloc = "http://Delia:8080/static/" + df + "done"
     print("checking: " + df)
-    while stat != 200:
+    while stat == '404':
         stat = requests.head(df).status_code
         print("file not done yet ", stat)
-        sleep(1)
+        sleep(.5)
     print("worker1 done")
 
 def worker2(site, timestmp, jname):   # run LinkCheck and print to console
+    print("just started thread. You entered: " + site)
     ac.myprint("running worker2 thread")
     set_names(site, timestmp, jname)
     notreadyyet(site, jname)
-    lc = LinkCheck()
-    answers = lc.main(site)
     donefile_path = pcf.get_donefile_path()
     ac.myprint("donefile:" + donefile_path)
+    lc = LinkCheck()
+    answers = lc.main(site)
 
     ac.myprint("donefile in worker1: " + donefile_path)
     ac.myprint("!!!!!!!!!!==---- len of answers: " + str(len(answers)))
@@ -104,11 +107,10 @@ def results():
     w2_thread = Thread(target=worker2, args=(site,timestp1, rfname))
     threads.append(w1_thread)
     threads.append(w2_thread)
+    w2_thread.start()
     w1_thread.start()
 
-    w2_thread.start()
-    sleep(3)
-    print("just started thread. You entered: " + site)
+    sleep(2)
     return render_template('results.html', name = rfname)  ## has a form
 
 
