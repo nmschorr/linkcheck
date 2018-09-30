@@ -304,9 +304,16 @@ class LinkCheckLib(object):
     def has_early_dollar( cls, clink, base_p):
         LinkCheckLib.myprint("in hasearlydollar: " + clink + " " + base_p)
         bp = clink.index(base_p)
-        if "$" or "?" or "#" in clink:
-            if (clink.index("$") < bp) or (clink.index("?") < bp) or (clink.index("#") < bp):
-                ## if $ or # or ? before base link
+        print("clink : ", clink)
+        print("base_p link index of base parent: ", bp)
+        if "?" in clink:
+            p =  clink.index("?")
+            print("index of ? : ", p )
+            if (p < bp):
+                return True
+
+        elif "$" or "#" in clink:
+            if (clink.index("$") < bp) or (clink.index("#") < bp):
                 return True     ## it's before base link - not good
             else:
                 return False     # there's a $ sign but it's ok
