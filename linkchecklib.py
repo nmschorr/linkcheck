@@ -5,9 +5,10 @@ from random import random
 
 class LinkCheckLib(object):
 
-    def __init__(self, timestmp):
+    def __init__(self):
+        #if not self.base:
         self.base = dict()
-        rand = timestmp
+        rand = str(random())
 
         re = "re_" + rand
         rd = "rd_" + rand
@@ -17,8 +18,6 @@ class LinkCheckLib(object):
         self.rd = rd
         self.ra = ra
         self.rb = rb
-
-
 
         err_links = []
         done_ln_gl_sing = []
@@ -41,7 +40,8 @@ class LinkCheckLib(object):
     @staticmethod
     def myprint(print_str, mdebug=0 ):
 
-        mdebug = 0
+        mdebug = 1
+
         if mdebug:
             print(print_str)
             #logging.info(print_str)
@@ -120,7 +120,7 @@ class LinkCheckLib(object):
                         LinkCheckLib.myprint(str(answer_string))
                 else:
                     finlist = [answer_string]
-                    #print("len of finlist: ", str(len(finlist)))
+                    LinkCheckLib.myprint("len of finlist: " + str(len(finlist)))
             except Exception as e:
                 LinkCheckLib.myprint('Exception print_errs: ' + str(e))
             return finlist
@@ -147,7 +147,7 @@ class LinkCheckLib(object):
                 in_base_loc = bool(this_link in [i for i in base_links_local])
         except Exception as e:
             None
-            #print("Exception ck_base: " + str(e))
+            LinkCheckLib.myprint("Exception ck_base: " + str(e))
         return _IS_BASE, in_base_loc
     #-----------------------------------------------------------------------
 
@@ -163,15 +163,17 @@ class LinkCheckLib(object):
                 session = HTMLSession()
 
                 resp = session.get(a_link)
-
+                print("a_link is: ", a_link)
                 code = resp.status_code
+                print("code: ", code)
                 t_err = self.ck_status_code(a_link, p_link, code)  ## if there's    an error
                 session.close()
 
         except Exception as e:
             self.handle_exc(e, a_link, p_link)
             LinkCheckLib.myprint("GOT AN EXCEPTION inside do_response")
-            return resp, t_err
+            #return resp, t_err
+            pass
         return resp, t_err
 
     #----------------------------------------------------------------------get_links-

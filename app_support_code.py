@@ -1,14 +1,11 @@
-from os import path, getenv
+from os import path
 import app_support_conf
 
 class AppSupport:
-    _DEBUG = 0
-
+    _DEBUG = 1
     # _DEBUG = getenv('_DEBUG')
-
     def __init__(self):
         self._DEBUG = AppSupport._DEBUG
-
 
     @staticmethod
     def myprint(print_str,_DEBUG=0 ):
@@ -19,8 +16,7 @@ class AppSupport:
         else:
             #logging.debug(print_str)
             None
-            
-            
+
     @staticmethod
     def fin_msg(asite):
         thishost = app_support_conf.thishost

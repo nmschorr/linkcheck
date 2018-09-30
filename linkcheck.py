@@ -2,13 +2,15 @@
 # Nancy Schorr, 2018
 # this file is in active development
 #from time import perf_counter
-from linkchecklib import *
+#from linkchecklib import *
 import requests
+import linkchecklib
+from linkchecklib import LinkCheckLib
 
 class LinkCheck(LinkCheckLib):
 
-    def __init__(self, timestmp):
-        super().__init__(timestmp)
+    def __init__(self):
+        super().__init__()
 
     def get_simple_response(self, lin_and_par_tup):
         link_count, stat = 0, 0
@@ -120,7 +122,9 @@ class LinkCheck(LinkCheckLib):
                             if self.ispar(THIS_LN, _plin) or has_bad:
                                 continue
 
-                            _IS_BASE, in_base_local = self.ck_base(THIS_LN, self.divide_url(_plin), base_lnks_loc)
+                            divurl = self.divide_url(_plin)
+
+                            _IS_BASE, in_base_local = self.ck_base(THIS_LN, divurl, base_lnks_loc)
 
                             if _IS_BASE and good_suffix:  # IS base type
                                 if not in_base_local:
@@ -159,7 +163,7 @@ class LinkCheck(LinkCheckLib):
 
 
 
-    def main(self, a_site="a.htm", timest='12345'):
+    def main(self, a_site="a.htm"):
         ra = self.ra
         rb = self.rb
         base_lnks_g = self.base.get(rb)

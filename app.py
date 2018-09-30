@@ -1,22 +1,21 @@
-from flask import Flask, request, render_template
-
-from linkcheck import LinkCheck
-from time import sleep
+from waitress import serve
 from threading import Thread
+from flask import Flask, request, render_template
 from jinja2 import Environment, PackageLoader, select_autoescape
 from datetime import datetime
 import prodconf as pcf
 from app_support_code import AppSupport as ac
+from time import sleep
 # from nocache import nocache
-from waitress import serve
+from linkcheck import LinkCheck
 
 
 #sys.stderr = sys.stdout
 #rootloglev = 40
 
-appf = Flask(__name__)
+app = Flask(__name__)
 
-env = Environment(
+env = Environment(    # jinja2
     loader=PackageLoader('linkcheck', 'templates'),
     autoescape=select_autoescape(['html', 'xml']),
 )
@@ -40,9 +39,9 @@ def worker1(site, timestmp, jname):   # run LinkCheck and print to console
     ac.myprint("running worker1 thread")
     set_names(site, timestmp, jname)
     notreadyyet(site, jname)
-    lc = LinkCheck(timestmp)
+    lc = LinkCheck()
     #lc.__init__()
-    answers = lc.main(site, timestmp)
+    answers = lc.main(site)
     donefile_path = pcf.get_donefile_path()
     ac.myprint("donefile:" + donefile_path)
 
@@ -67,7 +66,7 @@ def set_names(site, timestp4, justn):
     pcf.set_timestp(timestp4)
     pcf.set_site(site)
     pcf.set_just_name(just_name)
-    osroot = appf.root_path  # os path
+    osroot = app.root_path  # os path
     just_stat, donefile, file_path, donefile_path = ac.make_filenames(osroot, timestp4, just_name)
     pcf.set_just_stat(just_stat)
     pcf.set_donefile(donefile)
@@ -76,13 +75,13 @@ def set_names(site, timestp4, justn):
 
 
 
-@appf.route('/')
+@app.route('/')
 def index():
     return render_template('index.html')  ## has a form
 
 # @nocache             # very important so client server doesn'w_thread cache results
 
-@appf.route('/results', methods = ['POST', 'GET'])
+@app.route('/results', methods = ['POST', 'GET'])
 def results():
     site = request.form['name']
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
@@ -96,13 +95,8 @@ def results():
     return render_template('results.html', name = name)  ## has a form
 
 
-
-
-#serve(appf, listen='0.0.0.0:8080')
-#serve(appf, host='0.0.0.0', port=8080)
-#serve(appf, listen="0.0.0.0:8080 [::1]:8080")
+#serve(app, listen="127.0.0.1:8080")
 
 if __name__ == '__main__':
-    #serve(appf)
-    #serve(appf, listen="127.0.0.1:8080 [::1]:8080")
-    serve(appf, listen="0.0.0.0:8080")
+#     #serve(app, listen="0.0.0.0:8080")
+    app.run(host='127.0.0.1', port=5000, debug=True)
