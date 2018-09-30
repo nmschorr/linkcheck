@@ -2,7 +2,7 @@ from os import path
 import app_support_conf
 
 class AppSupport:
-    _DEBUG = 1
+    _DEBUG = 0
     # _DEBUG = getenv('_DEBUG')
     def __init__(self):
         self._DEBUG = AppSupport._DEBUG

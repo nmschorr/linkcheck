@@ -40,7 +40,7 @@ class LinkCheckLib(object):
     @staticmethod
     def myprint(print_str, mdebug=0 ):
 
-        mdebug = 1
+        mdebug = 0
 
         if mdebug:
             print(print_str)
