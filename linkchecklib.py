@@ -226,8 +226,8 @@ class LinkCheckLib(object):
                 session.close()
 
         except Exception as e:
-            self.handle_exc(e, a_link, p_link)
             self.myprint("GOT AN EXCEPTION inside do_response")
+            self.handle_exc(e, a_link, p_link)
             pass
         return resp, t_err
 
@@ -299,9 +299,10 @@ class LinkCheckLib(object):
         if "ConnectionResetError" in tempstr:
             return
 
-        stat = requests.get(link).status_code
+        #stat = requests.get(link)
+        #thecode = stat.status_code
 
-        self.myprint("----NEW STAT-----status: " + str(stat) + "\n")
+        #self.myprint("----2nd try STAT-----status: " + str(thecode) + "\n")
 
         if link not in err_links:
             err_links.append((link, tempstr[:42], plink))

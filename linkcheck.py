@@ -23,7 +23,7 @@ class LinkCheck(LinkCheckLib):
             self.myprint("-----status: " + str(stat) + "\n")
 
         except Exception as e:
-            self.myprint("Exception inside get_simple_response: " + str(e))
+            self.myprint("Exception inside get_simple_response: ")
             self.handle_exc(e, link_to_ck, parent)
 
     #---------------------------------------------------------------------------------------
