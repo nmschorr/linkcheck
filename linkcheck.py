@@ -1,12 +1,10 @@
 # python 3
 # Nancy Schorr, 2018
 # this file is in active development
-#from time import perf_counter
-#from linkchecklib import *
+from time import perf_counter
 import requests
-import linkchecklib
-from linkchecklib import LinkCheckLib
 from urllib.parse import urlparse
+from linkchecklib import LinkCheckLib
 
 class LinkCheck(LinkCheckLib):
 
@@ -71,6 +69,8 @@ class LinkCheck(LinkCheckLib):
 
     # #----------------------------------------------------------------------get_links-
     def get_links(self, mainlin, par_link):
+        _IS_BASE = False
+        _IS_BASE2 = False
         ra = self.ra
         rd = self.rd
         done_ln_gl_sing = self.MAIN_DICT.get(rd)
@@ -106,7 +106,7 @@ class LinkCheck(LinkCheckLib):
             for THIS_LN in new_lnks_loc:
                 if THIS_LN not in done_ln_gl_sing:
                     self.myprint("THIS_LN " + THIS_LN)
-                    #_IS_PARENT = self.ispar(THIS_LN, par_link)
+                    _IS_BASE = self.ispar(THIS_LN)
 
                     _IN_AN_LOC = self.ck_loc(THIS_LN, any_lnk_loc)
                     if not _IN_AN_LOC and not self._DONE_YET(THIS_LN):    #NOT done yet  cg = check glob
@@ -114,28 +114,23 @@ class LinkCheck(LinkCheckLib):
                         try:
                             self.myprint("new_lnks_loc === going to check bad data next: " + str(THIS_LN))
                             has_bad, good_suffix = self.ck_bad_data(THIS_LN)  # check for bad data
-                            #self.check_for_bad_data(THIS_LN)
                         except Exception as e:
                             self.handle_exc(e, THIS_LN, par_link)
                             continue
 
                         try:
-                            if self.ispar(THIS_LN, par_link) or has_bad:
+                            if self.ispar(THIS_LN) or has_bad:
                                 continue
 
-                            #divurl = self.divide_url(par_link)
+                            _IS_BASE2, in_base_local = self.ck_base(THIS_LN, base_lnks_loc)
 
-                            _IS_BASE, in_base_local = self.ck_base(THIS_LN, divurl, base_lnks_loc)
-
-                            if _IS_BASE and good_suffix:  # IS MAIN_DICT type
+                            if _IS_BASE2 and good_suffix:  # IS MAIN_DICT type
                                 if not in_base_local:
                                     base_lnks_loc.append(THIS_LN)
-
                                 self.add_any_bse_g(THIS_LN, par_link)
                             else:                   #if not a home based link
                                 if not self.ck_g(THIS_LN):  ## add bad suffix here too
                                     any_lnk_loc = self.add_any(THIS_LN, par_link)  #does global too
-                                    continue
 
                         except Exception as e:
                             self.handle_exc(e, THIS_LN, par_link)
@@ -165,12 +160,15 @@ class LinkCheck(LinkCheckLib):
 
 
     def main(self, a_site="a.htm"):
+        _IS_BASE2, _IS_BASE = False, False
+        tstart = perf_counter()
         ra = self.ra
         rb = self.rb
         base_lnks_g = self.MAIN_DICT.get(rb)
         any_link_glob= self.MAIN_DICT.get(ra)
 
-        parsed = urlparse(a_site)
+        asite=LinkCheckLib.ckaddymore(a_site)
+        parsed = urlparse(asite)
         BASE_PARSED = str(parsed.netloc)
         BASENAME = self.BASENAME
         self.MAIN_DICT.update({ BASENAME: BASE_PARSED })
@@ -181,7 +179,7 @@ class LinkCheck(LinkCheckLib):
         new_base_links_one = []
         full_addy = self.ckaddymore(a_site)
         new_sorted, repeats, the_len = [], 0, 0
-        #tstart_main = perf_counter()
+        tstart_main = perf_counter()
         self.myprint('In main() STARTING OVER Getting first address: ' + full_addy)
         try:
             #############---------step ONE:
@@ -245,7 +243,8 @@ class LinkCheck(LinkCheckLib):
 
         finlist = self.return_errors()
         #self.print_errs.del_finlist()
-        #self.myprint("totalTime: " + str(perf_counter() - tstart_main))
+
+        self.myprint("totalTime: " + str(perf_counter() - tstart))
         #x = len(self.done_ln_gl_sing)
         #self.myprint("errors: " + str(x))
         return finlist

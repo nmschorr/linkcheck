@@ -3,11 +3,12 @@ from urllib.parse import urlsplit
 from requests_html import HTMLSession
 from random import random
 from config import conf_debug
+from time import perf_counter
+
 
 class LinkCheckLib(object):
 
     def __init__(self):
-        #if not self.MAIN_DICT:
         MAIN_DICT = dict()
         self.MAIN_DICT = MAIN_DICT
         rand = str(random())
@@ -53,14 +54,6 @@ class LinkCheckLib(object):
             None
 
 
-    #-----------------------------------------------------------------------------
-    def ispar(self, thisln, par_loc):   # is it a parent? part of the main website?
-        BASENAME = self.BASENAME
-        par_loc = self.MAIN_DICT.get(BASENAME)
-        if par_loc in thisln:
-            return True
-        else:
-            return False # is it the parent?
 
     #-----------------------------------------------------------------------------
     @staticmethod
@@ -131,8 +124,21 @@ class LinkCheckLib(object):
         else:
             return []
 
+        # -----------------------------------------------------------------------------
+
+    def ispar(self, thisln):  # is it a parent? part of the main website?
+        BASENAME = self.BASENAME
+        basepartwww = 'www.' + BASENAME
+        par_loc = self.MAIN_DICT.get(BASENAME)
+        if thisln == BASENAME or thisln == basepartwww:
+            return True
+        else:
+            return False  # is it the parent?
+
     # -----------------------------------------------------------------------
     def ck_base(self, this_link, base_links_local=None):
+        _IS_BASE = False
+        in_base_loc = False
         basepart = self.MAIN_DICT.get(self.BASENAME)
 
         basepartwww = 'www.' + basepart
@@ -304,7 +310,7 @@ class LinkCheckLib(object):
     
     @classmethod
     def has_early_dollar( cls, clink, base_p):
-        self.myprint("in hasearlydollar: " + clink + " " + base_p)
+        LinkCheckLib.myprint("in hasearlydollar: " + clink + " " + base_p)
         bp = clink.index(base_p)
         print("clink : ", clink)
         print("base_p link index of MAIN_DICT parent: ", bp)
@@ -331,11 +337,11 @@ class LinkCheckLib(object):
             if thebase_part_local.startswith('www'):
                 thebase_part_local = thebase_part_local[4:]
         except Exception as e:
-            self.myprint('Exception divide_url: ' + str(e))
+            LinkCheckLib.myprint('Exception divide_url: ' + str(e))
 
         return thebase_part_local
 
-    # def reset_timer( name, tstart):
-    #     self.myprint(name, perf_counter() - tstart)
-    #     #tstart = perf_counter()
-    #     return tstart
+    def reset_timer( name, tstart):
+        LinkCheckLib.myprint(name, perf_counter() - tstart)
+        tstart = perf_counter()
+        return tstart
