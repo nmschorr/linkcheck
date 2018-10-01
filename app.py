@@ -1,14 +1,15 @@
 from waitress import serve
 from threading import Thread
+from socket import gethostbyaddr, gethostname
 from flask import Flask, request, render_template
 from jinja2 import Environment, PackageLoader, select_autoescape
 from datetime import datetime
 import prodconf as pcf
 from app_support_code import AppSupport as ac
 from time import sleep
-# from nocache import nocache
 from linkcheck import LinkCheck
-import requests
+#import requests
+# from nocache import nocache
 
 #sys.stderr = sys.stdout
 #rootloglev = 40
@@ -37,20 +38,20 @@ def write_no_err_pg(asited):
     fjj.close()
 
 def worker1(df):
-    stat = 404
-    df = "http://Delia:8080/static/" + df + "done"
-    dfloc = "http://Delia:8080/static/" + df + "done"
-    ac.myprint("checking: " + df)
-    while stat == 404:
-        stat = requests.head(df).status_code
-        ac.myprint("file not done yet " + str(stat))
-        sleep(.01)
+    from pathlib import Path
+    sleep(1)
+    dfp = pcf.get_donefile_path()
+    doneyet = False
+    while not doneyet:
+        doneyet= Path(dfp).exists()
+        ac.myprint("Checking from worker1 for done file: " + dfp)
+        sleep(1)
     ac.myprint("worker1 done")
 
     #-----------------------------------------------------------------------------
 
 def worker2(site, timestmp, jname):   # run LinkCheck and ac.myprint to console
-    ac.myprint("just started thread. You entered: " + site)
+    print("Just started thread. You entered: " + site)
     ac.myprint("running worker2 thread")
     set_names(site, timestmp, jname)
     notreadyyet(site, jname)
@@ -70,7 +71,7 @@ def worker2(site, timestmp, jname):   # run LinkCheck and ac.myprint to console
 
     sleep(1)
     dt = str(datetime.now())
-    ac.myprint( dt + "  worker2 done")
+    print( dt + "  worker2 done")
 
 
     #-----------------------------------------------------------------------------
@@ -100,9 +101,8 @@ def results():
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     rfname = "res" + timestp1 + ".html"
     threads = []
-    w1_thread = Thread(target=worker1, args=(rfname,))
+    w1_thread = Thread(target=worker1, args=(rfname,)) #provide args a tuple!!!
     w1_thread.setDaemon(True)
-                #Instead, you should provide args a tuple:
     ac.myprint('rfname: ' + rfname)
 
     w2_thread = Thread(target=worker2, args=(site,timestp1, rfname))
@@ -111,12 +111,27 @@ def results():
     w2_thread.start()
     w1_thread.start()
 
-    sleep(2)
+    sleep(4)  ## openshift is slow!
     return render_template('results.html', name = rfname)  ## has a form
 
 
 #serve(app, listen="127.0.0.1:8080")
 
 if __name__ == '__main__':
-    serve(app, channel_timeout=360)
+    serve(app, channel_timeout=9960)
     #app.run(host='127.0.0.1', port=5000, debug=True)
+
+
+
+
+
+
+    # stat = 404
+    # thost = gethostbyaddr(gethostname())[0]
+    # doneurl = "http://" + thost + "/static/" + df + "done"
+    # #df = "http://Delia:8080/static/" + df + "done"
+    # ac.myprint("checking: " + df)
+    # while stat == 404:
+    #     stat = requests.head(doneurl).status_code
+    #     ac.myprint("file not done yet " + str(stat))
+    #     sleep(1)

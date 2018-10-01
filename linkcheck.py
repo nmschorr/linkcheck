@@ -124,15 +124,20 @@ class LinkCheck(LinkCheckLib):
                             continue
 
                         try:
-                            #if self.ispar(THIS_LN) or has_bad:
+                            issame = self.is_same_site_link(THIS_LN)
+                            if issame:
+                                continue
 
+                        except Exception as e:
+                            self.handle_exc(e, THIS_LN, par_link)
+                            continue
+
+                        try:
                             if has_bad:
                                 continue
 
-                            _IS_BASE2, in_base_local, is_same_link = self.ck_base(THIS_LN, base_lnks_loc)
-                            if is_same_link:
-                                print("-----------is same link &&&&&&&&&&&&&&&&&&&&&&&&&&&")
-                                continue
+                            _IS_BASE2, in_base_local= self.ck_base(THIS_LN, base_lnks_loc)
+
 
                             if _IS_BASE2 and good_suffix:  # IS MAIN_DICT type
                                 if not in_base_local:

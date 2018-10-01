@@ -14,9 +14,8 @@ function doesFileExist(urlToFile) {
 }
 
 function keepchecking() {
-    x = 7;  // 5 Seconds
     console.log("in keepchecking");
-    setTimeout(checkRefrsh, x*1000);
+    setTimeout(checkRefrsh, 3000);  # 3 seconds
 }
 
 

@@ -45,14 +45,17 @@ class LinkCheckLib(object):
 
     #-----------------------------------------------------------------------------
     def myprint(self, print_str, mdebug=0 ):
-
         mdebug = conf_debug
         if mdebug:
             print(print_str)
-            #logging.info(print_str)
-        else:
-            #logging.debug(print_str)
-            None
+
+    #-----------------------------------------------------------------------------
+    @classmethod
+    def myprintc(cls, print_str):
+        mdebug = conf_debug
+        if mdebug:
+            print(print_str)
+
     #-----------------------------------------------------------------------------
     @staticmethod
     def write_some_contents(contnt, nme):
@@ -138,19 +141,26 @@ class LinkCheckLib(object):
         else:
             return False  # is it the parent?
     # -----------------------------------------------------------------------
+    def is_same_site_link(self, inlink):
+        par_loc = self.MAIN_DICT.get(self.BASENAME)
+        par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
+        is_same_link = False
+        this_link = inlink
+
+        if this_link == par_loc or this_link == par_locwww:
+            is_same_link = True
+            self.myprint("--Is same: " + this_link + " found: " + par_loc + " and: " + par_locwww)
+
+        return is_same_link
+
+    # -----------------------------------------------------------------------
 
     def ck_base(self, in_link, base_links_local=None):
         par_loc = self.MAIN_DICT.get(self.BASENAME)
         par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
-        is_same_link = False
         this_link = in_link
         _IS_BASE = False
         in_base_loc = False
-
-        if this_link == par_loc or this_link == par_locwww:
-            is_same_link = True
-            self.myprint("is same: " + this_link + " found MAIN_DICT: " + par_loc + " and: " + par_locwww)
-            return _IS_BASE, True, is_same_link
 
         one = 'http://'
         two = 'https:/'
@@ -161,7 +171,7 @@ class LinkCheckLib(object):
         basepart = self.MAIN_DICT.get(self.BASENAME)
         basepartwww = self.MAIN_DICT.get(self.BASENAMEwww)
 
-        self.myprint("looking for: " + basepart + " found MAIN_DICT: " + basepartwww + " in: " + this_link)
+        self.myprint("looking for: " + basepart + " found: " + basepartwww + " trying: " + this_link)
 
         this_sub = this_link[0:30]  # and this_link
         this_subww = basepartwww[0:30]
@@ -170,36 +180,18 @@ class LinkCheckLib(object):
 
             if this_link == basepart or this_link == basepartwww:
                 _IS_BASE = True
-                self.myprint(  "--------------!!TRUE!! - looking for: " + this_link + " found MAIN_DICT: " + basepart + " in: " + this_link)
+                self.myprint(  "--------------!!TRUE!! - looking for: " + this_link + " found : " + basepart + " in: " + this_link)
             elif this_sub == basepart[0:30] or this_sub == basepartwww[0:30]:
                 _IS_BASE = True
-                self.myprint(  "--------------!!TRUE!! - looking for: " + this_link + " found MAIN_DICT: " + basepart + " in: " + this_link)
+                self.myprint(  "--------------!!TRUE!! - looking for: " + this_link + " found : " + basepart + " in: " + this_link)
                 if base_links_local:
                     in_base_loc = bool(this_link in [i for i in base_links_local])
+                else:
+                    self.myprint("--------------!!TRUE!! - looking for: " + this_link + " found : " + basepart + " in: " + this_link)
         except Exception as e:
             self.myprint("Exception ck_base: " + str(e))
-        return _IS_BASE, in_base_loc, is_same_link
+        return _IS_BASE, in_base_loc
 
-    # -----------------------------------------------------------------------
-    # def ck_base2(self, this_link, base_links_local=None):
-    #     _IS_BASE = False
-    #     in_base_loc = False
-    #     basepart = self.MAIN_DICT.get(self.BASENAME)
-    #     basepartwww = self.MAIN_DICT.get(self.BASENAMEwww)
-    #
-    #     self.myprint("looking for: " + basepart + " found MAIN_DICT: " + basepartwww + " in: " + this_link)
-    #
-    #     try:
-    #         if this_link == basepart or this_link == basepartwww:
-    #             _IS_BASE = True
-    #             self.myprint("--------------!!TRUE!! - looking for: " + this_link + " found MAIN_DICT: " + basepart + " in: " + this_link)
-    #
-    #             if base_links_local:
-    #                 in_base_loc = bool(this_link in [i for i in base_links_local])
-    #     except Exception as e:
-    #         self.myprint("Exception ck_base: " + str(e))
-    #
-    #     return _IS_BASE, in_base_loc
     #-----------------------------------------------------------------------
 
     def do_response(self, a_link, p_link):
@@ -368,7 +360,8 @@ class LinkCheckLib(object):
             if thebase_part_local.startswith('www'):
                 thebase_part_local = thebase_part_local[4:]
         except Exception as e:
-            cls.myprint('Exception divide_url: ' + str(e))
+            tstr = 'Exception divide_url: ' + str(e)[:45]
+            cls.myprintc(tstr)
 
         return thebase_part_local
 

@@ -11,7 +11,9 @@ class AppSupport:
     @staticmethod
     def myprint(print_str,_DEBUG=0 ):
 
-        if conf_debug:
+        _DEBUG = conf_debug
+
+        if _DEBUG:
             print(print_str)
             #logging.info(print_str)
         else:
@@ -91,7 +93,7 @@ class AppSupport:
         st2 = "<body style='{padding-left:10em;}'> "
         st3 = "<script>setInterval(checkDoneFile, 2000);</script>"
         st4 = "Results not ready yet." + '<p></p>' + "You entered: " + gsite + '<p></p>' + \
-                   "Page will automatically reload until results appear." + '<p></p>'
+            "If server times out or gives an error, reload the page with the shift key down." + '<p></p>'
         refrsh_pg = arf1 + jst2 + ">Refresh this page</a>"
         whole_page = toppt + st1 + st2 + st3 + st4 + refrsh_pg + "</body></html>"
         return whole_page
