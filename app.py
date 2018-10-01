@@ -37,14 +37,14 @@ def write_no_err_pg(asited):
     fjj.close()
 
 def worker1(df):
-    stat = '0'
+    stat = 404
     df = "http://Delia:8080/static/" + df + "done"
     dfloc = "http://Delia:8080/static/" + df + "done"
     print("checking: " + df)
-    while stat == '404':
+    while stat == 404:
         stat = requests.head(df).status_code
         print("file not done yet ", stat)
-        sleep(.5)
+        sleep(.01)
     print("worker1 done")
 
 def worker2(site, timestmp, jname):   # run LinkCheck and print to console

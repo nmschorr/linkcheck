@@ -174,8 +174,6 @@ class LinkCheck(LinkCheckLib):
         rb = self.rb
         base_lnks_g = self.MAIN_DICT.get(rb)
         any_link_glob= self.MAIN_DICT.get(ra)
-        #BASENAME = self.BASENAME
-        #BASENAMEwww = self.BASENAMEwww
 
         asite=LinkCheckLib.ckaddymore(a_site)
         parsed = urlparse(asite)

@@ -1,10 +1,9 @@
 
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, urlparse
 from requests_html import HTMLSession
 from random import random
-from config import conf_debug
 from time import perf_counter
-from urllib.parse import urlparse
+from config import conf_debug
 
 
 class LinkCheckLib(object):
@@ -43,23 +42,16 @@ class LinkCheckLib(object):
         self.MAIN_DICT.update({ra: any_link_glob})
         self.MAIN_DICT.update({rb: base_lnks_g})
 
-
-
     #-----------------------------------------------------------------------------
-
     def myprint(self, print_str, mdebug=0 ):
 
         mdebug = conf_debug
-
         if mdebug:
             print(print_str)
             #logging.info(print_str)
         else:
             #logging.debug(print_str)
             None
-
-
-
     #-----------------------------------------------------------------------------
     @staticmethod
     def write_some_contents(contnt, nme):
@@ -69,7 +61,6 @@ class LinkCheckLib(object):
             wf.write(i)
             wf.close()
     #-----------------------------------------------------------------------------
-
 
     def ck_g(self, this_link):
         ra = self.ra
@@ -139,10 +130,8 @@ class LinkCheckLib(object):
         if parsed.scheme != '':
             main_link = parsed.netloc
 
-        BASENAME = self.BASENAME
-        BASENAMEwww = self.BASENAMEwww
-        par_loc = self.MAIN_DICT.get(BASENAME)
-        par_locwww = self.MAIN_DICT.get(BASENAMEwww)
+        par_loc = self.MAIN_DICT.get(self.BASENAME)
+        par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
         if main_link == par_loc or main_link == par_locwww:
             return True
         else:
@@ -150,10 +139,8 @@ class LinkCheckLib(object):
     # -----------------------------------------------------------------------
 
     def ck_base(self, in_link, base_links_local=None):
-        BASENAME = self.BASENAME
-        BASENAMEwww = self.BASENAMEwww
-        par_loc = self.MAIN_DICT.get(BASENAME)
-        par_locwww = self.MAIN_DICT.get(BASENAMEwww)
+        par_loc = self.MAIN_DICT.get(self.BASENAME)
+        par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
         is_same_link = False
         this_link = in_link
         _IS_BASE = False
@@ -164,19 +151,11 @@ class LinkCheckLib(object):
             print("is same: " + this_link + " found MAIN_DICT: " + par_loc + " and: " + par_locwww)
             return _IS_BASE, True, is_same_link
 
-
         one = 'http://'
         two = 'https:/'
         link_sub = in_link[0:7]
         if link_sub==one or link_sub==two:
            this_link = urlparse(in_link).netloc
-
-
-
-
-
-
-
 
         basepart = self.MAIN_DICT.get(self.BASENAME)
         basepartwww = self.MAIN_DICT.get(self.BASENAMEwww)
@@ -185,8 +164,6 @@ class LinkCheckLib(object):
 
         this_sub = this_link[0:30]  # and this_link
         this_subww = basepartwww[0:30]
-
-
 
         try:
 
@@ -245,7 +222,6 @@ class LinkCheckLib(object):
         except Exception as e:
             self.handle_exc(e, a_link, p_link)
             self.myprint("GOT AN EXCEPTION inside do_response")
-            #return resp, t_err
             pass
         return resp, t_err
 
@@ -267,10 +243,6 @@ class LinkCheckLib(object):
         return good_or_bad, good_suffix
 
     # #-----------------------------------------------------------------------------
-
-    # def check_for_bad_data(self, alink):
-    #     print("")
-    #     return
     #-----------------------------------------------------------------------------
 
     def has_correct_suffix(self, link):
