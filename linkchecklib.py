@@ -4,6 +4,7 @@ from requests_html import HTMLSession
 from random import random
 from config import conf_debug
 from time import perf_counter
+from urllib.parse import urlparse
 
 
 class LinkCheckLib(object):
@@ -14,11 +15,13 @@ class LinkCheckLib(object):
         rand = str(random())
 
         BASENAME = "BURL" + rand
+        BASENAMEwww = "BURLwww" + rand
         re = "re_" + rand
         rd = "rd_" + rand
         ra = "ra_" + rand
         rb = "rb_" + rand
         self.BASENAME = BASENAME
+        self.BASENAMEwww = BASENAMEwww
         self.re = re
         self.rd = rd
         self.ra = ra
@@ -29,10 +32,12 @@ class LinkCheckLib(object):
         any_link_glob = []
         base_lnks_g = []
         BN = "empty"
+        BNwww = "empty"
 
         tlds_list = []
         self.tlds_list = tlds_list
         self.MAIN_DICT.update({BASENAME: BN})
+        self.MAIN_DICT.update({BASENAMEwww: BNwww})
         self.MAIN_DICT.update({re: err_links})
         self.MAIN_DICT.update({rd: done_ln_gl_sing})
         self.MAIN_DICT.update({ra: any_link_glob})
@@ -126,22 +131,84 @@ class LinkCheckLib(object):
 
         # -----------------------------------------------------------------------------
 
-    def ispar(self, thisln):  # is it a parent? part of the main website?
+    def ispar(self, tlink):  # is it a parent? part of the main website?
+        main_link = tlink
+        parsed = urlparse(tlink)
+        thisln_PARSED = str(parsed.netloc)
+        print("parsed: " + thisln_PARSED)
+        if parsed.scheme != '':
+            main_link = parsed.netloc
+
         BASENAME = self.BASENAME
-        basepartwww = 'www.' + BASENAME
+        BASENAMEwww = self.BASENAMEwww
         par_loc = self.MAIN_DICT.get(BASENAME)
-        if thisln == BASENAME or thisln == basepartwww:
+        par_locwww = self.MAIN_DICT.get(BASENAMEwww)
+        if main_link == par_loc or main_link == par_locwww:
             return True
         else:
             return False  # is it the parent?
+    # -----------------------------------------------------------------------
+
+    def ck_base(self, in_link, base_links_local=None):
+        BASENAME = self.BASENAME
+        BASENAMEwww = self.BASENAMEwww
+        par_loc = self.MAIN_DICT.get(BASENAME)
+        par_locwww = self.MAIN_DICT.get(BASENAMEwww)
+        is_same_link = False
+        this_link = in_link
+        _IS_BASE = False
+        in_base_loc = False
+
+        if this_link == par_loc or this_link == par_locwww:
+            is_same_link = True
+            print("is same: " + this_link + " found MAIN_DICT: " + par_loc + " and: " + par_locwww)
+            return _IS_BASE, True, is_same_link
+
+
+        one = 'http://'
+        two = 'https:/'
+        link_sub = in_link[0:7]
+        if link_sub==one or link_sub==two:
+           this_link = urlparse(in_link).netloc
+
+
+
+
+
+
+
+
+        basepart = self.MAIN_DICT.get(self.BASENAME)
+        basepartwww = self.MAIN_DICT.get(self.BASENAMEwww)
+
+        print("looking for: " + basepart + " found MAIN_DICT: " + basepartwww + " in: " + this_link)
+
+        this_sub = this_link[0:30]  # and this_link
+        this_subww = basepartwww[0:30]
+
+
+
+        try:
+
+            if this_link == basepart or this_link == basepartwww:
+                _IS_BASE = True
+                print(  "--------------!!TRUE!! - looking for: " + this_link + " found MAIN_DICT: " + basepart + " in: " + this_link)
+            elif this_sub == basepart[0:30] or this_sub == basepartwww[0:30]:
+                _IS_BASE = True
+                print(  "--------------!!TRUE!! - looking for: " + this_link + " found MAIN_DICT: " + basepart + " in: " + this_link)
+                if base_links_local:
+                    in_base_loc = bool(this_link in [i for i in base_links_local])
+        except Exception as e:
+            self.myprint("Exception ck_base: " + str(e))
+        return _IS_BASE, in_base_loc, is_same_link
 
     # -----------------------------------------------------------------------
-    def ck_base(self, this_link, base_links_local=None):
+    def ck_base2(self, this_link, base_links_local=None):
         _IS_BASE = False
         in_base_loc = False
         basepart = self.MAIN_DICT.get(self.BASENAME)
+        basepartwww = self.MAIN_DICT.get(self.BASENAMEwww)
 
-        basepartwww = 'www.' + basepart
         print("looking for: " + basepart + " found MAIN_DICT: " + basepartwww + " in: " + this_link)
 
         try:
@@ -245,7 +312,7 @@ class LinkCheckLib(object):
         err_links = self.MAIN_DICT.get(re)
 
         tempstr = str(e)
-        self.myprint('!!!!! Inside handle_exc. Error------------------\n' + tempstr)
+        self.myprint('\n!!!!! Inside handle_exc. Error------------------> ' + tempstr)
         if "Document is empty" in tempstr:  # for mp3 and similar files
             return
         if "object has no attribute" in tempstr:  # for mp3 and similar files
@@ -296,10 +363,11 @@ class LinkCheckLib(object):
         one = 'http://'
         two = 'https://'
         needprefix = True
-        if addy[0:7]==one:
-            needprefix = False
         if addy[0:8] == two:
             needprefix = False
+        elif addy[0:7]==one:
+            needprefix = False
+
         if needprefix:
             full_addy = one + addy
         else:

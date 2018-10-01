@@ -20,9 +20,10 @@ class LinkCheck(LinkCheckLib):
         try:
             stat = requests.get(link_to_ck).status_code
             self.ck_status_code_simple(link_to_ck, parent, stat)
+            self.myprint("-----status: " + str(stat) + "\n")
 
         except Exception as e:
-            #self.myprint("Exception inside get_simple_response: " + str(e))
+            self.myprint("Exception inside get_simple_response: " + str(e))
             self.handle_exc(e, link_to_ck, parent)
 
     #---------------------------------------------------------------------------------------
@@ -76,6 +77,7 @@ class LinkCheck(LinkCheckLib):
         done_ln_gl_sing = self.MAIN_DICT.get(rd)
         any_link_glob= self.MAIN_DICT.get(ra)
         from time import sleep
+        self.myprint("\n\n------------ ")
 
         self.myprint("-------------Starting get_links with: " + mainlin)
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], "0", []
@@ -84,7 +86,7 @@ class LinkCheck(LinkCheckLib):
         is_bool = True
         good_suffix = True
         has_bad = False
-
+        is_same_link = False
 
         try:
             if response.status_code != "0":
@@ -119,10 +121,15 @@ class LinkCheck(LinkCheckLib):
                             continue
 
                         try:
-                            if self.ispar(THIS_LN) or has_bad:
+                            #if self.ispar(THIS_LN) or has_bad:
+
+                            if has_bad:
                                 continue
 
-                            _IS_BASE2, in_base_local = self.ck_base(THIS_LN, base_lnks_loc)
+                            _IS_BASE2, in_base_local, is_same_link = self.ck_base(THIS_LN, base_lnks_loc)
+                            if is_same_link:
+                                print("-----------is same link &&&&&&&&&&&&&&&&&&&&&&&&&&&")
+                                continue
 
                             if _IS_BASE2 and good_suffix:  # IS MAIN_DICT type
                                 if not in_base_local:
@@ -140,6 +147,7 @@ class LinkCheck(LinkCheckLib):
             self.myprint('!! NEW----end get_home_links \n\n')
             self.MAIN_DICT.update({rd: done_ln_gl_sing})
             self.MAIN_DICT.update({ra: any_link_glob})
+            self.myprint("- done with getlinks-----------\n \n")
 
             return list(set(base_lnks_loc))
 
@@ -166,12 +174,15 @@ class LinkCheck(LinkCheckLib):
         rb = self.rb
         base_lnks_g = self.MAIN_DICT.get(rb)
         any_link_glob= self.MAIN_DICT.get(ra)
+        #BASENAME = self.BASENAME
+        #BASENAMEwww = self.BASENAMEwww
 
         asite=LinkCheckLib.ckaddymore(a_site)
         parsed = urlparse(asite)
-        BASE_PARSED = str(parsed.netloc)
-        BASENAME = self.BASENAME
-        self.MAIN_DICT.update({ BASENAME: BASE_PARSED })
+        base_parsed = str(parsed.netloc)
+        base_parsed_www = 'www.' + base_parsed
+        self.MAIN_DICT.update({ self.BASENAME: base_parsed })
+        self.MAIN_DICT.update({ self.BASENAMEwww: base_parsed_www })
 
 
         self.myprint("Starting main with: " + a_site)
@@ -184,14 +195,17 @@ class LinkCheck(LinkCheckLib):
         try:
             #############---------step ONE:
             base_only_plain_repeat = self.get_links(full_addy, full_addy)  #first set of MAIN_DICT
-            #self.myprint("Step One Done")   ##first time:  HOME PAGE ONLY  ##first time
-            if base_only_plain_repeat:
+            self.myprint("Step One Done with base_only_plain_repeat")   ##first time:  HOME PAGE ONLY  ##first time
+
+            base_first_len = len(base_only_plain_repeat)
+            print("length base_only_plain_repeat: " + str(base_first_len))
+            if base_first_len:
                 the_len = len(base_only_plain_repeat)
             new_base_links_two, new_sorted, new_base_links_one= [], [], base_only_plain_repeat
 
             while the_len and repeats < 6:
                 repeats += 1
-                self.myprint("repeats: " + str(repeats) + "-------------------!!In main loop ")
+                self.myprint("\n\n-----repeats: " + str(repeats) + "-------------------!!In main loop ")
                 for baselink in new_base_links_one:
                     new_base_links_tmp = self.get_links( baselink, full_addy)  # first set of MAIN_DICT
                     new_base_links_two = self.rem_errs(new_base_links_tmp)
@@ -209,7 +223,7 @@ class LinkCheck(LinkCheckLib):
             while the_len_b and repeats < 6:
 
                 repeats += 1
-                #self.myprint("repeats: " + str(repeats) + "-------------------!!In main loop")
+                self.myprint(" \n repeats: " + str(repeats) + "-------------------!!In main loop")
                 for baselink in base_glob_now:
                     base_lin, BASE_URL = baselink[0], baselink[1]
                     new_base_links_here = self.get_links(base_lin, BASE_URL)  # first set of MAIN_DICT
@@ -220,7 +234,7 @@ class LinkCheck(LinkCheckLib):
 
         tup = ()
         try:
-            #self.myprint("Step Two Done")
+            self.myprint("Step Two Done")
             any_link_to_check = []
             any_link_to_check = list(any_link_glob)
 
