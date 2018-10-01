@@ -12,7 +12,6 @@ class AppSupport:
     def myprint(print_str,_DEBUG=0 ):
 
         if conf_debug:
-            None
             print(print_str)
             #logging.info(print_str)
         else:

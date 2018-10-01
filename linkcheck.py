@@ -82,6 +82,9 @@ class LinkCheck(LinkCheckLib):
         self.myprint("-------------Starting get_links with: " + mainlin)
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], "0", []
         response, resp_err = self.do_response(mainlin, par_link)
+
+
+
         sleep(.05)
         is_bool = True
         good_suffix = True
@@ -104,7 +107,7 @@ class LinkCheck(LinkCheckLib):
                 self.myprint("Exception inside get_links: " + str(e))
                 return
 
-            self.myprint("Starting Main Check" + mainlin)
+            self.myprint("Starting Main Check" + mainlin + "\n")
             for THIS_LN in new_lnks_loc:
                 if THIS_LN not in done_ln_gl_sing:
                     self.myprint("THIS_LN " + THIS_LN)

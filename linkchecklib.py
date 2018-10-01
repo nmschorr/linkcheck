@@ -4,6 +4,7 @@ from requests_html import HTMLSession
 from random import random
 from time import perf_counter
 from config import conf_debug
+import requests
 
 
 class LinkCheckLib(object):
@@ -126,7 +127,7 @@ class LinkCheckLib(object):
         main_link = tlink
         parsed = urlparse(tlink)
         thisln_PARSED = str(parsed.netloc)
-        print("parsed: " + thisln_PARSED)
+        self.myprint("parsed: " + thisln_PARSED)
         if parsed.scheme != '':
             main_link = parsed.netloc
 
@@ -148,7 +149,7 @@ class LinkCheckLib(object):
 
         if this_link == par_loc or this_link == par_locwww:
             is_same_link = True
-            print("is same: " + this_link + " found MAIN_DICT: " + par_loc + " and: " + par_locwww)
+            self.myprint("is same: " + this_link + " found MAIN_DICT: " + par_loc + " and: " + par_locwww)
             return _IS_BASE, True, is_same_link
 
         one = 'http://'
@@ -160,7 +161,7 @@ class LinkCheckLib(object):
         basepart = self.MAIN_DICT.get(self.BASENAME)
         basepartwww = self.MAIN_DICT.get(self.BASENAMEwww)
 
-        print("looking for: " + basepart + " found MAIN_DICT: " + basepartwww + " in: " + this_link)
+        self.myprint("looking for: " + basepart + " found MAIN_DICT: " + basepartwww + " in: " + this_link)
 
         this_sub = this_link[0:30]  # and this_link
         this_subww = basepartwww[0:30]
@@ -169,10 +170,10 @@ class LinkCheckLib(object):
 
             if this_link == basepart or this_link == basepartwww:
                 _IS_BASE = True
-                print(  "--------------!!TRUE!! - looking for: " + this_link + " found MAIN_DICT: " + basepart + " in: " + this_link)
+                self.myprint(  "--------------!!TRUE!! - looking for: " + this_link + " found MAIN_DICT: " + basepart + " in: " + this_link)
             elif this_sub == basepart[0:30] or this_sub == basepartwww[0:30]:
                 _IS_BASE = True
-                print(  "--------------!!TRUE!! - looking for: " + this_link + " found MAIN_DICT: " + basepart + " in: " + this_link)
+                self.myprint(  "--------------!!TRUE!! - looking for: " + this_link + " found MAIN_DICT: " + basepart + " in: " + this_link)
                 if base_links_local:
                     in_base_loc = bool(this_link in [i for i in base_links_local])
         except Exception as e:
@@ -180,25 +181,25 @@ class LinkCheckLib(object):
         return _IS_BASE, in_base_loc, is_same_link
 
     # -----------------------------------------------------------------------
-    def ck_base2(self, this_link, base_links_local=None):
-        _IS_BASE = False
-        in_base_loc = False
-        basepart = self.MAIN_DICT.get(self.BASENAME)
-        basepartwww = self.MAIN_DICT.get(self.BASENAMEwww)
-
-        print("looking for: " + basepart + " found MAIN_DICT: " + basepartwww + " in: " + this_link)
-
-        try:
-            if this_link == basepart or this_link == basepartwww:
-                _IS_BASE = True
-                print("--------------!!TRUE!! - looking for: " + this_link + " found MAIN_DICT: " + basepart + " in: " + this_link)
-
-                if base_links_local:
-                    in_base_loc = bool(this_link in [i for i in base_links_local])
-        except Exception as e:
-            self.myprint("Exception ck_base: " + str(e))
-
-        return _IS_BASE, in_base_loc
+    # def ck_base2(self, this_link, base_links_local=None):
+    #     _IS_BASE = False
+    #     in_base_loc = False
+    #     basepart = self.MAIN_DICT.get(self.BASENAME)
+    #     basepartwww = self.MAIN_DICT.get(self.BASENAMEwww)
+    #
+    #     self.myprint("looking for: " + basepart + " found MAIN_DICT: " + basepartwww + " in: " + this_link)
+    #
+    #     try:
+    #         if this_link == basepart or this_link == basepartwww:
+    #             _IS_BASE = True
+    #             self.myprint("--------------!!TRUE!! - looking for: " + this_link + " found MAIN_DICT: " + basepart + " in: " + this_link)
+    #
+    #             if base_links_local:
+    #                 in_base_loc = bool(this_link in [i for i in base_links_local])
+    #     except Exception as e:
+    #         self.myprint("Exception ck_base: " + str(e))
+    #
+    #     return _IS_BASE, in_base_loc
     #-----------------------------------------------------------------------
 
     def do_response(self, a_link, p_link):
@@ -212,10 +213,15 @@ class LinkCheckLib(object):
                 done_ln_gl_sing.append(a_link)  ## add to main done list
                 session = HTMLSession()
 
+                self.myprint("in response: getting this link: " + a_link)
                 resp = session.get(a_link)
-                print("a_link is: ", a_link)
+                #a = resp.html.absolute_links
+                #for i in a:
+                    #self.myprint("ablink-----------------------> " + i)
+
+                self.myprint("a_link is: " + a_link)
                 code = resp.status_code
-                print("code: ", code)
+                self.myprint("code: " + str(code))
                 t_err = self.ck_status_code(a_link, p_link, code)  ## if there's    an error
                 session.close()
 
@@ -285,13 +291,19 @@ class LinkCheckLib(object):
 
         tempstr = str(e)
         self.myprint('\n!!!!! Inside handle_exc. Error------------------> ' + tempstr)
+
         if "Document is empty" in tempstr:  # for mp3 and similar files
             return
         if "object has no attribute" in tempstr:  # for mp3 and similar files
             return
         if "ConnectionResetError" in tempstr:
             return
-        elif link not in err_links:
+
+        stat = requests.get(link).status_code
+
+        self.myprint("----NEW STAT-----status: " + str(stat) + "\n")
+
+        if link not in err_links:
             err_links.append((link, tempstr[:42], plink))
         self.MAIN_DICT.update({re:err_links})
     #-----------------------------------------------------------------------------
@@ -347,28 +359,6 @@ class LinkCheckLib(object):
         return full_addy
     #-----------------------------------------------------------------------------
 
-    
-    @classmethod
-    def has_early_dollar( cls, clink, base_p):
-        LinkCheckLib.myprint("in hasearlydollar: " + clink + " " + base_p)
-        bp = clink.index(base_p)
-        print("clink : ", clink)
-        print("base_p link index of MAIN_DICT parent: ", bp)
-        if "?" in clink:
-            p =  clink.index("?")
-            print("index of ? : ", p )
-            if (p < bp):
-                return True
-
-        elif "$" or "#" in clink:
-            if (clink.index("$") < bp) or (clink.index("#") < bp):
-                return True     ## it's before MAIN_DICT link - not good
-            else:
-                return False     # there's a $ sign but it's ok
-        else:
-            return False
-    #-----------------------------------------------------------------------------
-
     @classmethod
     def divide_url(cls, parent_local):
         thebase_part_local = ""
@@ -377,11 +367,12 @@ class LinkCheckLib(object):
             if thebase_part_local.startswith('www'):
                 thebase_part_local = thebase_part_local[4:]
         except Exception as e:
-            LinkCheckLib.myprint('Exception divide_url: ' + str(e))
+            cls.myprint('Exception divide_url: ' + str(e))
 
         return thebase_part_local
 
-    def reset_timer( name, tstart):
-        LinkCheckLib.myprint(name, perf_counter() - tstart)
+    #-----------------------------------------------------------------------------
+    def reset_timer( self, name, tstart):
+        self.myprint(name + str( perf_counter() - tstart))
         tstart = perf_counter()
         return tstart

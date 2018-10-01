@@ -40,15 +40,17 @@ def worker1(df):
     stat = 404
     df = "http://Delia:8080/static/" + df + "done"
     dfloc = "http://Delia:8080/static/" + df + "done"
-    print("checking: " + df)
+    ac.myprint("checking: " + df)
     while stat == 404:
         stat = requests.head(df).status_code
-        print("file not done yet ", stat)
+        ac.myprint("file not done yet " + str(stat))
         sleep(.01)
-    print("worker1 done")
+    ac.myprint("worker1 done")
 
-def worker2(site, timestmp, jname):   # run LinkCheck and print to console
-    print("just started thread. You entered: " + site)
+    #-----------------------------------------------------------------------------
+
+def worker2(site, timestmp, jname):   # run LinkCheck and ac.myprint to console
+    ac.myprint("just started thread. You entered: " + site)
     ac.myprint("running worker2 thread")
     set_names(site, timestmp, jname)
     notreadyyet(site, jname)
@@ -71,7 +73,6 @@ def worker2(site, timestmp, jname):   # run LinkCheck and print to console
     ac.myprint( dt + "  worker2 done")
 
 
-    #-----------------------------------------------------------------------------
     #-----------------------------------------------------------------------------
 def set_names(site, timestp4, justn):
     just_name = justn
@@ -102,7 +103,7 @@ def results():
     w1_thread = Thread(target=worker1, args=(rfname,))
     w1_thread.setDaemon(True)
                 #Instead, you should provide args a tuple:
-    print('rfname: ', rfname)
+    ac.myprint('rfname: ' + rfname)
 
     w2_thread = Thread(target=worker2, args=(site,timestp1, rfname))
     threads.append(w1_thread)
