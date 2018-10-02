@@ -262,16 +262,10 @@ class LinkCheck(LinkCheckLib):
             pass
 
         finlist = self.return_errors()
-        #self.print_errs.del_finlist()
-
-        self.myprint("totalTime: " + str(perf_counter() - tstart))
-        #x = len(self.done_ln_gl_sing)
-        #self.myprint("errors: " + str(x))
+        print("totalTime: " + str(perf_counter() - tstart))
         return finlist
 
 
-# if __name__ == "__main__":
-#     LinkCheck.main()
 
 
 
