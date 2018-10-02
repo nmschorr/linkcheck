@@ -114,24 +114,7 @@ def results():
     sleep(4)  ## openshift is slow!
     return render_template('results.html', name = rfname)  ## has a form
 
-
-#serve(app, listen="127.0.0.1:8080")
-
 if __name__ == '__main__':
-    serve(app, channel_timeout=9960)
+    serve(app)
     #app.run(host='127.0.0.1', port=5000, debug=True)
 
-
-
-
-
-
-    # stat = 404
-    # thost = gethostbyaddr(gethostname())[0]
-    # doneurl = "http://" + thost + "/static/" + df + "done"
-    # #df = "http://Delia:8080/static/" + df + "done"
-    # ac.myprint("checking: " + df)
-    # while stat == 404:
-    #     stat = requests.head(doneurl).status_code
-    #     ac.myprint("file not done yet " + str(stat))
-    #     sleep(1)
