@@ -8,7 +8,6 @@ import prodconf as pcf
 from app_support_code import AppSupport as ac
 from time import sleep
 from linkcheck import LinkCheck
-#import requests
 # from nocache import nocache
 
 #sys.stderr = sys.stdout
