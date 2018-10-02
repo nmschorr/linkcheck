@@ -33,7 +33,7 @@ class AppSupport:
     @classmethod
     def datalines(cls, f, data):
         thishost = app_support_conf.thishost
-        home_url =  "&nbsp;&nbsp;&nbsp;&nbsp;" +  "&nbsp;&nbsp;&nbsp;&nbsp;" + \
+        home_url = "&nbsp;&nbsp;&nbsp;&nbsp;" +  "&nbsp;&nbsp;&nbsp;&nbsp;" + \
                 "<h2><a href=" + thishost + ">Start Over</a></h2><p></p>"
 
         sm = "http://schorrmedia.com"
@@ -41,7 +41,9 @@ class AppSupport:
 
         git_url = "<a href=https://github.com/nmschorr/linkcheck>See the code for this on Github</a></h3>"
         spaces = "&ensp;"  #two spaces
-        f.write("<!doctype html><html><head></head><body><div style=margin-left:5em;>")
+        f.write("<!DOCTYPE html><html><head>")
+        f.write('<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />')
+        f.write("</head><body><div style=margin-left:5em;>")
 
         f.write("<p></p><h3>Here are your broken links:</h3><p></p>")
         for line in data:
@@ -78,6 +80,7 @@ class AppSupport:
         jst2 = "javascript:location.reload(true)"
 
         sc1 = "<!DOCTYPE html><html><head>"
+        sc1b='<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />'
         sc2 = '<script> function finddone(ur) { var xhr = new XMLHttpRequest();'
         sc3 = 'xhr.open("HEAD", ur, false); xhr.send();'
         sc3b = 'if (xhr.status == "404") { return false; } else {'
