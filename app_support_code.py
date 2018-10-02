@@ -78,16 +78,17 @@ class AppSupport:
         jst2 = "javascript:location.reload(true)"
 
         sc1 = "<!DOCTYPE html><html><head>"
-        sc2 = '<script src=./linkjscript.js></script>'
-        sc3 = '<script>   '
+        sc2 = '<script> function finddone(ur) { var xhr = new XMLHttpRequest();'
+        sc3 = 'xhr.open("HEAD", ur, false); xhr.send();'
+        sc3b = 'if (xhr.status == "404") { return false; } else {'
+        sc3c = 'return true; location.reload(true);}}'
         sc4 = ' function checkDoneFile(){ '
-        sc5 = ' var dname=window.location.href + "done";  '
+        sc5 = ' var df=window.location.href + "done";  '
 
-        # sc5 = ' var dname=' + dname
-        sc6 = ' var rel=doesFileExist(dname); '
+        sc6 = ' var rel=finddone(df); '
         sc7 = " if (rel==true) { location.reload(true); }}</script>"
         sc7b = "<title>Not Ready</title>"
-        toppt = sc1 + sc2 + sc3 + sc4 + sc5 + sc6 + sc7 + sc7b
+        toppt = sc1 + sc2 + sc3 + sc3b + sc3c + sc4 + sc5 + sc6 + sc7 + sc7b
 
         st1 = "<style>body {padding-left:10em;}</style></head>"
         st2 = "<body style='{padding-left:10em;}'> "

@@ -1,22 +1,26 @@
 
-function doesFileExist(urlToFile) {
+function de(ur) {
     var xhr = new XMLHttpRequest();
-    xhr.open('HEAD', urlToFile, false);
+    xhr.open('HEAD', ur, false);
     xhr.send();
 
     if (xhr.status == "404") {
         return false;
     } else {
         return true;
-        console.log("perfect");
         location.reload(true);
     }
 }
 
-function keepchecking() {
-    console.log("in keepchecking");
-    setTimeout(checkRefrsh, 3000);  # 3 seconds
-}
+'function de(ur) {  var xhr = new XMLHttpRequest();''
+'xhr.open('HEAD', ur, false); xhr.send();'
+'if (xhr.status == "404") {  return false;  } else {''
+ 'return true; location.reload(true);}}'
+
+//function keepchecking() {
+//    console.log("in keepchecking");
+//    setTimeout(checkRefrsh, 3000);  // 3 seconds
+//}
 
 
 //function refreshData() {
