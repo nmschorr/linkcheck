@@ -16,20 +16,19 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <link rel="icon" type="image/png" href="http://schorrmedia.com/favicon.png">
 
-    <script>
+<script>
 function demof() {
     var fname = '{{ name }}';
     var dr = document.referrer;
     var statd = 'static/';
-    midl = dr + statd + fname;
-    var demo = "<script><a href=" + midl + ">Click Here for Results</a><\/script>";
-    document.getElementById("demo").innerHTML = demof();
-
+    var midl = dr + statd + fname;
+    var demo = "<a href=" + midl + ">Click Here for Results</a>";
+    document.getElementById("demod").innerHTML = demo;
 }
 </script>
 
 </head>
-<body >
+<body onload="demof()">
 <div style="padding-left:10em; color:purple;">
 <script>
 </script>
@@ -37,10 +36,14 @@ function demof() {
 
 
 <div>
-<br><p id="demof"></p>
-
 <h4> &nbsp;&nbsp;&nbsp;&nbsp; Click the link below to check your results2:</h4>
 </div>
+
+
+
+<div id="demod"></div>
+
+
 
 <div style=padding-left:12em;>
 
