@@ -59,16 +59,18 @@ def worker2(site, timestmp, jname):   # run LinkCheck and ac.myprint to console
     lc = LinkCheck()
     answers = lc.main(site)
 
-    ac.myprint("donefile in worker1: " + donefile_path)
-    ac.myprint("!!!!!!!!!!==---- len of answers: " + str(len(answers)))
+    ac.myprint("donefile in worker1: " + donefile_path + \
+         "!!!!!!!!!!==---- len of answers: " + str(len(answers)))
     file_path = pcf.get_file_path()
     if len(answers) > -1:
-        ac.writeres(answers, file_path, donefile_path)
+        ac.datalines(file_path,answers)
+        with open(donefile_path, 'w') as fd:
+            fd.write("done")
     else:
         #logging.debug("no errors found")
         write_no_err_pg(site)
 
-    sleep(1)
+    #sleep(1)
     dt = str(datetime.now())
     print( dt + "  worker2 done")
 
@@ -104,12 +106,12 @@ def results():
     #w1_thread.setDaemon(True)
     ac.myprint('rfname: ' + rfname)
 
-    w2_thread = Thread(target=worker2, args=(site,timestp1, rfname))
+    #w2_thread = Thread(target=worker2, args=(site,timestp1, rfname))
     #threads.append(w1_thread)
-    threads.append(w2_thread)
-    w2_thread.start()
+    #threads.append(w2_thread)
+    #w2_thread.start()
     #w1_thread.start()
-
+    worker2(site, timestp1, rfname)
     sleep(3)  ## openshift is slow!
     return render_template('results.html', name = rfname)  ## has a form
 

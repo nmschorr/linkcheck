@@ -203,19 +203,14 @@ class LinkCheckLib(object):
             if a_link not in done_ln_gl_sing:
                 self.myprint("-starting-get_home_links - just got this link: " + str(a_link))
                 done_ln_gl_sing.append(a_link)  ## add to main done list
+
                 session = HTMLSession()
-
-                self.myprint("in response: getting this link: " + a_link)
                 resp = session.get(a_link)
-                #a = resp.html.absolute_links
-                #for i in a:
-                    #self.myprint("ablink-----------------------> " + i)
-
-                self.myprint("a_link is: " + a_link)
-                code = resp.status_code
-                self.myprint("code: " + str(code))
-                t_err = self.ck_status_code(a_link, p_link, code)  ## if there's    an error
                 session.close()
+
+                code = resp.status_code
+                t_err = self.ck_status_code(a_link, p_link, code)  ## if there's    an error
+                self.myprint("LINK: " + a_link + "  status code: " + str(code))
 
         except Exception as e:
             self.myprint("GOT AN EXCEPTION inside do_response")
@@ -290,7 +285,7 @@ class LinkCheckLib(object):
             return
         if "ConnectionResetError" in tempstr:
             return
-        if  "Connection aborted." or "RemoteDisconnected"  in tempstr:
+        if  "RemoteDisconnected" in tempstr:
             return
 
         #stat = requests.get(link)

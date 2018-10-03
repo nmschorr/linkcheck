@@ -13,14 +13,14 @@ class LinkCheck(LinkCheckLib):
 
     def get_simple_response(self, lin_and_par_tup):
         link_count, stat = 0, 0
-        #er, response = "0", "0"
         link_to_ck, parent = lin_and_par_tup[0], lin_and_par_tup[1]
         link_count += 1
         self.myprint("Checking this link: " + link_to_ck )
         try:
-            stat = requests.get(link_to_ck).status_code
+            resp = requests.head(link_to_ck)
+            stat = resp.status_code
             self.ck_status_code_simple(link_to_ck, parent, stat)
-            self.myprint("-----status: " + str(stat) + "\n")
+            self.myprint("-----status: " + str(stat) )
 
         except Exception as e:
             self.myprint("Exception inside get_simple_response: ")

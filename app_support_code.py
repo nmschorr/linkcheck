@@ -5,6 +5,7 @@ from time import sleep
 
 class AppSupport:
     _DEBUG = conf_debug
+    #_DEBUG = 0
 
     def __init__(self):
         self.conf_debug = conf_debug
@@ -13,6 +14,7 @@ class AppSupport:
     def myprint(print_str,_DEBUG=0 ):
 
         _DEBUG = conf_debug
+        #_DEBUG = 0
 
         if _DEBUG:
             print(print_str)
@@ -32,7 +34,7 @@ class AppSupport:
         return newstt
 
     @classmethod
-    def datalines(cls, f, data):
+    def datalines(cls, filey, data):
         thishost = app_support_conf.thishost
         home_url = "&nbsp;&nbsp;&nbsp;&nbsp;" +  "&nbsp;&nbsp;&nbsp;&nbsp;" + \
                 "<h2><a href=" + thishost + ">Start Over</a></h2><p></p>"
@@ -42,37 +44,41 @@ class AppSupport:
 
         git_url = "<a href=https://github.com/nmschorr/linkcheck>See the code for this on Github</a></h3>"
         spaces = "&ensp;"  #two spaces
-        f.write("<!DOCTYPE html><html><head>")
-        f.write('<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />')
-        f.write("</head><body><div style=margin-left:5em;>")
 
-        f.write("<p></p><h3>Here are your broken links:</h3><p></p>")
-        for line in data:
-            f.write("BAD LINK-->  ")
-            f.write("<a href='")
-            f.write(str(line[0]))
-            f.write("'>")
-            f.write(str(line[0]))
-            f.write("</a>")
-            f.write(spaces)
-            f.write("**ERROR-->  ")
-            f.write(str(line[1]))  ## the error
-            f.write(spaces)
-            f.write("<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;" + "  ***FOUND ON: ")
-            f.write("<a href='")
-            f.write(str(line[2]))
-            f.write("'>")
-            f.write(str(line[2]))
-            f.write("</a>")
+        with open(filey, 'w') as f:
+
+            f.write("<!DOCTYPE html><html><head>")
+            f.write('<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />')
+            f.write("</head><body><div style=margin-left:5em;>")
+            f.write("<p></p><h3>Here are your broken links:</h3><p></p>")
+
+            for line in data:
+                #f.write("<p>&nbsp;</p>")
+                f.write("BAD LINK-->  ")
+                f.write("<a href='")
+                f.write(str(line[0]))
+                f.write("'>")
+                f.write(str(line[0]))
+                f.write("</a>")
+                f.write(spaces)
+                f.write("**ERROR-->  ")
+                f.write(str(line[1]))  ## the error
+                f.write(spaces)
+                f.write("<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;" + "  ***FOUND ON: ")
+                f.write("<a href='")
+                f.write(str(line[2]))
+                f.write("'>")
+                f.write(str(line[2]))
+                f.write("</a>")
+                f.write('<p></p>')
+
             f.write('<p></p>')
-
-        f.write('<p></p>')
-        f.write(home_url)
-        f.write("&nbsp;&nbsp;&nbsp;&nbsp;")
-        f.write(smedia_url)
-        f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-        f.write(git_url)
-        f.write("</div>" + "</body></html>")
+            f.write(home_url)
+            f.write("&nbsp;&nbsp;&nbsp;&nbsp;")
+            f.write(smedia_url)
+            f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+            f.write(git_url)
+            f.write("</div>" + "</body></html>")
 
     @classmethod
     def not_ready_msg(cls, gsite):
@@ -115,19 +121,3 @@ class AppSupport:
         AppSupport.myprint("make_filenames os_donefile_path: " + os_donefile_path)
         return just_stat, donef_name, file_os_path_all, os_donefile_path
 
-
-    @classmethod
-    def writeres(cls, data, fnfull, osdonefile_loc):
-        AppSupport.myprint("INSIDE WRITERES!!!!!-----------------------")
-        AppSupport.myprint("osdonefile_loc WRITERES!!!!!-----------------------" + osdonefile_loc)
-        f = open(fnfull, "w")
-        sleep(.4)
-        f.write('<p></p>')
-        cls.datalines(f,data)
-
-        f.close() # file is not immediately deleted because we
-        AppSupport.myprint("reg_os_file_path named: " + fnfull + "  f.name: " + f.name)
-        AppSupport.myprint("osdonef in writeres: " + osdonefile_loc)
-        fd = open(osdonefile_loc,"w")
-        fd.write("done")
-        fd.close() # file is not immediately deleted because we
