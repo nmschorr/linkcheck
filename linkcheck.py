@@ -77,7 +77,7 @@ class LinkCheck(LinkCheckLib):
         done_ln_gl_sing = self.MAIN_DICT.get(rd)
         any_link_glob= self.MAIN_DICT.get(ra)
         from time import sleep
-        self.myprint("\n\n------------ ")
+        self.myprint("\n------------ ")
 
         self.myprint("-------------Starting get_links with: " + mainlin)
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], "0", []
@@ -151,11 +151,11 @@ class LinkCheck(LinkCheckLib):
                             self.handle_exc(e, THIS_LN, par_link)
                             continue
 
-            self.myprint('---returning base_links_local: ' + str(base_lnks_loc))
-            self.myprint('!! NEW----end get_home_links \n\n')
+            #self.myprint('---returning base_links_local: ' + str(base_lnks_loc))
+            #self.myprint('!! NEW----end get_home_links \n\n')
             self.MAIN_DICT.update({rd: done_ln_gl_sing})
             self.MAIN_DICT.update({ra: any_link_glob})
-            self.myprint("- done with getlinks-----------\n \n")
+            self.myprint("- done with getlinks-----------\n")
 
             return list(set(base_lnks_loc))
 
@@ -211,7 +211,7 @@ class LinkCheck(LinkCheckLib):
 
             while the_len and repeats < 6:
                 repeats += 1
-                self.myprint("\n\n-----repeats: " + str(repeats) + "-------------------!!In main loop ")
+                self.myprint("\n-----repeats: " + str(repeats) + "-------------------!!In main loop ")
                 for baselink in new_base_links_one:
                     new_base_links_tmp = self.get_links( baselink, full_addy)  # first set of MAIN_DICT
                     new_base_links_two = self.rem_errs(new_base_links_tmp)

@@ -1,6 +1,7 @@
 from os import path
 import app_support_conf
 from config import conf_debug
+from time import sleep
 
 class AppSupport:
     _DEBUG = conf_debug
@@ -120,11 +121,12 @@ class AppSupport:
         AppSupport.myprint("INSIDE WRITERES!!!!!-----------------------")
         AppSupport.myprint("osdonefile_loc WRITERES!!!!!-----------------------" + osdonefile_loc)
         f = open(fnfull, "w")
+        sleep(.4)
         f.write('<p></p>')
         cls.datalines(f,data)
 
         f.close() # file is not immediately deleted because we
-        AppSupport.myprint("reg_os_file_path named: " + fnfull + "f.name: " + f.name)
+        AppSupport.myprint("reg_os_file_path named: " + fnfull + "  f.name: " + f.name)
         AppSupport.myprint("osdonef in writeres: " + osdonefile_loc)
         fd = open(osdonefile_loc,"w")
         fd.write("done")

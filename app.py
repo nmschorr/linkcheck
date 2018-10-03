@@ -100,15 +100,15 @@ def results():
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     rfname = "res" + timestp1 + ".html"
     threads = []
-    w1_thread = Thread(target=worker1, args=(rfname,)) #provide args a tuple!!!
-    w1_thread.setDaemon(True)
+    #w1_thread = Thread(target=worker1, args=(rfname,)) #provide args a tuple!!!
+    #w1_thread.setDaemon(True)
     ac.myprint('rfname: ' + rfname)
 
     w2_thread = Thread(target=worker2, args=(site,timestp1, rfname))
-    threads.append(w1_thread)
+    #threads.append(w1_thread)
     threads.append(w2_thread)
     w2_thread.start()
-    w1_thread.start()
+    #w1_thread.start()
 
     sleep(3)  ## openshift is slow!
     return render_template('results.html', name = rfname)  ## has a form

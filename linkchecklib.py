@@ -130,7 +130,7 @@ class LinkCheckLib(object):
         main_link = tlink
         parsed = urlparse(tlink)
         thisln_PARSED = str(parsed.netloc)
-        self.myprint("parsed: " + thisln_PARSED)
+        #self.myprint("parsed: " + thisln_PARSED)
         if parsed.scheme != '':
             main_link = parsed.netloc
 
@@ -171,7 +171,7 @@ class LinkCheckLib(object):
         basepart = self.MAIN_DICT.get(self.BASENAME)
         basepartwww = self.MAIN_DICT.get(self.BASENAMEwww)
 
-        self.myprint("looking for: " + basepart + " found: " + basepartwww + " trying: " + this_link)
+        #self.myprint("looking for: " + basepart + " found: " + basepartwww + " trying: " + this_link)
 
         this_sub = this_link[0:30]  # and this_link
         this_subww = basepartwww[0:30]
@@ -226,7 +226,7 @@ class LinkCheckLib(object):
     #----------------------------------------------------------------------get_links-
 
     def ck_bad_data(self, dlink):
-        self.myprint("!!!!!=============inside ck_bad_data. val of link: " + dlink)
+        #self.myprint("!!!!!=============inside ck_bad_data. val of link: " + dlink)
         good_or_bad = 0
         mylist = ['#', 'tel:+']
         try:
@@ -237,7 +237,7 @@ class LinkCheckLib(object):
             self.myprint("Exception ck_bad_data: " + str(e))
 
         good_suffix = self.has_correct_suffix(dlink)  # check suffix
-        self.myprint("!inside ck_bad_data: " + str(good_or_bad) + ' ' + str(good_suffix))
+        #self.myprint("!inside ck_bad_data: " + str(good_or_bad) + ' ' + str(good_suffix))
         return good_or_bad, good_suffix
 
     # #-----------------------------------------------------------------------------
@@ -289,6 +289,8 @@ class LinkCheckLib(object):
         if "object has no attribute" in tempstr:  # for mp3 and similar files
             return
         if "ConnectionResetError" in tempstr:
+            return
+        if  "Connection aborted." or "RemoteDisconnected"  in tempstr:
             return
 
         #stat = requests.get(link)
