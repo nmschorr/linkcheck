@@ -69,7 +69,7 @@ class AppSupport:
         f.write(home_url)
         f.write("&nbsp;&nbsp;&nbsp;&nbsp;")
         f.write(smedia_url)
-        f.write("&nbsp;&nbsp;&nbsp;&nbsp;")
+        f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
         f.write(git_url)
         f.write("</div>" + "</body></html>")
 
@@ -79,27 +79,27 @@ class AppSupport:
         arf1 = "<a href="
         jst2 = "javascript:location.reload(true)"
 
-        sc1 = "<!DOCTYPE html><html><head>"
-        sc1b='<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />'
-        sc2 = '<script> function finddone(ur) { var xhr = new XMLHttpRequest();'
-        sc3 = 'xhr.open("HEAD", ur, false); xhr.send();'
-        sc3b = 'if (xhr.status == "404") { return false; } else {'
+        sc1 = "<!DOCTYPE html><html><head> "
+        sc1b='<meta charset=utf-8> <style> p { padding-left:10em;} </style>'
+        sc2 = '<script> function finddone(ur) { var xhr = new XMLHttpRequest() ;'
+        sc3 = '  xhr.open("HEAD", ur, false); xhr.send(); '
+        sc3b = ' if (xhr.status == "404") { return false; } else {'
         sc3c = 'return true; location.reload(true);}}'
-        sc4 = ' function checkDoneFile(){ '
+        sc4 = ' function cdf(){ '
         sc5 = ' var df=window.location.href + "done";  '
 
         sc6 = ' var rel=finddone(df); '
         sc7 = " if (rel==true) { location.reload(true); }}</script>"
-        sc7b = "<title>Not Ready</title>"
-        toppt = sc1 + sc2 + sc3 + sc3b + sc3c + sc4 + sc5 + sc6 + sc7 + sc7b
+        sta = "<script>function doit() { setInterval(cdf, 2000);} </script>"
+        sc7b = "<title>Not Ready</title> </head>"
+        toppt = sc1 + sc1b + sc2 + sc3 + sc3b + sc3c + sc4 + sc5 + sc6 + sc7 + sta + sc7b
 
-        st1 = "<style>body {padding-left:10em;}</style></head>"
-        st2 = "<body style='{padding-left:10em;}'> "
-        st3 = "<script>setInterval(checkDoneFile, 2000);</script>"
-        st4 = "Results not ready yet." + '<p></p>' + "You entered: " + gsite + '<p></p>' + \
-            "If server times out or gives an error, reload the page with the shift key down." + '<p></p>'
-        refrsh_pg = arf1 + jst2 + ">Refresh this page</a>"
-        whole_page = toppt + st1 + st2 + st3 + st4 + refrsh_pg + "</body></html>"
+
+        st2 = "<body onload=doit()> <div padding-left:10em;>"
+        st4 = "<p>Results not ready yet." + '</p><p> </p><p>' + "You entered: " + gsite + '</p><p></p>' + \
+            "<p>If server times out or gives an error, reload the page with the shift key down." + '</p><p></p>'
+        refrsh_pg = "<p><a href=" + jst2 + ">Refresh this page</a></p>"
+        whole_page = toppt + st2 + st4 + refrsh_pg + "</div></body></html>"
         return whole_page
 
     @classmethod

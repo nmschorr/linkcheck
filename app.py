@@ -110,10 +110,10 @@ def results():
     w2_thread.start()
     w1_thread.start()
 
-    #sleep(2)  ## openshift is slow!
+    sleep(3)  ## openshift is slow!
     return render_template('results.html', name = rfname)  ## has a form
 
 if __name__ == '__main__':
-    serve(app, port=5000)
+    serve(app)
     #app.run(host='127.0.0.1', port=5000, debug=True)
 
