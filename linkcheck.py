@@ -18,8 +18,8 @@ class LinkCheck(LinkCheckLib):
         link_count += 1
         self.myprint("Checking this link: " + link_to_ck )
         try:
-            t_timeout = Timeout(connect=2.0, read=5.0)
-            resp = requests.head(link_to_ck, timeout=2)
+            #t_timeout = Timeout(connect=2.0, read=5.0)
+            resp = requests.head(link_to_ck, timeout=5)
             stat = resp.status_code
             self.ck_status_code_simple(link_to_ck, parent, stat)
             self.myprint("-----status: " + str(stat) )
@@ -46,8 +46,8 @@ class LinkCheck(LinkCheckLib):
 
         except Exception as e:
             self.myprint("Exception add_any_bse_g: " + str(e))
-
-        self.MAIN_DICT.update({rb: base_lnks_g})
+        base_lnks_g2 = list(set(base_lnks_g))
+        self.MAIN_DICT.update({rb: base_lnks_g2})
     #---------------------------------------------------------------------------------------
     def add_any(self, tlink, parent_local, any_link_loc=None):  # Adding this MAIN_DICT link to any glob
         ra = self.ra
@@ -63,7 +63,9 @@ class LinkCheck(LinkCheckLib):
             else:
                 any_link_glob.append((tlink, parent_local))  # make it if starting empty
                 any_link_loc.append((tlink, parent_local))
-            self.MAIN_DICT.update({ra: any_link_glob})
+
+            any_link_glob2 = list(set(any_link_glob))
+            self.MAIN_DICT.update({ra: any_link_glob2})
         except Exception as e:
             self.myprint("exception in add_any: " + str(e))
 
@@ -109,7 +111,7 @@ class LinkCheck(LinkCheckLib):
                 self.myprint("Exception inside get_links: " + str(e))
                 return
 
-            self.myprint("Starting Main Check" + mainlin + "\n")
+            self.myprint("Starting Main Check of: " + mainlin + "\n")
             for THIS_LN in new_lnks_loc:
                 if THIS_LN not in done_ln_gl_sing:
                     self.myprint("THIS_LN " + THIS_LN)
@@ -155,8 +157,10 @@ class LinkCheck(LinkCheckLib):
 
             #self.myprint('---returning base_links_local: ' + str(base_lnks_loc))
             #self.myprint('!! NEW----end get_home_links \n\n')
-            self.MAIN_DICT.update({rd: done_ln_gl_sing})
-            self.MAIN_DICT.update({ra: any_link_glob})
+            done_ln_gl_sing2 = list(set(done_ln_gl_sing))
+            any_link_glob2 = list(set(any_link_glob))
+            self.MAIN_DICT.update({rd: done_ln_gl_sing2})
+            self.MAIN_DICT.update({ra: any_link_glob2})
             self.myprint("- done with getlinks-----------\n")
 
             return list(set(base_lnks_loc))
