@@ -5,6 +5,7 @@ from time import perf_counter
 import requests
 from urllib.parse import urlparse
 from linkchecklib import LinkCheckLib
+from urllib3.util.timeout import Timeout
 
 class LinkCheck(LinkCheckLib):
 
@@ -17,7 +18,8 @@ class LinkCheck(LinkCheckLib):
         link_count += 1
         self.myprint("Checking this link: " + link_to_ck )
         try:
-            resp = requests.head(link_to_ck)
+            t_timeout = Timeout(connect=2.0, read=5.0)
+            resp = requests.head(link_to_ck, timeout=2)
             stat = resp.status_code
             self.ck_status_code_simple(link_to_ck, parent, stat)
             self.myprint("-----status: " + str(stat) )
