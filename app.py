@@ -1,7 +1,7 @@
 from waitress import serve
-from threading import Thread
-from socket import gethostbyaddr, gethostname
-from flask import Flask, request, render_template
+#from threading import Thread
+#from socket import gethostbyaddr, gethostname
+from flask import Flask, request, render_template, after_this_request
 from jinja2 import Environment, PackageLoader, select_autoescape
 from datetime import datetime
 import prodconf as pcf
@@ -9,6 +9,30 @@ from app_support_code import AppSupport as ac
 from time import sleep
 from linkcheck import LinkCheck
 # from nocache import nocache
+import logging
+import socket
+import sys
+#import multiprocessing   #, signal
+
+# lock_socket = None  # we want to keep the socket open until the very end of
+#                     # our script so we use a global variable to avoid going
+#                     # out of scope and being garbage-collected
+#
+# def is_lock_free():
+#     global lock_socket
+#     lock_socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+#     try:
+#         lock_id = "jetgal.app"   # this should be unique. using your username as a prefix is a convention
+#         lock_socket.bind('\0' + lock_id)
+#         logging.debug("Acquired lock %r" % (lock_id,))
+#         return True
+#     except socket.error:
+#         # socket already locked, task must already be running
+#         logging.info("Failed to acquire lock %r" % (lock_id,))
+#         return False
+#
+# if not is_lock_free():
+#     sys.exit()
 
 #sys.stderr = sys.stdout
 #rootloglev = 40
@@ -23,22 +47,20 @@ env = Environment(    # jinja2
 
 def notreadyyet(ste, jname):
     newst= ac.not_ready_msg(ste)
-    js = './static/' + jname
-    pcf.set_just_stat(js)
-    fj = open(js, "w")
-    fj.write(newst)
-    fj.close()
+    jstatn = './static/' + jname
+    pcf.set_just_stat(jstatn)
+    with open(jstatn, "w") as fhandle:
+        fhandle.write(newst)
 
 def write_no_err_pg(asited):
     just_stat = pcf.get_just_stat()
-    newstt = ac.fin_msg(asited)
-    fjj = open(just_stat, "w")
-    fjj.write(newstt)
-    fjj.close()
+    newst2 = ac.fin_msg(asited)
+    with open(just_stat, "w") as fjj:
+        fjj.write(newst2)
 
-def worker1(df):
+def multi2(df):
     from pathlib import Path
-    sleep(1)
+    #sleep(1)
     dfp = pcf.get_donefile_path()
     doneyet = False
     while not doneyet:
@@ -47,15 +69,17 @@ def worker1(df):
         sleep(1)
     ac.myprint("worker1 done")
 
-    #-----------------------------------------------------------------------------
-
-def worker2(site, timestmp, jname):   # run LinkCheck and ac.myprint to console
-    print("Just started thread. You entered: " + site)
-    ac.myprint("running worker2 thread")
-    set_names(site, timestmp, jname)
-    notreadyyet(site, jname)
+    #
     donefile_path = pcf.get_donefile_path()
-    ac.myprint("donefile:" + donefile_path)
+    ac.myprint("donefile: " + donefile_path)
+
+#-----------------------------------------------------------------------------
+def worker2(site, timestmp, jname):   # run LinkCheck and ac.myprint to console
+    print("Just started. You entered: " + site)
+    ac.myprint("running worker2")
+
+    donefile_path = pcf.get_donefile_path()
+    ac.myprint("donefile: " + donefile_path)
     lc = LinkCheck()
     answers = lc.main(site)
 
@@ -96,23 +120,28 @@ def index():
 
 # @nocache             # very important so client server doesn'w_thread cache results
 
+# def notreadyyet_proc(site, jname):
+#     p = multiprocessing.Process(target=notreadyyet, args=(site, jname,))
+#     p.start()
+#     sleep(2)
+#     p.terminate()
+
+
 @app.route('/results', methods = ['POST', 'GET'])
 def results():
     site = request.form['name']
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     rfname = "res" + timestp1 + ".html"
-    threads = []
-    #w1_thread = Thread(target=worker1, args=(rfname,)) #provide args a tuple!!!
-    #w1_thread.setDaemon(True)
+    set_names(site, timestp1, rfname)
+
+    notreadyyet(site, rfname)  # write the temp file
     ac.myprint('rfname: ' + rfname)
 
-    #w2_thread = Thread(target=worker2, args=(site,timestp1, rfname))
-    #threads.append(w1_thread)
-    #threads.append(w2_thread)
-    #w2_thread.start()
-    #w1_thread.start()
+    #@after_this_request
+    #def afterthis(site):
     worker2(site, timestp1, rfname)
-    sleep(3)  ## openshift is slow!
+    #    return site
+
     return render_template('results.html', name = rfname)  ## has a form
 
 if __name__ == '__main__':

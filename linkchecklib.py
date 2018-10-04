@@ -4,8 +4,7 @@ from requests_html import HTMLSession
 from random import random
 from time import perf_counter
 from config import conf_debug
-import requests
-
+from urllib3.util.timeout import Timeout
 
 class LinkCheckLib(object):
 
@@ -102,7 +101,7 @@ class LinkCheckLib(object):
                     errs = list(set(err_links))
                     err_links.clear()
                     er_len = len(errs)
-                    nstring = "\nTotal errors: " + str(er_len) + " Here are the errors ---:"
+                    nstring = "\\nTotal errors: " + str(er_len) + " Here are the errors ---:"
                     self.myprint(nstring)
                     errs2 = sorted(errs, key=lambda x: x[0])  # sort on first
 
@@ -129,7 +128,7 @@ class LinkCheckLib(object):
     def ispar(self, tlink):  # is it a parent? part of the main website?
         main_link = tlink
         parsed = urlparse(tlink)
-        thisln_PARSED = str(parsed.netloc)
+        #thisln_PARSED = str(parsed.netloc)
         #self.myprint("parsed: " + thisln_PARSED)
         if parsed.scheme != '':
             main_link = parsed.netloc
@@ -156,8 +155,8 @@ class LinkCheckLib(object):
     # -----------------------------------------------------------------------
 
     def ck_base(self, in_link, base_links_local=None):
-        par_loc = self.MAIN_DICT.get(self.BASENAME)
-        par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
+        # = self.MAIN_DICT.get(self.BASENAME)
+        #par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
         this_link = in_link
         _IS_BASE = False
         in_base_loc = False
@@ -174,7 +173,7 @@ class LinkCheckLib(object):
         #self.myprint("looking for: " + basepart + " found: " + basepartwww + " trying: " + this_link)
 
         this_sub = this_link[0:30]  # and this_link
-        this_subww = basepartwww[0:30]
+        #this_subww = basepartwww[0:30]
 
         try:
 
@@ -201,11 +200,11 @@ class LinkCheckLib(object):
         resp = None
         try:
             if a_link not in done_ln_gl_sing:
-                self.myprint("-starting-get_home_links - just got this link: " + str(a_link))
+                self.myprint("Starting-get_home_links - just got this link: " + str(a_link))
                 done_ln_gl_sing.append(a_link)  ## add to main done list
 
                 session = HTMLSession()
-                resp = session.get(a_link)
+                resp = session.get(a_link, timeout=2)
                 session.close()
 
                 code = resp.status_code
@@ -213,7 +212,8 @@ class LinkCheckLib(object):
                 self.myprint("LINK: " + a_link + "  status code: " + str(code))
 
         except Exception as e:
-            self.myprint("GOT AN EXCEPTION inside do_response")
+            self.myprint("GOT AN EXCEPTION inside do_response ")
+            self.myprint(str(e))
             self.handle_exc(e, a_link, p_link)
             pass
         return resp, t_err
@@ -277,7 +277,7 @@ class LinkCheckLib(object):
         err_links = self.MAIN_DICT.get(re)
 
         tempstr = str(e)
-        self.myprint('\n!!!!! Inside handle_exc. Error------------------> ' + tempstr)
+        self.myprint('!!!!! Inside handle_exc. Error------------------> ' + tempstr)
 
         if "Document is empty" in tempstr:  # for mp3 and similar files
             return
