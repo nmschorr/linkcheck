@@ -1,36 +1,12 @@
 from waitress import serve
 
-from flask import Flask, request, render_template, g
-import flask
-from jinja2 import Environment, PackageLoader, select_autoescape, Template
+from flask import Flask, request, render_template
+#import flask
+from jinja2 import Environment, PackageLoader, select_autoescape
 from datetime import datetime
 import prodconf as pcf
 from app_support_code import AppSupport as ac
-from time import sleep
 from linkcheck import LinkCheck
-
-#import multiprocessing   #, signal
-
-# lock_socket = None  # we want to keep the socket open until the very end of
-#                     # our script so we use a global variable to avoid going
-#                     # out of scope and being garbage-collected
-#
-# def is_lock_free():
-#     global lock_socket
-#     lock_socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
-#     try:
-#         lock_id = "jetgal.app"   # this should be unique. using your username as a prefix is a convention
-#         lock_socket.bind('\0' + lock_id)
-#         logging.debug("Acquired lock %r" % (lock_id,))
-#         return True
-#     except socket.error:
-#         # socket already locked, task must already be running
-#         logging.info("Failed to acquire lock %r" % (lock_id,))
-#         return False
-#
-# if not is_lock_free():
-#     sys.exit()
-
 #sys.stderr = sys.stdout
 #rootloglev = 40
 from config import conf_debug
@@ -77,7 +53,7 @@ def main_work(site):   # run LinkCheck and ac.myprint to console
         write_no_err_pg(site)
 
     dt = str(datetime.now())
-    print( dt + "  worker2 done")
+    print( dt + "  main_work done")
 
 
     #-----------------------------------------------------------------------------
@@ -97,26 +73,9 @@ def set_names(site, timestp4, justn):
 @app.route('/')
 def index():
      return render_template('index.html')  ## has a form
-#
-# def after_this_request(f):
-#     if not hasattr(g, 'after_request_callbacks'):
-#         g.after_request_callbacks = []
-#     g.after_request_callbacks.append(f)
-#     return f
-#
-# @app.after_request
-# def call_after_request_callbacks(response):
-#     for callback in getattr(g, 'after_request_callbacks', ()):
-#         callback(response)
-#     return response
 
 
 
-@app.after_request
-def after_request(site):
-    print("after2")
-    main_work(site)
-    return site
 
 
 @app.route('/results', methods = ['POST', 'GET'])
@@ -124,13 +83,12 @@ def results():
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     rfname = "res" + timestp1 + ".html"
     site = request.form['name']
-    app.after_request(after_request(site))
+
+    #flask.after_this_request(print("yes"))
 
     set_names(site, timestp1, rfname)
     make_notreadyyet_page(site, rfname)  # write the temp file
-    #main_work(site)
-
-
+    main_work(site)
 
     return render_template('results.html', name = rfname)  ## has a form
 
@@ -138,6 +96,19 @@ def results():
 if __name__ == '__main__':
     #serve(app)
     app.run(host='127.0.0.1', port=5000, debug=True)
+
+    #
+    # def after_this_request(f):
+    #     if not hasattr(g, 'after_request_callbacks'):
+    #         g.after_request_callbacks = []
+    #     g.after_request_callbacks.append(f)
+    #     return f
+    #
+    # @app.after_request
+    # def call_after_request_callbacks(response):
+    #     for callback in getattr(g, 'after_request_callbacks', ()):
+    #         callback(response)
+    #     return response
 
 # @nocache             # very important so client server doesn'w_thread cache results
 
