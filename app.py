@@ -94,8 +94,8 @@ def results():
 
 
 if __name__ == '__main__':
-    #serve(app)
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    serve(app)
+    #app.run(host='127.0.0.1', port=5000, debug=True)
 
     #
     # def after_this_request(f):
