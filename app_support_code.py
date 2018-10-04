@@ -1,7 +1,7 @@
-from os import path
+from os import path, unlink
 import app_support_conf
 from config import conf_debug
-from time import sleep
+#from time import sleep
 
 class AppSupport:
     _DEBUG = conf_debug
@@ -35,6 +35,7 @@ class AppSupport:
 
     @classmethod
     def datalines(cls, filey, data):
+        unlink(filey)
         thishost = app_support_conf.thishost
         home_url = "&nbsp;&nbsp;&nbsp;&nbsp;" +  "&nbsp;&nbsp;&nbsp;&nbsp;" + \
                 "<h2><a href=" + thishost + ">Start Over</a></h2><p></p>"
@@ -44,6 +45,7 @@ class AppSupport:
 
         git_url = "<a href=https://github.com/nmschorr/linkcheck>See the code for this on Github</a></h3>"
         spaces = "&ensp;"  #two spaces
+
 
         with open(filey, 'w') as f:
 
