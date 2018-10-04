@@ -12,6 +12,8 @@ class LinkCheck(LinkCheckLib):
         super().__init__()
 
     def get_simple_response(self, lin_and_par_tup):
+        redirs = self.redirs
+        rederdat = self.MAIN_DICT.get(self.redirs)
         link_count, stat = 0, 0
         link_to_ck, parent = lin_and_par_tup[0], lin_and_par_tup[1]
         link_count += 1
@@ -22,6 +24,19 @@ class LinkCheck(LinkCheckLib):
             stat = resp.status_code
             self.ck_status_code_simple(link_to_ck, parent, stat)
             self.myprint("-----status: " + str(stat) )
+
+            if stat == 301:  # get head doesn't check 301s
+                #newurl = resp.headers['location']
+                newurl = resp.headers['X-Pingback']
+                print("     ---------- !! this is new url to ck 301 head: ", newurl)
+                respf = requests.head(newurl, timeout=7.0)
+                self.ck_status_code_simple(newurl, parent, respf.status_code)
+                self.myprint("-----followed url redirect status: " + str(respf.status_code) )
+                if respf.status_code == 301:                       # get head doesn't check 301s
+                    print("appending to 301: " + newurl)
+                    rederdat.append(newurl)
+
+            self.MAIN_DICT.update({redirs: rederdat})
 
         except Exception as e:
             self.myprint("Exception inside get_simple_response: ")
@@ -78,7 +93,7 @@ class LinkCheck(LinkCheckLib):
         done_ln_gl_sing = self.MAIN_DICT.get(rd)
         any_link_glob= self.MAIN_DICT.get(ra)
         from time import sleep
-        self.myprint("\n------------ ")
+        self.myprint("------------ ")
 
         self.myprint("-------------Starting get_links with: " + mainlin)
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], "0", []
@@ -266,6 +281,12 @@ class LinkCheck(LinkCheckLib):
             #print(str(e))
             self.handle_exc(e, tup[0] ,tup[1])
             pass
+
+        rederdatf = self.MAIN_DICT.get(self.redirs)
+        print()
+        print('Here are the redirect errors - they should be fixed too:')
+        for i in rederdatf:
+            print(i)
 
         finlist = self.return_errors()
         print("totalTime: " + str(perf_counter() - tstart))

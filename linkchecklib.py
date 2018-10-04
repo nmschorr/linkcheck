@@ -18,11 +18,14 @@ class LinkCheckLib(object):
         rd = "rd_" + rand
         ra = "ra_" + rand
         rb = "rb_" + rand
+        redirs = "redirs" + rand
+        self.redirs = redirs
         self.BASENAME = BASENAME
         self.BASENAMEwww = BASENAMEwww
         self.re = re
         self.rd = rd
         self.ra = ra
+        self.rb = rb
         self.rb = rb
 
         err_links = []
@@ -31,6 +34,7 @@ class LinkCheckLib(object):
         base_lnks_g = []
         BN = "empty"
         BNwww = "empty"
+        redirs_dat = []
 
         tlds_list = []
         self.tlds_list = tlds_list
@@ -40,6 +44,7 @@ class LinkCheckLib(object):
         self.MAIN_DICT.update({rd: done_ln_gl_sing})
         self.MAIN_DICT.update({ra: any_link_glob})
         self.MAIN_DICT.update({rb: base_lnks_g})
+        self.MAIN_DICT.update({redirs: redirs_dat})
 
     #-----------------------------------------------------------------------------
     def myprint(self, print_str, mdebug=0 ):
@@ -178,14 +183,14 @@ class LinkCheckLib(object):
 
             if this_link == basepart or this_link == basepartwww:
                 _IS_BASE = True
-                self.myprint(  "--------------!!TRUE!! - looking for: " + this_link + " found : " + basepart + " in: " + this_link)
+                self.myprint(  "--------------!!basepart or this_link == basepartwww!! _IS_BASE = True: " + this_link + " found : " + basepart + " in: " + this_link)
             elif this_sub == basepart[0:30] or this_sub == basepartwww[0:30]:
                 _IS_BASE = True
-                self.myprint(  "--------------!!TRUE!! - looking for: " + this_link + " found : " + basepart + " in: " + this_link)
+                self.myprint(  "--------------!!_IS_BASE = True " + this_link + " found : " + basepart + " in: " + this_link)
                 if base_links_local:
                     in_base_loc = bool(this_link in [i for i in base_links_local])
                 else:
-                    self.myprint("--------------!!TRUE!! - looking for: " + this_link + " found : " + basepart + " in: " + this_link)
+                    self.myprint("did not find: " + this_link + " : " + basepart + " in: " + this_link)
         except Exception as e:
             self.myprint("Exception ck_base: " + str(e))
         return _IS_BASE, in_base_loc
@@ -193,7 +198,9 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------
 
     def do_response(self, a_link, p_link):
+        redirs = self.redirs
         rd = self.rd
+        rederdat = self.MAIN_DICT.get(redirs)
         done_ln_gl_sing = self.MAIN_DICT.get(rd)
         t_err = 0
         resp = None
@@ -208,13 +215,18 @@ class LinkCheckLib(object):
 
                 code = resp.status_code
                 t_err = self.ck_status_code(a_link, p_link, code)  ## if there's    an error
-                self.myprint("LINK: " + a_link + "  status code: " + str(code))
+                self.myprint("LINK: in do_response: " + a_link + "  status code: " + str(code))
+
+                if code == 301:
+                    rederdat.append(a_link)  # no need to recheck because it's automatic
+
 
         except Exception as e:
             self.myprint("GOT AN EXCEPTION inside do_response ")
             self.myprint(str(e))
             self.handle_exc(e, a_link, p_link)
             pass
+        self.MAIN_DICT.update({redirs: rederdat})
         return resp, t_err
 
     #----------------------------------------------------------------------get_links-
@@ -229,6 +241,19 @@ class LinkCheckLib(object):
                     good_or_bad += 1
         except Exception as e:
             self.myprint("Exception ck_bad_data: " + str(e))
+
+        ckme = dlink[7:30]
+        if "pinterest.com" in ckme:
+            good_or_bad += 1
+
+        if "facebook.com" in ckme:
+            if len(dlink) > 50:
+                good_or_bad += 1
+
+        if "twitter.com" in ckme:
+            if len(dlink) > 50:
+                good_or_bad += 1
+
 
         good_suffix = self.has_correct_suffix(dlink)  # check suffix
         #self.myprint("!inside ck_bad_data: " + str(good_or_bad) + ' ' + str(good_suffix))
