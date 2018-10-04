@@ -1,7 +1,7 @@
 from waitress import serve
 #from threading import Thread
 #from socket import gethostbyaddr, gethostname
-from flask import Flask, request, render_template, after_this_request
+from flask import Flask, request, render_template, after_this_request, before_render_template
 from jinja2 import Environment, PackageLoader, select_autoescape
 from datetime import datetime
 import prodconf as pcf
@@ -45,7 +45,8 @@ env = Environment(    # jinja2
     autoescape=select_autoescape(['html', 'xml']),
 )
 
-def notreadyyet(ste, jname):
+def notreadyyet(r, jname):
+    ste = r
     newst= ac.not_ready_msg(ste)
     jstatn = './static/' + jname
     pcf.set_just_stat(jstatn)
@@ -116,25 +117,30 @@ def set_names(site, timestp4, justn):
 
 @app.route('/')
 def index():
-    return render_template('index.html')  ## has a form
+     return render_template('index.html')  ## has a form
 
 # @nocache             # very important so client server doesn'w_thread cache results
-
-# def notreadyyet_proc(site, jname):
-#     p = multiprocessing.Process(target=notreadyyet, args=(site, jname,))
-#     p.start()
-#     sleep(2)
-#     p.terminate()
 
 
 @app.route('/results', methods = ['POST', 'GET'])
 def results():
-    site = request.form['name']
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     rfname = "res" + timestp1 + ".html"
+    site = request.form['name']
+    r = app.make_response(rfname)
+    @app.before_request
+    def tempp(r):
+
+        notreadyyet(site, r)  # write the temp file
+        #notreadyyet(site, rfname)  # write the temp file
+        return r
+
+    #site = request.form['name']
+   # timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
+    #rfname = "res" + timestp1 + ".html"
     set_names(site, timestp1, rfname)
 
-    notreadyyet(site, rfname)  # write the temp file
+    #notreadyyet(site, rfname)  # write the temp file
     ac.myprint('rfname: ' + rfname)
 
     #@after_this_request

@@ -101,7 +101,7 @@ class LinkCheckLib(object):
                     errs = list(set(err_links))
                     err_links.clear()
                     er_len = len(errs)
-                    nstring = "\\nTotal errors: " + str(er_len) + " Here are the errors ---:"
+                    nstring = '\n' + "Total errors: " + str(er_len) + " Here are the errors ---:"
                     self.myprint(nstring)
                     errs2 = sorted(errs, key=lambda x: x[0])  # sort on first
 
@@ -146,7 +146,7 @@ class LinkCheckLib(object):
         is_same_link = False
         this_link = inlink
 
-        if this_link == par_loc or this_link == par_locwww:
+        if (this_link == par_loc) or (this_link == par_locwww):
             is_same_link = True
             self.myprint("--Is same: " + this_link + " found: " + par_loc + " and: " + par_locwww)
 
@@ -204,7 +204,7 @@ class LinkCheckLib(object):
                 done_ln_gl_sing.append(a_link)  ## add to main done list
 
                 session = HTMLSession()
-                resp = session.get(a_link, timeout=2)
+                resp = session.get(a_link, timeout=7.0)
                 session.close()
 
                 code = resp.status_code
