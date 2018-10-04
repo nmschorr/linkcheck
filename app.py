@@ -1,17 +1,14 @@
 from waitress import serve
-#from threading import Thread
-#from socket import gethostbyaddr, gethostname
-from flask import Flask, request, render_template, after_this_request, before_render_template
-from jinja2 import Environment, PackageLoader, select_autoescape
+
+from flask import Flask, request, render_template, g
+import flask
+from jinja2 import Environment, PackageLoader, select_autoescape, Template
 from datetime import datetime
 import prodconf as pcf
 from app_support_code import AppSupport as ac
 from time import sleep
 from linkcheck import LinkCheck
-# from nocache import nocache
-import logging
-import socket
-import sys
+
 #import multiprocessing   #, signal
 
 # lock_socket = None  # we want to keep the socket open until the very end of
@@ -45,7 +42,7 @@ env = Environment(    # jinja2
     autoescape=select_autoescape(['html', 'xml']),
 )
 
-def notreadyyet(r, jname):
+def make_notreadyyet_page(r, jname):
     ste = r
     newst= ac.not_ready_msg(ste)
     jstatn = './static/' + jname
@@ -59,25 +56,10 @@ def write_no_err_pg(asited):
     with open(just_stat, "w") as fjj:
         fjj.write(newst2)
 
-def multi2(df):
-    from pathlib import Path
-    #sleep(1)
-    dfp = pcf.get_donefile_path()
-    doneyet = False
-    while not doneyet:
-        doneyet= Path(dfp).exists()
-        ac.myprint("Checking from worker1 for done file: " + dfp)
-        sleep(1)
-    ac.myprint("worker1 done")
-
-    #
-    donefile_path = pcf.get_donefile_path()
-    ac.myprint("donefile: " + donefile_path)
-
 #-----------------------------------------------------------------------------
-def worker2(site, timestmp, jname):   # run LinkCheck and ac.myprint to console
-    print("Just started. You entered: " + site)
-    ac.myprint("running worker2")
+def main_work(site):   # run LinkCheck and ac.myprint to console
+    print("Just started. You entered: " + str(site))
+    ac.myprint("running main_work")
 
     donefile_path = pcf.get_donefile_path()
     ac.myprint("donefile: " + donefile_path)
@@ -92,10 +74,8 @@ def worker2(site, timestmp, jname):   # run LinkCheck and ac.myprint to console
         with open(donefile_path, 'w') as fd:
             fd.write("done")
     else:
-        #logging.debug("no errors found")
         write_no_err_pg(site)
 
-    #sleep(1)
     dt = str(datetime.now())
     print( dt + "  worker2 done")
 
@@ -114,12 +94,29 @@ def set_names(site, timestp4, justn):
     pcf.set_donefile_path(donefile_path)
 
 
-
 @app.route('/')
 def index():
      return render_template('index.html')  ## has a form
+#
+# def after_this_request(f):
+#     if not hasattr(g, 'after_request_callbacks'):
+#         g.after_request_callbacks = []
+#     g.after_request_callbacks.append(f)
+#     return f
+#
+# @app.after_request
+# def call_after_request_callbacks(response):
+#     for callback in getattr(g, 'after_request_callbacks', ()):
+#         callback(response)
+#     return response
 
-# @nocache             # very important so client server doesn'w_thread cache results
+
+
+@app.after_request
+def after_request(site):
+    print("after2")
+    main_work(site)
+    return site
 
 
 @app.route('/results', methods = ['POST', 'GET'])
@@ -127,30 +124,34 @@ def results():
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     rfname = "res" + timestp1 + ".html"
     site = request.form['name']
-    r = app.make_response(rfname)
-    @app.before_request
-    def tempp(r):
+    app.after_request(after_request(site))
 
-        notreadyyet(site, r)  # write the temp file
-        #notreadyyet(site, rfname)  # write the temp file
-        return r
-
-    #site = request.form['name']
-   # timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
-    #rfname = "res" + timestp1 + ".html"
     set_names(site, timestp1, rfname)
+    make_notreadyyet_page(site, rfname)  # write the temp file
+    #main_work(site)
 
-    #notreadyyet(site, rfname)  # write the temp file
-    ac.myprint('rfname: ' + rfname)
 
-    #@after_this_request
-    #def afterthis(site):
-    worker2(site, timestp1, rfname)
-    #    return site
 
     return render_template('results.html', name = rfname)  ## has a form
 
-if __name__ == '__main__':
-    serve(app)
-    #app.run(host='127.0.0.1', port=5000, debug=True)
 
+if __name__ == '__main__':
+    #serve(app)
+    app.run(host='127.0.0.1', port=5000, debug=True)
+
+# @nocache             # very important so client server doesn'w_thread cache results
+
+# def multi2(df):
+#     from pathlib import Path
+#     #sleep(1)
+#     dfp = pcf.get_donefile_path()
+#     doneyet = False
+#     while not doneyet:
+#         doneyet= Path(dfp).exists()
+#         ac.myprint("Checking from worker1 for done file: " + dfp)
+#         sleep(1)
+#     ac.myprint("worker1 done")
+#
+#     #
+#     donefile_path = pcf.get_donefile_path()
+#     ac.myprint("donefile: " + donefile_path)

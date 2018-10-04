@@ -18,10 +18,6 @@ class AppSupport:
 
         if _DEBUG:
             print(print_str)
-            #logging.info(print_str)
-        else:
-            #logging.debug(print_str)
-            None
 
     @staticmethod
     def fin_msg(asite):

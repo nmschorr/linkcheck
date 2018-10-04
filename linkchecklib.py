@@ -4,7 +4,6 @@ from requests_html import HTMLSession
 from random import random
 from time import perf_counter
 from config import conf_debug
-from urllib3.util.timeout import Timeout
 
 class LinkCheckLib(object):
 

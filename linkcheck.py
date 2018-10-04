@@ -5,7 +5,6 @@ from time import perf_counter
 import requests
 from urllib.parse import urlparse
 from linkchecklib import LinkCheckLib
-from urllib3.util.timeout import Timeout
 
 class LinkCheck(LinkCheckLib):
 
