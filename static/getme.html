@@ -1,0 +1,46 @@
+<!DOCTYPE html
+      PUBLIC "-//W3C//DTD HTML 4.01//EN"
+      "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+
+
+<head>
+   <title>a</title>
+
+
+<script>
+
+
+function finddone(urr) {
+   var xhr = new XMLHttpRequest();
+   xhr.open("HEAD", urr);
+   xhr.send();
+
+   xhr.onreadystatechange=(e)=>{
+   console.log(xhr.responseText)
+   console.log("here now")
+   document.getElementById("demo").innerHTML = urr
+   }
+}
+
+var myurl = "http://Delia:8080/static/testdone.html";
+var finalResult = setInterval(finddone(myurl), 3000);
+
+</script>
+   <script>
+
+   function runget(){
+   <object id="mine" width="600" height="400" type="text/html" data="testdone.html" border="0" >
+</object>
+    }
+
+</head>
+
+
+   <body>
+
+<p id="mine"> </p>
+
+</body>
+</html>
