@@ -9,8 +9,8 @@ from app_support_code import AppSupport as ac
 from linkcheck import LinkCheck
 #sys.stderr = sys.stdout
 #rootloglev = 40
-from config import conf_debug
-from werkzeug.wrappers import Response
+# from config import conf_debug
+# from werkzeug.wrappers import Response
 
 
 app = Flask(__name__)
@@ -36,10 +36,6 @@ def write_no_err_pg(asited):
 
 #-----------------------------------------------------------------------------
 def main_work(site):   # run LinkCheck and ac.myprint to console
-#def main_work(re):  # run LinkCheck and ac.myprint to console
-
-    #siteb = re.response
-    #site = siteb[0].decode("utf-8")
 
     print("Just started. You entered: " + str(site))
     ac.myprint("running main_work")
@@ -62,7 +58,6 @@ def main_work(site):   # run LinkCheck and ac.myprint to console
     dt = str(datetime.now())
     print( dt + "  main_work done")
 
-
     #-----------------------------------------------------------------------------
 def set_names(site, timestp4, justn):
     just_name = justn
@@ -76,37 +71,9 @@ def set_names(site, timestp4, justn):
     pcf.set_file_path(file_path)
     pcf.set_donefile_path(donefile_path)
 
-
 @app.route('/')
 def index():
      return render_template('index.html')  ## has a form
-
-#
-# def get_msg(site):  # the callback
-#     print("calling main_work now")
-#     main_work(site)
-#
-# def after_this_request(func, site):
-#     return func(site)
-#--------------------------------------------------------------
-from flask import g
-from flask import after_this_request
-
-
-# def after_this_request(f):
-#     if not hasattr(g, 'after_request_callbacks'):
-#         g.after_request_callbacks = []
-#     g.after_request_callbacks.append(f)
-#     return f
-#
-#
-#
-# @app.after_request
-# def call_after_request_callbacks(response):
-#     for callback in getattr(g, 'after_request_callbacks', ()):
-#         response = callback(response)
-#     return response
-
 
 @app.route('/results', methods = ['POST', 'GET'])
 def results():
@@ -115,62 +82,9 @@ def results():
     site = request.form['name']
     set_names(site, timestp1, rfname)
     make_notreadyyet_page(site, rfname)  # write the temp file
-
-    # def __init__(self, response=None, status=None, headers=None,
-    #              mimetype=None, content_type=None, direct_passthrough=False):
-
-    # fheaders = {
-    #         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0',
-    #         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    #         'Accept-Language': 'en-US,en;q=0.5',
-    #         'Accept-Encoding': 'gzip, deflate',
-    # }
-
-
-    # @after_this_request
-    # def mainw(resp):
-    #     resp = Response(site, status=200, headers=fheaders)
-    #     main_work(resp)
-
     main_work(site)
-
     return render_template('results.html', name = rfname)  ## has a form
 
-
 if __name__ == '__main__':
-    #serve(app)
-    app.run(host='127.0.0.1', port=5000, debug=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# @nocache             # very important so client server doesn'w_thread cache results
-
-# def multi2(df):
-#     from pathlib import Path
-#     #sleep(1)
-#     dfp = pcf.get_donefile_path()
-#     doneyet = False
-#     while not doneyet:
-#         doneyet= Path(dfp).exists()
-#         ac.myprint("Checking from worker1 for done file: " + dfp)
-#         sleep(1)
-#     ac.myprint("worker1 done")
-#
-#     #
-#     donefile_path = pcf.get_donefile_path()
-#     ac.myprint("donefile: " + donefile_path)
+    serve(app)
+    #app.run('127.0.0.1', 8080, debug=True)
