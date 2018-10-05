@@ -10,6 +10,8 @@ from linkcheck import LinkCheck
 #sys.stderr = sys.stdout
 #rootloglev = 40
 from config import conf_debug
+from werkzeug.wrappers import Response
+
 
 app = Flask(__name__)
 
@@ -34,6 +36,11 @@ def write_no_err_pg(asited):
 
 #-----------------------------------------------------------------------------
 def main_work(site):   # run LinkCheck and ac.myprint to console
+#def main_work(re):  # run LinkCheck and ac.myprint to console
+
+    #siteb = re.response
+    #site = siteb[0].decode("utf-8")
+
     print("Just started. You entered: " + str(site))
     ac.myprint("running main_work")
 
@@ -74,8 +81,31 @@ def set_names(site, timestp4, justn):
 def index():
      return render_template('index.html')  ## has a form
 
+#
+# def get_msg(site):  # the callback
+#     print("calling main_work now")
+#     main_work(site)
+#
+# def after_this_request(func, site):
+#     return func(site)
+#--------------------------------------------------------------
+from flask import g
+from flask import after_this_request
 
 
+# def after_this_request(f):
+#     if not hasattr(g, 'after_request_callbacks'):
+#         g.after_request_callbacks = []
+#     g.after_request_callbacks.append(f)
+#     return f
+#
+#
+#
+# @app.after_request
+# def call_after_request_callbacks(response):
+#     for callback in getattr(g, 'after_request_callbacks', ()):
+#         response = callback(response)
+#     return response
 
 
 @app.route('/results', methods = ['POST', 'GET'])
@@ -83,11 +113,25 @@ def results():
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     rfname = "res" + timestp1 + ".html"
     site = request.form['name']
-
-    #flask.after_this_request(print("yes"))
-
     set_names(site, timestp1, rfname)
     make_notreadyyet_page(site, rfname)  # write the temp file
+
+    # def __init__(self, response=None, status=None, headers=None,
+    #              mimetype=None, content_type=None, direct_passthrough=False):
+
+    # fheaders = {
+    #         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0',
+    #         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    #         'Accept-Language': 'en-US,en;q=0.5',
+    #         'Accept-Encoding': 'gzip, deflate',
+    # }
+
+
+    # @after_this_request
+    # def mainw(resp):
+    #     resp = Response(site, status=200, headers=fheaders)
+    #     main_work(resp)
+
     main_work(site)
 
     return render_template('results.html', name = rfname)  ## has a form
@@ -97,18 +141,22 @@ if __name__ == '__main__':
     #serve(app)
     app.run(host='127.0.0.1', port=5000, debug=True)
 
-    #
-    # def after_this_request(f):
-    #     if not hasattr(g, 'after_request_callbacks'):
-    #         g.after_request_callbacks = []
-    #     g.after_request_callbacks.append(f)
-    #     return f
-    #
-    # @app.after_request
-    # def call_after_request_callbacks(response):
-    #     for callback in getattr(g, 'after_request_callbacks', ()):
-    #         callback(response)
-    #     return response
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # @nocache             # very important so client server doesn'w_thread cache results
 

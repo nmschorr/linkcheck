@@ -25,16 +25,19 @@ class LinkCheck(LinkCheckLib):
             self.ck_status_code_simple(link_to_ck, parent, stat)
             self.myprint("-----status: " + str(stat) )
 
-            if stat == 301:  # get head doesn't check 301s
-                #newurl = resp.headers['location']
-                newurl = resp.headers['X-Pingback']
-                print("     ---------- !! this is new url to ck 301 head: ", newurl)
-                respf = requests.head(newurl, timeout=7.0)
-                self.ck_status_code_simple(newurl, parent, respf.status_code)
-                self.myprint("-----followed url redirect status: " + str(respf.status_code) )
-                if respf.status_code == 301:                       # get head doesn't check 301s
-                    print("appending to 301: " + newurl)
-                    rederdat.append(newurl)
+            #if stat == 301:  # get head doesn't check 301s
+            if 300 < stat < 400:  # get head doesn't check 301s
+                    #if "pingback" in resp.headers:
+                    print("found x in: " + link_to_ck, resp.headers)
+            #     #newurl = resp.headers['location']
+            #     newurl = resp.headers['X-Pingback']
+            #     print("     ---------- !! this is new url to ck 301 head: ", newurl)
+            #     respf = requests.head(newurl, timeout=7.0)
+            #     self.ck_status_code_simple(newurl, parent, respf.status_code)
+            #     self.myprint("-----followed url redirect status: " + str(respf.status_code) )
+            #     if respf.status_code == 301:                       # get head doesn't check 301s
+            #         print("appending to 301: " + newurl)
+            #         rederdat.append(newurl)
 
             self.MAIN_DICT.update({redirs: rederdat})
 
