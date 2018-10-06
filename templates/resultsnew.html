@@ -1,0 +1,54 @@
+<!DOCTYPE html  PUBLIC "-//W3C//DTD HTML 4.01//EN"
+      "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en-US">
+
+<head>
+
+<meta name="title" content="LinkCheck">
+<meta http-equiv="Cache-Control" content="no-cache, max-age=0">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+
+        <title>Step one need to click again</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="icon" type="image/png" href="http://schorrmedia.com/favicon.png">
+
+<script>
+function demof() {
+    var fname = '{{ name }}';
+   var dr = document.referrer;
+    var statd = 'static/';
+    var midl = dr + statd + fname;
+    var demo = "<a href=" + midl + ">Click Here to keep going</a>";
+    document.getElementById("demod").innerHTML = demo;
+}
+</script>
+
+</head>
+<body onload="demof()" style="padding-left:5em; font-size: large; font-weight: bold;">
+<div style="padding-left:7em; color:purple;">
+   <p> <br></p>
+
+</div>
+
+
+<div>
+<h4> Click Here to keep going</h4>
+</div>
+<div>
+
+<form action="/static/resultsnew2.html">
+  <input type="hidden" name="name" value="{{ name }}" />
+  <input type="submit" value="Send data">
+
+</form>
+
+
+</div>
+
+</body>
+
+</html>

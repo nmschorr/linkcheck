@@ -20,6 +20,8 @@ env = Environment(    # jinja2
     autoescape=select_autoescape(['html', 'xml']),
 )
 
+thesite = 'none'
+
 def make_notreadyyet_page(r, jname):
     ste = r
     newst= ac.not_ready_msg(ste)
@@ -75,16 +77,29 @@ def set_names(site, timestp4, justn):
 def index():
      return render_template('index.html')  ## has a form
 
-@app.route('/results', methods = ['POST', 'GET'])
-def results():
+@app.route('/resultsnew2', methods = ['POST', 'GET'])
+def resultsnew2():
+    rfname = request.form['name']
+    print("in results two")
+    site2 = pcf.get_site()
+    main_work(site2)
+    return render_template('resultsnew2.html', name = rfname)  ## has a form
+
+rfname2 = 'none'
+site = 'none'
+
+@app.route('/resultsnew', methods = ['POST', 'GET', 'HEAD'])
+def resultsnew():
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     rfname = "res" + timestp1 + ".html"
+    rfname2 =  "res" + timestp1 + ".html"
     site = request.form['name']
     set_names(site, timestp1, rfname)
     make_notreadyyet_page(site, rfname)  # write the temp file
-    main_work(site)
-    return render_template('results.html', name = rfname)  ## has a form
+    return render_template('resultsnew.html', name = rfname)  ## has a form
 
 if __name__ == '__main__':
-    serve(app)
-    #app.run('127.0.0.1', 8080, debug=True)
+    #serve(app)
+    app.run('127.0.0.1', 5000, debug=True)
+
+#    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));

@@ -2,7 +2,13 @@ import unittest
 from linkcheck import LinkCheckLib as lcc
 
 class TestCaseLC2(unittest.TestCase):
-    lcobj = lcc()
+
+    def __init__():
+        lcobj = lcc()
+        self.lcobj = lcobj
+
+    def setUp(self):
+        pass
 
     def test_link3(self):
         test_link = "one.html"
@@ -43,28 +49,28 @@ class TestCaseLC2(unittest.TestCase):
         test_link = "http//onebigurlstring#.html"
         exp_link = "https://one.html"
 
-        ans, ans2 = lcc.ck_bad_data(test_link)
+        ans, ans2 = lcc.ck_bad_data(self.lcobj,test_link)
         self.assertEquals(ans, 1)
         self.assertTrue(ans2)
 
     def test_link9(self):
         test_link = "http//onebigurlstring.html"
 
-        ans, ans2 = lcc.ck_bad_data(test_link)
+        ans, ans2 = lcc.ck_bad_data(self.lcobj,test_link)
         self.assertEquals(ans, 0)
         self.assertTrue(ans2)
 
     def test_link10(self):
         test_link = "http//onebigurlstring.fff"
 
-        ans, ans2 = lcc.ck_bad_data(test_link)
+        ans, ans2 = lcc.ck_bad_data(self.lcobj,test_link)
         self.assertEquals(ans, 0)
         self.assertFalse(ans2)
 
     def test_link10(self):
         test_link = "http//onebigurlstring.fff"  #bad
 
-        ans, ans2 = lcc.ck_bad_data(test_link)
+        ans, ans2 = lcc.ck_bad_data(self.lcobj, test_link)
         self.assertEquals(ans, 0)
         self.assertFalse(ans2)
 
