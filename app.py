@@ -7,6 +7,7 @@ import prodconf as pcf
 from app_support_code import AppSupport as ac
 from linkcheck import LinkCheck
 #sys.stderr = sys.stdout   rootloglev = 40
+from time import sleep
 
 app = Flask(__name__)
 
@@ -81,7 +82,6 @@ def indexn():  # git name of url, construct names and pages, present page with b
 
 @app.route('/indexnn', methods = ['POST', 'GET', 'HEAD'])
 def indexnn():  # git name of ur
-    from time import sleep
     theinput = request.form['name']  # from indexn.html
     sleep(1)
     jsn = pcf.get_just_name()

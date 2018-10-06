@@ -1,10 +1,20 @@
 <!DOCTYPE html  PUBLIC "-//W3C//DTD HTML 4.01//EN"
       "http://www.w3.org/TR/html4/strict.dtd">
-<link rel="stylesheet" href="./static/style.css">
 
 <html>
 
 <head>
+<link rel="icon" type="image/png" href="http://schorrmedia.com/favicon.png">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Cache-Control" content="no-cache" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+
+
+
+
+
 <script>
 
 function finddone(ur)    {
@@ -21,19 +31,19 @@ function finddone(ur)    {
 
 function cdf(){
     var df = '{{ name }}';
-    <!--var df=window.location.href;-->
     var rel=finddone(df);
     if (rel==true)
     {
         display(df);
+        clearInterval(nIntervId);
     }}
 
  function doit()
- { setInterval(cdf, 2000);}
+ { nIntervId = setInterval(cdf, 2000);}
 
 </script>
 
-<title>Get url name from index-html</title>
+<title>LinkCheck Results</title>
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -54,14 +64,17 @@ $.mjs();
 
 </script>
 
-
 </head>
 
 <body>
 
-<div id="content" style="padding-top:2em; padding-bottom:2em"></div>
+<div id="content" style="padding-top:2em; padding-bottom:2em"><h4 style="padding-left:4em">Your results are almost ready.</h4></div>
 
 
 </body>
-
+<head>
+<meta http-equiv="Cache-Control" content="no-cache" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="-1" />
+</head>
 </html>
