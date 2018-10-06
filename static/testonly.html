@@ -8,21 +8,32 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
 $(document).ready(function(){
-
    $('#content').load("res.html");
-
 });
 </script>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
 
-<body>
+$.mjs = function() {
+   $('#content2').load("res.html");
+};
 
-<div id="content"></div>
+function display() {
+$.mjs();
+};
+
+</script>
+
+<body onload="$.mjs">
+
+<div id="content2"></div>
 
 
 <!--<object id="mine" width="600" height="400" type="text/html" data="res.html" border="0" >-->
 <!--</object>-->
 
+<input type="button" value="submit" onclick=" display();">
 
 </body>
 
