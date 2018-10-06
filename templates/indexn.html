@@ -1,25 +1,33 @@
-<!DOCTYPE html  PUBLIC "-//W3C//DTD HTML 4.01//EN"
+<!DOCTYPE html
+      PUBLIC "-//W3C//DTD HTML 4.01//EN"
       "http://www.w3.org/TR/html4/strict.dtd">
 
-
+<html lang="en-US">
 <head>
+<link rel="icon" type="image/png" href="http://schorrmedia.com/favicon.png">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-<title>Get url name from index-html</title>
+
+
+<title>LinkCheck Step Two</title>
 
 </head>
+<body style="padding-left:5em;">
 
+<div style="padding-top:3em;padding-left:5em;padding-bottom:2em;">
 
-get the name from index.html.  Then construct the name of the results file and
-create a button to push with it.  When push, it goes to the temp results page,
-plus that starts the main-work action.
+You entered:  "{{ name }}"     <br>
+Please press Continue.  <br>
+</div>
+<div style="padding-left:10em;padding-bottom:2em;">
 
 <form action="/indexnn" method ="POST">
   <input type="hidden" name="name" value="{{ name }}">
-  <input type="submit" value="Send">
+  <input type="submit" value="   Continue   ">
 
 </form>
-
-
+</div>
 
 </body>
 

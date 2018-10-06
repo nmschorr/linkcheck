@@ -36,9 +36,9 @@ def write_no_err_pg(asited):
         fjj.write(newst2)
 
 #-----------------------------------------------------------------------------
-def main_work(site):   # run LinkCheck and ac.myprint to console
-
-    print("Just started. You entered: " + str(site))
+def main_work():   # run LinkCheck and ac.myprint to console
+    site = pcf.get_site()
+    #print("Just started. You entered: " + site)
     ac.myprint("running main_work")
 
     donefile_path = pcf.get_donefile_path()
@@ -79,20 +79,26 @@ def index():
 @app.route('/indexn', methods = ['POST', 'GET', 'HEAD'])
 def indexn():  # git name of url, construct names and pages, present page with button to next step
     site = request.form['name']  # from index.html
+
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     rfname = "res" + timestp1 + ".html"
     set_names(site, timestp1, rfname)
     make_notreadyyet_page(site, rfname)  # write the temp file
-    return render_template('indexn.html', name = rfname)  ## has a form
+    return render_template('indexn.html', name = site)  ## has a form
 
 @app.route('/indexnn', methods = ['POST', 'GET', 'HEAD'])
 def indexnn():  # git name of ur
-    newform = request.form['name']  # from index.html
-    site = pcf.get_site()
-    js = pcf.get_just_name()
-    rname = "http://127.0.0.1:5000/static/" + newform
-    main_work(site)
-    return render_template('indexnn.html', name = rname)  ## has a form
+    from time import sleep
+    theinput = request.form['name']  # from indexn.html
+    sleep(1)
+    #print("site: ", site)
+    #print("newform: ", newform)
+    jsn = pcf.get_just_name()
+    #rname = "http://127.0.0.1:5000/static/" + newform
+    fname = "./static/" + jsn
+    main_work()
+    sleep(2)
+    return render_template('indexnn.html', name = fname)  ## has a form
 
 
 

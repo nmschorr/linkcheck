@@ -1,37 +1,71 @@
 <!DOCTYPE html  PUBLIC "-//W3C//DTD HTML 4.01//EN"
       "http://www.w3.org/TR/html4/strict.dtd">
+<link rel="stylesheet" href="./static/style.css">
 
 <html>
 
 <head>
+<script>
+
+function finddone(ur)    {
+    var xhr = new XMLHttpRequest() ;
+    xhr.open("HEAD", ur, false);
+    xhr.send();
+    if (xhr.status == "404")
+    {
+    return false;
+    }
+    else {
+       return true;
+    }}
+
+function cdf(){
+    var df = '{{ name }}';
+    <!--var df=window.location.href;-->
+    var rel=finddone(df);
+    if (rel==true)
+    {
+        display(df);
+    }}
+
+ function doit()
+ { setInterval(cdf, 2000);}
+
+</script>
 
 <title>Get url name from index-html</title>
 
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
-function getindexname() {
-    var fname = '{{ name }}';
 
-    var dr = document.referrer;
-    var statd = 'static/';
-    var midl = dr + statd + fname;
+$(document).ready(function(){
+    $doit();
+});
 
-    var demo = "<a href=" + fname + ">Click Here to keep going</a>";
-    document.getElementById("demo").innerHTML = demo;
-}
+$.mjs = function(df) {
+    var df = '{{ name }}';
+        $( "#content" ).load(df );
+};
+
+function display() {
+$.mjs();
+};
+
 </script>
 
+
 </head>
-<body onload="getindexname();">
 
-get the name from index.html.  Then construct the name of the results file and
-create a button to push with it.  When push, it goes to the temp results page,
-plus that starts the main-work action.
-
-<div id="demo"></div>
+<body>
 
 
-</form>
+
+
+
+
+<div id="content" style="padding-top:2em; padding-bottom:2em"></div>
+
 
 
 
