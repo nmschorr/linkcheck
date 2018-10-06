@@ -20,7 +20,6 @@ env = Environment(    # jinja2
     autoescape=select_autoescape(['html', 'xml']),
 )
 
-
 def make_notreadyyet_page(r, jname):
     ste = r
     newst= ac.not_ready_msg(ste)
@@ -76,40 +75,19 @@ def set_names(site, timestp4, justn):
 def index():
      return render_template('index.html')  ## has a form
 
-@app.route('/indexn', methods = ['POST', 'GET', 'HEAD'])
-def indexn():  # git name of url, construct names and pages, present page with button to next step
-    site = request.form['name']  # from index.html
+
+@app.route('/results', methods = ['POST', 'GET'])
+def results():
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     rfname = "res" + timestp1 + ".html"
-    set_names(site, timestp1, rfname)
-    make_notreadyyet_page(site, rfname)  # write the temp file
-    return render_template('indexn.html', name = rfname)  ## has a form
-
-@app.route('/indexnn', methods = ['POST', 'GET', 'HEAD'])
-def indexnn():  # git name of ur
-    newform = request.form['name']  # from index.html
-    site = pcf.get_site()
-    js = pcf.get_just_name()
-    rname = "http://127.0.0.1:5000/static/" + newform
-    main_work(site)
-    return render_template('indexnn.html', name = rname)  ## has a form
-
-
-
-
-
-@app.route('/resultsnew', methods = ['POST', 'GET', 'HEAD'])
-def resultsnew():
-    timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
-    rfname = "res" + timestp1 + ".html"
-    rfname2 =  "res" + timestp1 + ".html"
     site = request.form['name']
     set_names(site, timestp1, rfname)
     make_notreadyyet_page(site, rfname)  # write the temp file
-    return render_template('resultsnew.html', name = rfname)  ## has a form
+    main_work(site)
+    return render_template('results.html', name = rfname)  ## has a form
 
 if __name__ == '__main__':
-    #serve(app)
-    app.run('127.0.0.1', 5000, debug=True)
+    serve(app)
+    #app.run('127.0.0.1', 5000, debug=True)
 
 #    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));

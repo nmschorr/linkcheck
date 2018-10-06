@@ -1,21 +1,35 @@
 <!DOCTYPE html  PUBLIC "-//W3C//DTD HTML 4.01//EN"
       "http://www.w3.org/TR/html4/strict.dtd">
 
+<html>
 
 <head>
 
 <title>Get url name from index-html</title>
 
-</head>
 
+<script>
+function getindexname() {
+    var fname = '{{ name }}';
+
+    var dr = document.referrer;
+    var statd = 'static/';
+    var midl = dr + statd + fname;
+
+    var demo = "<a href=" + fname + ">Click Here to keep going</a>";
+    document.getElementById("demo").innerHTML = demo;
+}
+</script>
+
+</head>
+<body onload="getindexname();">
 
 get the name from index.html.  Then construct the name of the results file and
 create a button to push with it.  When push, it goes to the temp results page,
 plus that starts the main-work action.
 
-<form action="/indexnn" method ="POST">
-  <input type="hidden" name="name" value="{{ name }}">
-  <input type="submit" value="Send">
+<div id="demo"></div>
+
 
 </form>
 
