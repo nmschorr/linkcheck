@@ -8,26 +8,36 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-
-
 <title>LinkCheck Step Two</title>
 
 </head>
 <body style="padding-left:5em;">
 
 <div style="padding-top:3em;padding-left:5em;padding-bottom:2em;">
+<h4>
+      You must keep this window open <br>
+    and in front in order for the program to complete.</h4>
 
 You entered:  "{{ name }}"     <br>
-Please press Continue.  <br>
+ </h4> <br>
 </div>
 <div style="padding-left:10em;padding-bottom:2em;">
 
-<form action="/indexnn" method ="POST">
+<form action="/indexnn" method ="POST"  onsubmit="mybutton.hidden = true; return true;">
   <input type="hidden" name="name" value="{{ name }}">
-  <input type="submit" value="   Continue   ">
+  <input type="submit" name="mybutton" value="   Continue   ">
 
 </form>
 </div>
+
+
+
+<div style="text-align:center; padding-top:2em; font-style:italic; font-size: 100%; color:red">
+Don't put this window behind other windows or minimize. </div>
+
+<div style="text-align:center; padding-top:1em; font-weight: bolder; font-size: 150%; color:red">
+Keep this window in front.</div>
+<div style="padding-bottom:2em"></div>
 
 </body>
 

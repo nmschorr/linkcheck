@@ -1,17 +1,12 @@
 from waitress import serve
 
 from flask import Flask, request, render_template
-#import flask
 from jinja2 import Environment, PackageLoader, select_autoescape
 from datetime import datetime
 import prodconf as pcf
 from app_support_code import AppSupport as ac
 from linkcheck import LinkCheck
-#sys.stderr = sys.stdout
-#rootloglev = 40
-# from config import conf_debug
-# from werkzeug.wrappers import Response
-
+#sys.stderr = sys.stdout   rootloglev = 40
 
 app = Flask(__name__)
 
@@ -19,7 +14,6 @@ env = Environment(    # jinja2
     loader=PackageLoader('linkcheck', 'templates'),
     autoescape=select_autoescape(['html', 'xml']),
 )
-
 
 def make_notreadyyet_page(r, jname):
     ste = r
@@ -79,7 +73,6 @@ def index():
 @app.route('/indexn', methods = ['POST', 'GET', 'HEAD'])
 def indexn():  # git name of url, construct names and pages, present page with button to next step
     site = request.form['name']  # from index.html
-
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     rfname = "res" + timestp1 + ".html"
     set_names(site, timestp1, rfname)
@@ -91,31 +84,24 @@ def indexnn():  # git name of ur
     from time import sleep
     theinput = request.form['name']  # from indexn.html
     sleep(1)
-    #print("site: ", site)
-    #print("newform: ", newform)
     jsn = pcf.get_just_name()
-    #rname = "http://127.0.0.1:5000/static/" + newform
     fname = "./static/" + jsn
     main_work()
-    sleep(2)
+    sleep(1)
     return render_template('indexnn.html', name = fname)  ## has a form
-
-
-
 
 
 @app.route('/resultsnew', methods = ['POST', 'GET', 'HEAD'])
 def resultsnew():
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     rfname = "res" + timestp1 + ".html"
-    rfname2 =  "res" + timestp1 + ".html"
     site = request.form['name']
     set_names(site, timestp1, rfname)
     make_notreadyyet_page(site, rfname)  # write the temp file
     return render_template('resultsnew.html', name = rfname)  ## has a form
 
 if __name__ == '__main__':
-    #serve(app)
-    app.run('127.0.0.1', 5000, debug=True)
+    serve(app)
+    #app.run('127.0.0.1', 5000, debug=True)
 
 #    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
