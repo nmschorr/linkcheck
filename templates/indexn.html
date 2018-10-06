@@ -1,0 +1,30 @@
+<!DOCTYPE html  PUBLIC "-//W3C//DTD HTML 4.01//EN"
+      "http://www.w3.org/TR/html4/strict.dtd">
+
+
+<head>
+
+<title>Get url name from index-html</title>
+
+</head>
+
+
+get the name from index.html.  Then construct the name of the results file and
+create a button to push with it.  When push, it goes to the temp results page,
+plus that starts the main-work action.
+<script>
+    var x = window
+    var b = window + "/templates/indexnn.html"
+
+</script>
+<form action="/indexnn" method ="POST">
+  <input type="hidden" name="name" value="{{ name }}">
+  <input type="submit" value="Send">
+
+</form>
+
+
+
+</body>
+
+</html>
