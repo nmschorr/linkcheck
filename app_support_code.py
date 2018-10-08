@@ -23,10 +23,12 @@ class AppSupport:
     def fin_msg(asite):
         thishost = app_support_conf.thishost
         AppSupport.myprint("inside hc. ")
-        outst1 = "<!DOCTYPE html><html><head><title>No Broken Links</title></head><body>"
+        outst1 = '<!DOCTYPE html><html><head><title>No Broken Links</title>'
+        ob ='<link rel=stylesheet href="../static/style.css"></head><body>'
+
         answer2 =  "No broken links found for " + asite +". Thanks for using LinkCheck."
         home_url = "<a href=" + thishost + ">Start Over</a>"
-        newstt = outst1 + answer2 + '<p></p>' + home_url + "</body></html>"
+        newstt = outst1 + ob + answer2 + '<p></p>' + home_url + "</body></html>"
         return newstt
 
     @classmethod
@@ -47,7 +49,7 @@ class AppSupport:
 
             f.write("<!DOCTYPE html><html><head>")
             f.write('<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />')
-            f.write("</head><body><div style=margin-left:5em;>")
+            f.write('<link rel=stylesheet href="./static/style.css"></head><body><div style=margin-left:5em;>')
             f.write("<p></p><h3>Here are your broken links:</h3><p></p>")
 
             for line in data:
