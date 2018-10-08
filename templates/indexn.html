@@ -16,11 +16,8 @@
 
 
 <style>
-h1 { font-family: Arial, "Helvetica Neue", Helvetica,
- sans-serif; font-size: 16px;
- font-style: normal; font-variant: normal;
- font-weight: 700; line-height: 16px;
- }
+.invisible { display: none; }
+
 
 h3 {
     color:#003399;
@@ -28,23 +25,30 @@ h3 {
      font-weight: 700;
 }
 
-.mybutton
- {
-  align-self: start;
-  min-width: 14em;
-   background-color: #48B8C6; /* Green */
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    font-style: strong;
-    border-radius: 12px;
+.loader {
+  position: center;
+  margin-left:20em;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 50px;
+  height: 50px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
 
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 </style>
+
 
 </head>
 <body style="padding-left:5em;">
@@ -61,16 +65,29 @@ h3 {
 <h3>
 You entered:  "{{ name }}"   </h3>
 </div>
+<script>
+    mv() {
+    <div id="div1" style="display: block;">
+    document.getElementById("div1").innerHTML = "div1";
+    }
+</script>
+<div id="div1" class="loader" style="margin-left:10em; display: none;"></div>
+
+
+
 <div style="padding-left:10em;padding-bottom:2em;">
 
-<form action="/indexnn" method ="POST"  onsubmit="mybutton.hidden = true; return true;">
+
+<form id="form" action="/indexnn" method ="POST" onsubmit="mybutton.hidden=true; return true;">
   <input type="hidden" name="name" value="{{ name }}">
-  <input type="submit" name="mybutton" value="   Continue   "
+  <input type="submit" name="mybutton" value="   Continue   " onclick="mv();"
          style="background-color: #48B8C6; color: white; padding: 12px 32px; font-size: 16px;
         font-style: strong;
             border-radius: 12px;">
 
 </form>
+
+
 </div>
 
 <div style="text-align:center; padding-top:1em; font-weight: bolder; font-size: 150%; color:red">
