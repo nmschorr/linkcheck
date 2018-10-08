@@ -5,41 +5,82 @@
 <html lang="en-US">
 <head>
 <link rel="icon" type="image/png" href="http://schorrmedia.com/favicon.png">
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Cache-Control" content="no-cache" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 <title>LinkCheck Step Two</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<link rel="stylesheet" href="../static/style.css">
+
+
+<style>
+h1 { font-family: Arial, "Helvetica Neue", Helvetica,
+ sans-serif; font-size: 16px;
+ font-style: normal; font-variant: normal;
+ font-weight: 700; line-height: 16px;
+ }
+
+h3 {
+    color:#003399;
+    font-family:"Arial", "Helvetica Neue", Helvetica, sans-serif;
+     font-weight: 700;
+}
+
+.mybutton
+ {
+  align-self: start;
+  min-width: 14em;
+   background-color: #48B8C6; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    font-style: strong;
+    border-radius: 12px;
+
+
+</style>
 
 </head>
 <body style="padding-left:5em;">
 
 <div style="padding-top:3em;padding-left:5em;padding-bottom:2em;">
-<h4>
-      You must keep this window open <br>
-    and in front in order for the program to complete.</h4>
 
-You entered:  "{{ name }}"     <br>
- </h4> <br>
+<h3>
+      You must keep this window open <br>
+    and in front in order for the program to complete.
+ </h3>
+
+
+    <br>
+<h3>
+You entered:  "{{ name }}"   </h3>
 </div>
 <div style="padding-left:10em;padding-bottom:2em;">
 
 <form action="/indexnn" method ="POST"  onsubmit="mybutton.hidden = true; return true;">
   <input type="hidden" name="name" value="{{ name }}">
-  <input type="submit" name="mybutton" value="   Continue   ">
+  <input type="submit" name="mybutton" value="   Continue   "
+         style="background-color: #48B8C6; color: white; padding: 12px 32px; font-size: 16px;
+        font-style: strong;
+            border-radius: 12px;">
 
 </form>
 </div>
 
-
+<div style="text-align:center; padding-top:1em; font-weight: bolder; font-size: 150%; color:red">
+Please keep this window in front.</div>
 
 <div style="text-align:center; padding-top:2em; font-style:italic; font-size: 100%; color:red">
 Don't put this window behind other windows or minimize. </div>
-
-<div style="text-align:center; padding-top:1em; font-weight: bolder; font-size: 150%; color:red">
-Keep this window in front.</div>
 <div style="padding-bottom:2em"></div>
+
+
 
 </body>
 <head>
