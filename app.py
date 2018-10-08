@@ -78,16 +78,16 @@ def indexn():  # git name of url, construct names and pages, present page with b
     rfname = "res" + timestp1 + ".html"
     set_names(site, timestp1, rfname)
     make_notreadyyet_page(site, rfname)  # write the temp file
+    sleep(1)
     return render_template('indexn.html', name = site)  ## has a form
 
 @app.route('/indexnn', methods = ['POST', 'GET', 'HEAD'])
 def indexnn():  # git name of ur
     theinput = request.form['name']  # from indexn.html
-    sleep(1)
     jsn = pcf.get_just_name()
     fname = "./static/" + jsn
     main_work()
-    sleep(1)
+    sleep(3)
     return render_template('indexnn.html', name = fname)  ## has a form
 
 
