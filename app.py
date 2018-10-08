@@ -40,12 +40,15 @@ def main_work():   # run LinkCheck and ac.myprint to console
     ac.myprint("donefile: " + donefile_path)
     lc = LinkCheck()
     answers = lc.main(site)
-
+    len_ans = len(answers)
     ac.myprint("donefile in worker1: " + donefile_path + \
-         "!!!!!!!!!!==---- len of answers: " + str(len(answers)))
+         "!!!!!!!!!!==---- len of answers: " + str(len_ans))
     file_path = pcf.get_file_path()
-    if len(answers) > -1:
-        ac.datalines(file_path,answers)
+    if len_ans > -1:
+        if len_ans == 0:
+            ac.datalines(file_path, [('','','')], special=1)  #special=1 is a page with no broken links
+        else:
+            ac.datalines(file_path,answers)
         with open(donefile_path, 'w') as fd:
             fd.write("done")
     else:
@@ -78,7 +81,7 @@ def indexn():  # git name of url, construct names and pages, present page with b
     rfname = "res" + timestp1 + ".html"
     set_names(site, timestp1, rfname)
     make_notreadyyet_page(site, rfname)  # write the temp file
-    sleep(1)
+    sleep(2)
     return render_template('indexn.html', name = site)  ## has a form
 
 @app.route('/indexnn', methods = ['POST', 'GET', 'HEAD'])
@@ -87,18 +90,18 @@ def indexnn():  # git name of ur
     jsn = pcf.get_just_name()
     fname = "./static/" + jsn
     main_work()
-    sleep(3)
+    sleep(1)
     return render_template('indexnn.html', name = fname)  ## has a form
 
-
-@app.route('/resultsnew', methods = ['POST', 'GET', 'HEAD'])
-def resultsnew():
-    timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
-    rfname = "res" + timestp1 + ".html"
-    site = request.form['name']
-    set_names(site, timestp1, rfname)
-    make_notreadyyet_page(site, rfname)  # write the temp file
-    return render_template('resultsnew.html', name = rfname)  ## has a form
+#
+# @app.route('/resultsnew', methods = ['POST', 'GET', 'HEAD'])
+# def resultsnew():
+#     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
+#     rfname = "res" + timestp1 + ".html"
+#     site = request.form['name']
+#     set_names(site, timestp1, rfname)
+#     make_notreadyyet_page(site, rfname)  # write the temp file
+#     return render_template('resultsnew.html', name = rfname)  ## has a form
 
 if __name__ == '__main__':
     serve(app)

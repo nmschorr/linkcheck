@@ -32,7 +32,7 @@ class AppSupport:
         return newstt
 
     @classmethod
-    def datalines(cls, filey, data):
+    def datalines(cls, filey, data, special=0):
         unlink(filey)
         thishost = app_support_conf.thishost
         home_url = "&nbsp;&nbsp;&nbsp;&nbsp;" +  "&nbsp;&nbsp;&nbsp;&nbsp;" + \
@@ -43,28 +43,35 @@ class AppSupport:
 
         git_url = "<a href=https://github.com/nmschorr/linkcheck>See the code for this on Github</a></h3>"
         spaces = "&ensp;"  #two spaces
-
-
+        first = "BAD LINK-->  "
+        sec = "**ERROR-->  "
+        third = "  ***FOUND ON: "
+        fourth = "Here are your broken links:"
+        if special == 1:
+            first = "No broken links."
+            sec = "No errors found."
+            third = ""
+            fourth = "Thanks for using LinkCheck."
         with open(filey, 'w') as f:
 
-            f.write("<!DOCTYPE html><html><head>")
+            f.write("<!DOCTYPE html><html><head><style> h3 { color:#36d1af;}</style>")
             f.write('<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />')
             f.write('<link rel=stylesheet href="./static/style.css"></head><body><div style=margin-left:5em;>')
-            f.write("<p></p><h3>Here are your broken links:</h3><p></p>")
+            f.write("<p></p><h3>" + fourth + "</h3><p></p>")
 
             for line in data:
                 #f.write("<p>&nbsp;</p>")
-                f.write("BAD LINK-->  ")
+                f.write(first)
                 f.write("<a href='")
                 f.write(str(line[0]))
                 f.write("'>")
                 f.write(str(line[0]))
                 f.write("</a>")
                 f.write(spaces)
-                f.write("**ERROR-->  ")
+                f.write(sec)
                 f.write(str(line[1]))  ## the error
                 f.write(spaces)
-                f.write("<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;" + "  ***FOUND ON: ")
+                f.write("<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;" + third)
                 f.write("<a href='")
                 f.write(str(line[2]))
                 f.write("'>")
