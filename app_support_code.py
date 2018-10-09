@@ -1,6 +1,8 @@
-import app_support_conf
-from config import conf_debug
-#from time import sleep
+from config import conf_debug, thishost
+from flask import make_response
+from functools import wraps, update_wrapper
+from datetime import datetime
+
 
 class AppSupport:
     _DEBUG = conf_debug
@@ -16,7 +18,6 @@ class AppSupport:
 
     @classmethod
     def datalines(cls, filey, data, special=0):
-        thishost = app_support_conf.thishost
         home_url = "&nbsp;&nbsp;&nbsp;&nbsp;" +  "&nbsp;&nbsp;&nbsp;&nbsp;" + \
                 "<h2><a href=" + thishost + ">Start Over</a></h2><p></p>"
 
@@ -74,3 +75,14 @@ class AppSupport:
             f.write("</div>" + "</body></html>")
 
 
+def nocache(view):
+    @wraps(view)
+    def no_cache(*args, **kwargs):
+        response = make_response(view(*args, **kwargs))
+        response.headers['Last-Modified'] = datetime.now()
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '-1'
+        return response
+
+    return update_wrapper(no_cache, view)

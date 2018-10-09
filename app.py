@@ -6,7 +6,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from datetime import datetime
 
 from linkcheck import LinkCheck
-from nocache import nocache
+from app_support_code import nocache
 from app_support_code import AppSupport as ac
 from prodconf import ProfConf
 #sys.stderr = sys.stdout   rootloglev = 40
