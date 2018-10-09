@@ -22,8 +22,10 @@ def make_notreadyyet_page(r, jname):
     newst= ac.not_ready_msg(ste)
     jstatn = './static/' + jname
     pcf.set_just_stat(jstatn)
+    ac.myprint("making new page named: " + jstatn)
     with open(jstatn, "w") as fhandle:
         fhandle.write(newst)
+    fhandle.close()
 
 def write_no_err_pg(asited):
     just_stat = pcf.get_just_stat()
@@ -56,6 +58,16 @@ def main_work():   # run LinkCheck and ac.myprint to console
         write_no_err_pg(site)
 
     dt = str(datetime.now())
+
+    pcf.set_just_stat('')
+    pcf.set_donefile('')
+    pcf.set_file_path('')
+    pcf.set_donefile_path('')
+    pcf.set_timestp('')
+    pcf.set_site('')
+    pcf.set_just_name('')
+
+
     print( dt + "  main_work done")
 
     #-----------------------------------------------------------------------------
@@ -82,7 +94,7 @@ def indexn():  # git name of url, construct names and pages, present page with b
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     rfname = "res" + timestp1 + ".html"
     set_names(site, timestp1, rfname)
-    make_notreadyyet_page(site, rfname)  # write the temp file
+    #make_notreadyyet_page(site, rfname)  # write the temp file
     sleep(2)
     return render_template('indexn.html', name = site)  ## has a form
 
@@ -96,7 +108,7 @@ def indexnn():  # git name of ur
     return render_template('indexnn.html', name = fname)  ## has a form
 
 if __name__ == '__main__':
-    serve(app)
-    #app.run('127.0.0.1', 5000, debug=True)
+    #serve(app)
+    app.run('127.0.0.1', 5000, debug=True)
 
 #    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));

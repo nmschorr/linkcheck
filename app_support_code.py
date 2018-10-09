@@ -33,7 +33,7 @@ class AppSupport:
 
     @classmethod
     def datalines(cls, filey, data, special=0):
-        unlink(filey)
+        #unlink(filey)
         thishost = app_support_conf.thishost
         home_url = "&nbsp;&nbsp;&nbsp;&nbsp;" +  "&nbsp;&nbsp;&nbsp;&nbsp;" + \
                 "<h2><a href=" + thishost + ">Start Over</a></h2><p></p>"
@@ -98,13 +98,18 @@ class AppSupport:
         sc2 = '<script> function finddone(ur) { var xhr = new XMLHttpRequest() ;'
         sc3 = '  xhr.open("HEAD", ur, false); xhr.send(); '
         sc3b = ' if (xhr.status == "404") { return false; } else {'
-        sc3c = 'return true; location.reload(true);}}'
+        # sc3c = 'return true; location.reload(true);}}'
+        sc3c = 'return true; }}'
         sc4 = ' function cdf(){ '
-        sc5 = ' var df=window.location.href + "done";  '
+        #sc5 = ' var df=window.location.href + "done";  '
+        sc5 = ' var df = ur + "done";}  '
+        #sc6 = ' var rel=finddone(df); '
 
-        sc6 = ' var rel=finddone(df); '
-        sc7 = " if (rel==true) { location.reload(true); }}</script>"
-        sta = "<script>function doit() { setInterval(cdf, 2000);} </script>"
+        sc6 = '  '
+        #sc7 = " if (rel==true) { location.reload(true); }}</script>"
+        sc7 = " </script>"
+        #sta = "<script>function doit() { setInterval(cdf, 2000);} </script>"
+        sta = " "
         sc7b = "<title>Not Ready</title> </head>"
         toppt = sc1 + sc1b + sc2 + sc3 + sc3b + sc3c + sc4 + sc5 + sc6 + sc7 + sta + sc7b
 
