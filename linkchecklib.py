@@ -66,7 +66,7 @@ class LinkCheckLib(object):
         wf = open(fname, "w")
         for i in contnt:
             wf.write(i)
-            wf.close()
+        wf.close()
     #-----------------------------------------------------------------------------
 
     def ck_g(self, this_link):
@@ -282,10 +282,11 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------------
 
     def load_tlds(self):
-        with open('tlds-alpha-by-domain.txt', 'r') as filehandle:
-            for line in filehandle:
-                current_place = line[:-1]
-                self.tlds_list.append((current_place.lower()))
+        filehandle = open('tlds-alpha-by-domain.txt', 'r')
+        for line in filehandle:
+            current_place = line[:-1]
+            self.tlds_list.append((current_place.lower()))
+        filehandle.close()
     #-----------------------------------------------------------------------------
 
     def check_sufx(self, sufx):
