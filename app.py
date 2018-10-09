@@ -1,14 +1,18 @@
 from waitress import serve
-from nocache import nocache
-
+from time import sleep
+from os import path
 from flask import Flask, request, render_template
 from jinja2 import Environment, PackageLoader, select_autoescape
 from datetime import datetime
-import prodconf as pcf
-from app_support_code import AppSupport as ac
+
 from linkcheck import LinkCheck
+from nocache import nocache
+from app_support_code import AppSupport as ac
+from prodconf import ProfConf
 #sys.stderr = sys.stdout   rootloglev = 40
-from time import sleep
+
+
+pcf = ProfConf()
 
 app = Flask(__name__)
 
@@ -16,22 +20,6 @@ env = Environment(    # jinja2
     loader=PackageLoader('linkcheck', 'templates'),
     autoescape=select_autoescape(['html', 'xml']),
 )
-
-def make_notreadyyet_page(r, jname):
-    ste = r
-    newst= ac.not_ready_msg(ste)
-    jstatn = './static/' + jname
-    pcf.set_just_stat(jstatn)
-    ac.myprint("making new page named: " + jstatn)
-    with open(jstatn, "w") as fhandle:
-        fhandle.write(newst)
-    fhandle.close()
-
-def write_no_err_pg(asited):
-    just_stat = pcf.get_just_stat()
-    newst2 = ac.fin_msg(asited)
-    with open(just_stat, "w") as fjj:
-        fjj.write(newst2)
 
 #-----------------------------------------------------------------------------
 def main_work():   # run LinkCheck and ac.myprint to console
@@ -55,51 +43,49 @@ def main_work():   # run LinkCheck and ac.myprint to console
         with open(donefile_path, 'w') as fd:
             fd.write("done")
     else:
-        write_no_err_pg(site)
+        None
 
     dt = str(datetime.now())
     print( dt + "  main_work done")
 
     #-----------------------------------------------------------------------------
-def set_names(site, timestp4, justn):
-    just_name = justn
-    pcf.set_timestp(timestp4)
+def set_names(site):
+    osroot = app.root_path  # os path
+    timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
+    just_name = "res" + timestp1 + ".html"
+    just_stat = "./static/" + just_name
+    donefile = just_name + "done"
+    os_path_plus_stat = path.join(osroot, "static")
+    file_path = path.join(os_path_plus_stat, just_name)
+    donefile_path = path.join(os_path_plus_stat, donefile)
+    #AppSupport.myprint("make_filenames os_donefile_path: " + os_donefile_path)
+    pcf.set_timestp(timestp1)
     pcf.set_site(site)
     pcf.set_just_name(just_name)
-    osroot = app.root_path  # os path
-    just_stat, donefile, file_path, donefile_path = ac.make_filenames(osroot, timestp4, just_name)
     pcf.set_just_stat(just_stat)
-    pcf.set_donefile(donefile)
     pcf.set_file_path(file_path)
+    pcf.set_donefile(donefile)
     pcf.set_donefile_path(donefile_path)
 
 @app.route('/')
 def index():
-    pcf.set_just_stat('na')
-    pcf.set_donefile('na')
-    pcf.set_file_path('na')
-    pcf.set_donefile_path('na')
-    pcf.set_timestp('')
-    pcf.set_site('na')
-    pcf.set_just_name('na')
+    pcf.prod_reset()
     return render_template('index.html')  ## has a form
 
 @nocache             # very important so client server doesn'w_thread cache results
 @app.route('/indexn', methods = ['POST', 'GET', 'HEAD'])
 def indexn():  # git name of url, construct names and pages, present page with button to next step
     site = request.form['name']  # from index.html
-    timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
-    rfname = "res" + timestp1 + ".html"
-    set_names(site, timestp1, rfname)
-    #make_notreadyyet_page(site, rfname)  # write the temp file
+    set_names(site)
     sleep(2)
     return render_template('indexn.html', name = site)  ## has a form
 
 @app.route('/indexnn', methods = ['POST', 'GET', 'HEAD'])
 def indexnn():  # git name of ur
     theinput = request.form['name']  # from indexn.html
-    jsn = pcf.get_just_name()
-    fname = "./static/" + jsn
+    #jsn = pcf.get_just_name()
+    fname = pcf.get_just_stat()
+    #fname = "./static/" + jsn
     main_work()
     sleep(1)
     return render_template('indexnn.html', name = fname)  ## has a form
