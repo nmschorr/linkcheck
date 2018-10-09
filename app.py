@@ -1,4 +1,5 @@
 from waitress import serve
+from nocache import nocache
 
 from flask import Flask, request, render_template
 from jinja2 import Environment, PackageLoader, select_autoescape
@@ -74,6 +75,7 @@ def set_names(site, timestp4, justn):
 def index():
      return render_template('index.html')  ## has a form
 
+@nocache             # very important so client server doesn'w_thread cache results
 @app.route('/indexn', methods = ['POST', 'GET', 'HEAD'])
 def indexn():  # git name of url, construct names and pages, present page with button to next step
     site = request.form['name']  # from index.html
@@ -92,16 +94,6 @@ def indexnn():  # git name of ur
     main_work()
     sleep(1)
     return render_template('indexnn.html', name = fname)  ## has a form
-
-#
-# @app.route('/resultsnew', methods = ['POST', 'GET', 'HEAD'])
-# def resultsnew():
-#     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
-#     rfname = "res" + timestp1 + ".html"
-#     site = request.form['name']
-#     set_names(site, timestp1, rfname)
-#     make_notreadyyet_page(site, rfname)  # write the temp file
-#     return render_template('resultsnew.html', name = rfname)  ## has a form
 
 if __name__ == '__main__':
     serve(app)

@@ -1,18 +1,31 @@
 import unittest
-from linkcheck import LinkCheckLib
+from linkcheck import LinkCheckLib as lclib
 
 class TestCaseLC(unittest.TestCase):
+    def __init__(self):
+        super().__init__()
+        lcb = lclib()
+        self.lcb = lcb
+
+    def setUp(self):
+        """ Setting up for the test """
+        print("setUp_:begin")
+        intro = "Testname is: "
+        testName = self.shortDescription()
+        if len(testName) > 0:
+            print(intro + testName)
+        else:
+            print("UNKNOWN TEST ROUTINE")
+        print("setUp_:end")
 
     def test_link1(self):
         test_link = "schorrmedbbbbbbb"
-        lctest = LinkCheckLib()
-        self.assertFalse(lctest.check_sufx(test_link))
+        self.assertFalse(self.lcb.check_sufx(test_link))
 
     def test_link2(self):
         test_link = "schorrmedbbbb.com"
-        lctest = LinkCheckLib()
         #self.assertTrue('FOO'.isupper())
-        self.assertTrue(lctest.check_sufx(test_link))
+        self.assertTrue(self.lcb.check_sufx(test_link))
 
 
 if __name__ == '__main__':

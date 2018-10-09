@@ -1,5 +1,6 @@
 import unittest
 from tests import test_one
+from tests import test_two
 
 ## unittest.TextTestRunner(verbosity=2).run(suite)
 
