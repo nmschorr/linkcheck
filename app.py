@@ -58,16 +58,6 @@ def main_work():   # run LinkCheck and ac.myprint to console
         write_no_err_pg(site)
 
     dt = str(datetime.now())
-
-    pcf.set_just_stat('')
-    pcf.set_donefile('')
-    pcf.set_file_path('')
-    pcf.set_donefile_path('')
-    pcf.set_timestp('')
-    pcf.set_site('')
-    pcf.set_just_name('')
-
-
     print( dt + "  main_work done")
 
     #-----------------------------------------------------------------------------
@@ -85,7 +75,14 @@ def set_names(site, timestp4, justn):
 
 @app.route('/')
 def index():
-     return render_template('index.html')  ## has a form
+    pcf.set_just_stat('na')
+    pcf.set_donefile('na')
+    pcf.set_file_path('na')
+    pcf.set_donefile_path('na')
+    pcf.set_timestp('')
+    pcf.set_site('na')
+    pcf.set_just_name('na')
+    return render_template('index.html')  ## has a form
 
 @nocache             # very important so client server doesn'w_thread cache results
 @app.route('/indexn', methods = ['POST', 'GET', 'HEAD'])
