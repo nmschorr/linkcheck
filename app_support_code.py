@@ -35,44 +35,44 @@ class AppSupport:
             sec = "No errors found."
             third = ""
             fourth = "Thanks for using LinkCheck."
-        with open(filey, 'w') as f:
 
-            f.write("<!DOCTYPE html><html><head><style> h3 { color:#36d1af;}</style>")
-            f.write('<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />')
-            f.write('<meta http-equiv="Cache-Control" content="no-cache" />')
-            f.write('<meta http-equiv="Pragma" content="no-cache"  />')
-            f.write('<meta http-equiv="Expires" content="0"  />')
+        f = open(filey, 'w')
+        f.write("<!DOCTYPE html><html><head><style> h3 { color:#36d1af;}</style>")
+        f.write('<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />')
+        f.write('<meta http-equiv="Cache-Control" content="no-cache" />')
+        f.write('<meta http-equiv="Pragma" content="no-cache"  />')
+        f.write('<meta http-equiv="Expires" content="0"  />')
 
-            f.write('<link rel=stylesheet href="./static/style.css"></head><body><div style=margin-left:5em;>')
-            f.write("<p></p><h3>" + fourth + "</h3><p></p>")
+        f.write('<link rel=stylesheet href="./static/style.css"></head><body><div style=margin-left:5em;>')
+        f.write("<p></p><h3>" + fourth + "</h3><p></p>")
 
-            for line in data:
-                #f.write("<p>&nbsp;</p>")
-                f.write(first)
-                f.write("<a href='")
-                f.write(str(line[0]))
-                f.write("'>")
-                f.write(str(line[0]))
-                f.write("</a>")
-                f.write(spaces)
-                f.write(sec)
-                f.write(str(line[1]))  ## the error
-                f.write(spaces)
-                f.write("<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;" + third)
-                f.write("<a href='")
-                f.write(str(line[2]))
-                f.write("'>")
-                f.write(str(line[2]))
-                f.write("</a>")
-                f.write('<p></p>')
-
+        for line in data:
+            f.write(first)
+            f.write("<a href='")
+            f.write(str(line[0]))
+            f.write("'>")
+            f.write(str(line[0]))
+            f.write("</a>")
+            f.write(spaces)
+            f.write(sec)
+            f.write(str(line[1]))  ## the error
+            f.write(spaces)
+            f.write("<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;" + third)
+            f.write("<a href='")
+            f.write(str(line[2]))
+            f.write("'>")
+            f.write(str(line[2]))
+            f.write("</a>")
             f.write('<p></p>')
-            f.write(home_url)
-            f.write("&nbsp;&nbsp;&nbsp;&nbsp;")
-            f.write(smedia_url)
-            f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-            f.write(git_url)
-            f.write("</div>" + "</body></html>")
+
+        f.write('<p></p>')
+        f.write(home_url)
+        f.write("&nbsp;&nbsp;&nbsp;&nbsp;")
+        f.write(smedia_url)
+        f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+        f.write(git_url)
+        f.write("</div>" + "</body></html>")
+        f.close()
 
 
 def nocache(view):

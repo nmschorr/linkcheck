@@ -11,7 +11,6 @@ from app_support_code import AppSupport as ac
 from prodconf import ProfConf
 #sys.stderr = sys.stdout   rootloglev = 40
 
-
 pcf = ProfConf()
 
 app = Flask(__name__)
@@ -35,15 +34,10 @@ def main_work():   # run LinkCheck and ac.myprint to console
     ac.myprint("donefile in worker1: " + donefile_path + \
          "!!!!!!!!!!==---- len of answers: " + str(len_ans))
     file_path = pcf.get_file_path()
-    if len_ans > -1:
-        if len_ans == 0:
-            ac.datalines(file_path, [('','','')], special=1)  #special=1 is a page with no broken links
-        else:
-            ac.datalines(file_path,answers)
-        with open(donefile_path, 'w') as fd:
-            fd.write("done")
+    if len_ans == 0:
+        ac.datalines(file_path, [('','','')], special=1)  #special=1 is a page with no broken links
     else:
-        None
+        ac.datalines(file_path,answers)
 
     dt = str(datetime.now())
     print( dt + "  main_work done")
@@ -80,12 +74,11 @@ def indexn():  # git name of url, construct names and pages, present page with b
     sleep(2)
     return render_template('indexn.html', name = site)  ## has a form
 
+@nocache             # very important so client server doesn'w_thread cache results
 @app.route('/indexnn', methods = ['POST', 'GET', 'HEAD'])
 def indexnn():  # git name of ur
-    theinput = request.form['name']  # from indexn.html
-    #jsn = pcf.get_just_name()
+    e_unused = request.form['name']  # from indexn.html
     fname = pcf.get_just_stat()
-    #fname = "./static/" + jsn
     main_work()
     sleep(1)
     return render_template('indexnn.html', name = fname)  ## has a form
