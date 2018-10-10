@@ -234,31 +234,31 @@ class LinkCheckLib(object):
 
     def ck_bad_data(self, dlink):
         #self.myprint("!!!!!=============inside ck_bad_data. val of link: " + dlink)
-        good_or_bad = 0
+        bad_counter = 0
         mylist = ['#', 'tel:+']
         try:
             for item in mylist:
                 if item in dlink:
-                    good_or_bad += 1
+                    bad_counter += 1
         except Exception as e:
             self.myprint("Exception ck_bad_data: " + str(e))
 
         ckme = dlink[7:30]
         if "pinterest.com" in ckme:
-            good_or_bad += 1
+            bad_counter += 1
 
         if "facebook.com" in ckme:
             if len(dlink) > 50:
-                good_or_bad += 1
+                bad_counter += 1
 
         if "twitter.com" in ckme:
             if len(dlink) > 50:
-                good_or_bad += 1
+                bad_counter += 1
 
 
         good_suffix = self.has_correct_suffix(dlink)  # check suffix
         #self.myprint("!inside ck_bad_data: " + str(good_or_bad) + ' ' + str(good_suffix))
-        return good_or_bad, good_suffix
+        return bad_counter, good_suffix
 
     # #-----------------------------------------------------------------------------
     #-----------------------------------------------------------------------------
@@ -267,11 +267,11 @@ class LinkCheckLib(object):
         answ, answ2, final_answer = False, False, False
 
         try:
-            answ = self.check_sufx(link)
+            answ = self.ck_tld_sufx(link)
             goods = ['html', 'htm', '/', 'php', 'asp', 'pl', 'com', 'net', 'org',
                      'css', 'py', 'rb', 'js','jsp', 'shtml',
                      'cgi', 'txt', 'edu', 'gov']
-            for g in goods:
+            for g in goods:      # in case tld list fails for some reason
                 if link.endswith(g):
                     answ2 = True
             if answ == True or answ2 == True:
@@ -290,9 +290,13 @@ class LinkCheckLib(object):
         filehandle.close()
     #-----------------------------------------------------------------------------
 
-    def check_sufx(self, sufx):
-        low_sufx = str(sufx).lower()
-        if low_sufx in self.tlds_list:
+    def ck_tld_sufx(self, alink):
+        tlink = alink.lower()
+        the_suf = tlink.split(".")[-1]
+        if the_suf[-1] == '/':
+            the_suf = the_suf[0:-1]
+
+        if the_suf in self.tlds_list:
             return True
         else:
             return False
