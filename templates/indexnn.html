@@ -11,7 +11,7 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 
-<style>
+<style type="text/css">
 h4 {
      color: #003399;
      font-family:"Arial", "Helvetica Neue", Helvetica, sans-serif;
@@ -23,31 +23,35 @@ h4 {
 
 
 <script>
+var nIntervId;
 
-function finddone(ur)    {
+function find_done(ur)    {
     var xhr = new XMLHttpRequest() ;
-    xhr.open("HEAD", ur, false);
+    xhr.open("HEAD", ur, true);
     xhr.send();
     if (xhr.status == "404")
     {
     return false;
     }
     else {
+       clearInterval(nIntervId);
+       console.log("clearing interval")
        return true;
-    }}
+   }}
 
-function cdf(){
-    var df = '{{ name }}';
-    var rel=finddone(df);
-    if (rel==true)
+function ck_done_file(done_file){
+    var answer=find_done(done_file);
+    if (answer==true)
     {
-        display(df);
-        log.console("df: " + df)
+        display(done_file);
+        console.log("found done_file: " + done_file)
         clearInterval(nIntervId);
     }}
 
- function doit()
- { nIntervId = setInterval(cdf, 2000);}
+ function run_ck_ready() {
+    var donefile = '{{ name }}';
+    nIntervId = setInterval(ck_done_file(donefile, ), 2000);
+  }
 
 </script>
 
@@ -58,7 +62,7 @@ function cdf(){
 <script>
 
 $(document).ready(function(){
-    doit();
+    run_ck_ready();
 });
 
 $.mjs = function(df) {

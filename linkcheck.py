@@ -265,7 +265,6 @@ class LinkCheck(LinkCheckLib):
         tup = ()
         try:
             self.myprint("Step Two Done")
-            any_link_to_check = []
             any_link_to_check = list(any_link_glob)
 
             any_link_to_check = list(set(any_link_to_check))
