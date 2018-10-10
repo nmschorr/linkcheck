@@ -45,6 +45,7 @@ class LinkCheckLib(object):
         self.MAIN_DICT.update({ra: any_link_glob})
         self.MAIN_DICT.update({rb: base_lnks_g})
         self.MAIN_DICT.update({redirs: redirs_dat})
+        self.load_tlds()
 
     #-----------------------------------------------------------------------------
     def myprint(self, print_str, mdebug=0 ):

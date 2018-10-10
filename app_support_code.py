@@ -43,7 +43,7 @@ class AppSupport:
         f.write('<meta http-equiv="Pragma" content="no-cache"  />')
         f.write('<meta http-equiv="Expires" content="0"  />')
 
-        f.write('<link rel=stylesheet href="./static/style.css"></head><body><div style=margin-left:5em;>')
+        f.write('<link rel=stylesheet href="./static/style.css"></head><body><div style="margin-left:5em;line-height:1.4;">')
         f.write("<p></p><h3>" + fourth + "</h3><p></p>")
 
         for line in data:
