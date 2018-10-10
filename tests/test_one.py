@@ -1,35 +1,33 @@
 import unittest
 from linkcheck import LinkCheckLib as lclib
+import sys
 
-class TestCaseLC(unittest.TestCase):
-    def __init__(self):
-        super().__init__()
-        lcb = lclib()
-        self.lcb = lcb
+class test_one(unittest.TestCase):
 
     def setUp(self):
         """ Setting up for the test """
-        print("setUp_:begin")
-        intro = "Testname is: "
-        testName = self.shortDescription()
-        if len(testName) > 0:
-            print(intro + testName)
-        else:
-            print("UNKNOWN TEST ROUTINE")
-        print("setUp_:end")
+        self.lcb = lclib()
+        print("\n")
+        print("----------------In setUp - CLASS: test_one")
+        print("Running test: ", self._testMethodName)
 
     def test_link1(self):
+        test_name = self._testMethodName
         test_link = "schorrmedbbbbbbb"
         self.assertFalse(self.lcb.check_sufx(test_link))
 
     def test_link2(self):
+        test_name = self._testMethodName
         test_link = "schorrmedbbbb.com"
-        #self.assertTrue('FOO'.isupper())
         self.assertTrue(self.lcb.check_sufx(test_link))
 
+    def tearDown(self):
+        """Cleaning up after the test"""
+        print("Done with test: ", self._testMethodName, " --RESULT: ")
 
-if __name__ == '__main__':
-    unittest.main()
+
+
+
 
 
 

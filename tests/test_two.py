@@ -1,24 +1,15 @@
 import unittest
 from linkcheck import LinkCheckLib as lclib
 
-class TestCaseLC2(unittest.TestCase):
+class test_two(unittest.TestCase):
 
-
-    def __init__(self):
-        super().__init__()
-        lcb = lclib()
-        self.lcb = lcb
 
     def setUp(self):
         """ Setting up for the test """
-        print("setUp_:begin")
-        intro = "Testname is: "
-        testName = self.shortDescription()
-        if len(testName) > 0:
-            print(intro + testName)
-        else:
-            print("UNKNOWN TEST ROUTINE")
-        print("setUp_:end")
+        self.lcb = lclib()
+        print("\n")
+        print("----------------In setUp - CLASS: test_two")
+        print("Running test: ", self._testMethodName)
 
 
     def test_link3(self):
@@ -97,15 +88,7 @@ class TestCaseLC2(unittest.TestCase):
     # ending the test
     def tearDown(self):
         """Cleaning up after the test"""
-        print("tearDown_:begin")
-        intro = "Testname is: "
-        testName = self.shortDescription()
-        if len(testName) > 0:
-            print(intro + testName)
-        else:
-            print("UNKNOWN TEST ROUTINE")
-        print("tearDown_:end")
-# ck_bad_data(self, dlink):
+        print("Done with test: ", self._testMethodName, " --RESULT: ")
 
 
 
