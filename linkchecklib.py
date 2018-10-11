@@ -36,8 +36,7 @@ class LinkCheckLib(object):
         BNwww = "empty"
         redirs_dat = []
 
-        tlds_list = []
-        self.tlds_list = tlds_list
+        self.tlds_list = []
         self.MAIN_DICT.update({BASENAME: BN})
         self.MAIN_DICT.update({BASENAMEwww: BNwww})
         self.MAIN_DICT.update({re: err_links})
@@ -53,34 +52,19 @@ class LinkCheckLib(object):
         if mdebug:
             print(print_str)
 
-    #-----------------------------------------------------------------------------
-    @classmethod
-    def myprintc(cls, print_str):
-        mdebug = conf_debug
-        if mdebug:
-            print(print_str)
 
-    #-----------------------------------------------------------------------------
-    @staticmethod
-    def write_some_contents(contnt, nme):
-        fname = str(nme) + ".log"
-        wf = open(fname, "w")
-        for i in contnt:
-            wf.write(i)
-        wf.close()
     #-----------------------------------------------------------------------------
 
     def ck_g(self, this_link):
         ra = self.ra
-        any_link_glob = self.MAIN_DICT.get(ra)
+        any_link_glob = self.MAIN_DICT.get(self.ra)
         return bool(this_link in [i[0] for i in any_link_glob])
 
     #-----------------------------------------------------------------------------
-
      
     def _DONE_YET(self, this_link):
         rd = self.rd
-        done_ln_gl_sing = self.MAIN_DICT.get(rd)
+        done_ln_gl_sing = self.MAIN_DICT.get(self.rd)
 
         return bool(this_link in done_ln_gl_sing)
     #-----------------------------------------------------------------------------
@@ -130,11 +114,8 @@ class LinkCheckLib(object):
 
         # -----------------------------------------------------------------------------
 
-    def ispar(self, tlink):  # is it a parent? part of the main website?
-        main_link = tlink
-        parsed = urlparse(tlink)
-        #thisln_PARSED = str(parsed.netloc)
-        #self.myprint("parsed: " + thisln_PARSED)
+    def ispar(self, main_link):  # is it a parent? part of the main website?
+        parsed = urlparse(main_link)
         if parsed.scheme != '':
             main_link = parsed.netloc
 
@@ -146,22 +127,23 @@ class LinkCheckLib(object):
             return False  # is it the parent?
     # -----------------------------------------------------------------------
     def is_same_site_link(self, inlink):
+        is_same_link = False
         par_loc = self.MAIN_DICT.get(self.BASENAME)
         par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
-        is_same_link = False
-        this_link = inlink
 
-        if (this_link == par_loc) or (this_link == par_locwww):
+        (scheme, netloc, path, params, query, fragment) = urlparse(inlink)
+        rebuild = netloc + path + params + query
+
+        if (rebuild == par_loc) or (rebuild == par_locwww):
             is_same_link = True
-            self.myprint("--Is same: " + this_link + " found: " + par_loc + " and: " + par_locwww)
+            self.myprint("--Is same: " + inlink + " found: " + par_loc + " and: " + par_locwww)
 
         return is_same_link
 
     # -----------------------------------------------------------------------
 
     def ck_base(self, in_link, base_links_local=None):
-        # = self.MAIN_DICT.get(self.BASENAME)
-        #par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
+
         this_link = in_link
         _IS_BASE = False
         in_base_loc = False
@@ -175,10 +157,7 @@ class LinkCheckLib(object):
         basepart = self.MAIN_DICT.get(self.BASENAME)
         basepartwww = self.MAIN_DICT.get(self.BASENAMEwww)
 
-        #self.myprint("looking for: " + basepart + " found: " + basepartwww + " trying: " + this_link)
-
         this_sub = this_link[0:30]  # and this_link
-        #this_subww = basepartwww[0:30]
 
         try:
 
@@ -200,9 +179,8 @@ class LinkCheckLib(object):
 
     def do_response(self, a_link, p_link):
         redirs = self.redirs
-        rd = self.rd
         rederdat = self.MAIN_DICT.get(redirs)
-        done_ln_gl_sing = self.MAIN_DICT.get(rd)
+        done_ln_gl_sing = self.MAIN_DICT.get(self.rd)
         t_err = 0
         resp = None
         try:
@@ -220,7 +198,6 @@ class LinkCheckLib(object):
 
                 if code == 301:
                     rederdat.append(a_link)  # no need to recheck because it's automatic
-
 
         except Exception as e:
             self.myprint("GOT AN EXCEPTION inside do_response ")
@@ -254,7 +231,6 @@ class LinkCheckLib(object):
         if "twitter.com" in ckme:
             if len(dlink) > 50:
                 bad_counter += 1
-
 
         good_suffix = self.has_correct_suffix(dlink)  # check suffix
         #self.myprint("!inside ck_bad_data: " + str(good_or_bad) + ' ' + str(good_suffix))
@@ -309,39 +285,16 @@ class LinkCheckLib(object):
         tempstr = str(e)
         self.myprint('!!!!! Inside handle_exc. Error------------------> ' + tempstr)
 
-        if "Document is empty" in tempstr:  # for mp3 and similar files
-            return
-        if "object has no attribute" in tempstr:  # for mp3 and similar files
-            return
-        if "ConnectionResetError" in tempstr:
-            return
-        if  "RemoteDisconnected" in tempstr:
-            return
+        badlist = ["Document is empty","object has no attribute","ConnectionResetError","RemoteDisconnected"]
 
-        #stat = requests.get(link)
-        #thecode = stat.status_code
-
-        #self.myprint("----2nd try STAT-----status: " + str(thecode) + "\n")
+        for i in badlist:
+            if i in tempstr:  # for mp3 and similar files
+                return
 
         if link not in err_links:
-            err_links.append((link, tempstr[:42], plink))
-        self.MAIN_DICT.update({re:err_links})
-    #-----------------------------------------------------------------------------
-    def ck_status_code_simple(self, tlink, tpar, stat):
-        re = self.re
-        err_links = self.MAIN_DICT.get(re)
-        try:
-            err_codes = [400, 404, 408, 409]
-            if stat in err_codes:
-                if tlink not in err_links:
-                    err_links.append((tlink, stat, tpar))
-                return 1
-            else:
-                return 0  # ok
-        except Exception as e:
-            self.myprint("Exception in ck_status_code: " + str(e))
-            pass
-        self.MAIN_DICT.update({re:err_links})
+            err_links.append((link, tempstr[:72], plink))
+            self.MAIN_DICT.update({re:err_links})
+
     #-----------------------------------------------------------------------------
 
     def ck_status_code(self, t_link, tpar, st_code):
@@ -352,18 +305,20 @@ class LinkCheckLib(object):
             if st_code in err_codes:
                 if t_link not in err_links:
                     err_links.append((t_link, st_code, tpar))
+                    self.MAIN_DICT.update({re: err_links})
                 return 1
-            else: return 0  # ok
+            else:
+                return 0  # ok
         except Exception as e:
             self.myprint("Exception in ck_status_code: " + str(e))
             pass
-        self.MAIN_DICT.update({re:err_links})
 
     #-----------------------------------------------------------------------------
 
     
     @classmethod
     def ckaddymore(cls, addy):
+        LinkCheckLib.myprint(LinkCheckLib(), "--------testingprinting-----------!!!!!!")
         one = 'http://'
         two = 'https://'
         needprefix = True
@@ -379,18 +334,19 @@ class LinkCheckLib(object):
         return full_addy
     #-----------------------------------------------------------------------------
 
-    @classmethod
-    def divide_url(cls, parent_local):
-        thebase_part_local = ""
-        try:
-            thebase_part_local = (urlsplit(parent_local))[1]
-            if thebase_part_local.startswith('www'):
-                thebase_part_local = thebase_part_local[4:]
-        except Exception as e:
-            tstr = 'Exception divide_url: ' + str(e)[:45]
-            cls.myprintc(tstr)
-
-        return thebase_part_local
+    # @classmethod
+    # def divide_url(cls, parent_local):
+    #     thebase_part_local = ""
+    #     try:
+    #         thebase_part_local = (urlsplit(parent_local))[1]
+    #         if thebase_part_local.startswith('www'):
+    #             thebase_part_local = thebase_part_local[4:]
+    #     except Exception as e:
+    #         tstr = 'Exception divide_url: ' + str(e)[:45]
+    #         #cls.myprintc(tstr)
+    #         LinkCheckLib.myprint(LinkCheckLib(), tstr)
+    #
+    #     return thebase_part_local
 
     #-----------------------------------------------------------------------------
     def reset_timer( self, name, tstart):

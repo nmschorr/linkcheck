@@ -11,35 +11,14 @@ class LinkCheck(LinkCheckLib):
     def __init__(self):
         super().__init__()
 
+    #---------------------------------------------------------------------------------------
     def get_simple_response(self, lin_and_par_tup):
-        redirs = self.redirs
-        rederdat = self.MAIN_DICT.get(self.redirs)
-        link_count, stat = 0, 0
         link_to_ck, parent = lin_and_par_tup[0], lin_and_par_tup[1]
-        link_count += 1
         self.myprint("Checking this link: " + link_to_ck )
         try:
-            #t_timeout = Timeout(connect=2.0, read=5.0)
             resp = requests.head(link_to_ck, timeout=7.0)
             stat = resp.status_code
-            self.ck_status_code_simple(link_to_ck, parent, stat)
-            self.myprint("-----status: " + str(stat) )
-
-            #if stat == 301:  # get head doesn't check 301s
-            if 300 < stat < 400:  # get head doesn't check 301s
-                    #if "pingback" in resp.headers:
-                    print("found x in: " + link_to_ck, resp.headers)
-            #     #newurl = resp.headers['location']
-            #     newurl = resp.headers['X-Pingback']
-            #     print("     ---------- !! this is new url to ck 301 head: ", newurl)
-            #     respf = requests.head(newurl, timeout=7.0)
-            #     self.ck_status_code_simple(newurl, parent, respf.status_code)
-            #     self.myprint("-----followed url redirect status: " + str(respf.status_code) )
-            #     if respf.status_code == 301:                       # get head doesn't check 301s
-            #         print("appending to 301: " + newurl)
-            #         rederdat.append(newurl)
-
-            self.MAIN_DICT.update({redirs: rederdat})
+            self.ck_status_code(link_to_ck, parent, stat)
 
         except Exception as e:
             self.myprint("Exception inside get_simple_response: ")
@@ -47,8 +26,8 @@ class LinkCheck(LinkCheckLib):
 
     #---------------------------------------------------------------------------------------
     def add_any_bse_g(self, zlink, parent_local):  # Adding this MAIN_DICT link to MAIN_DICT glob
-        rb = self.rb
-        base_lnks_g = self.MAIN_DICT.get(rb)
+       # rb = self.rb
+        base_lnks_g = self.MAIN_DICT.get(self.rb)
 
         if base_lnks_g is None:
             base_lnks_g = []
@@ -64,11 +43,11 @@ class LinkCheck(LinkCheckLib):
         except Exception as e:
             self.myprint("Exception add_any_bse_g: " + str(e))
         base_lnks_g2 = list(set(base_lnks_g))
-        self.MAIN_DICT.update({rb: base_lnks_g2})
+        self.MAIN_DICT.update({self.rb: base_lnks_g2})
     #---------------------------------------------------------------------------------------
     def add_any(self, tlink, parent_local, any_link_loc=None):  # Adding this MAIN_DICT link to any glob
-        ra = self.ra
-        any_link_glob = self.MAIN_DICT.get(ra)
+        #ra = self.ra
+        any_link_glob = self.MAIN_DICT.get(self.ra)
         if any_link_loc is None:
             any_link_loc = []
         try:
@@ -80,7 +59,7 @@ class LinkCheck(LinkCheckLib):
             else:
                 any_link_glob.append((tlink, parent_local))  # make it if starting empty
                 any_link_loc.append((tlink, parent_local))
-            self.MAIN_DICT.update({ra: any_link_glob})
+            self.MAIN_DICT.update({self.ra: any_link_glob})
         except Exception as e:
             self.myprint("exception in add_any: " + str(e))
 
@@ -89,33 +68,24 @@ class LinkCheck(LinkCheckLib):
 
     # #----------------------------------------------------------------------get_links-
     def get_links(self, mainlin, par_link):
-        _IS_BASE = False
-        _IS_BASE2 = False
+        _IS_BASE, _IS_BASE2 = False, False
+        is_bool, good_suffix = True, True
+        has_bad, is_same_link = False, False
         ra = self.ra
         rd = self.rd
         done_ln_gl_sing = self.MAIN_DICT.get(rd)
         any_link_glob= self.MAIN_DICT.get(ra)
-        from time import sleep
         self.myprint("------------ ")
 
         self.myprint("-------------Starting get_links with: " + mainlin)
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], "0", []
         response, resp_err = self.do_response(mainlin, par_link)
 
-
-
-        sleep(.05)
-        is_bool = True
-        good_suffix = True
-        has_bad = False
-        is_same_link = False
-
         try:
             if response.status_code != "0":
                 self.myprint("Status code: " + str(response.status_code))
         except Exception as e:
             self.myprint("Exception no valid response from: " + mainlin)
-            #self.handle_exc(e, mainlin, par_link)
             return
 
         if resp_err == 0 and is_bool is True:  ## if there's an error  - 0 is good to continue
@@ -143,25 +113,15 @@ class LinkCheck(LinkCheckLib):
                         try:
                             self.myprint("new_lnks_loc === going to check bad data next: " + str(THIS_LN))
                             has_bad, good_suffix = self.ck_bad_data(THIS_LN)  # check for bad data
-                        except Exception as e:
-                            self.handle_exc(e, THIS_LN, par_link)
-                            continue
-
-                        try:
-                            issame = self.is_same_site_link(THIS_LN)
-                            if issame:
-                                continue
-
-                        except Exception as e:
-                            self.handle_exc(e, THIS_LN, par_link)
-                            continue
-
-                        try:
                             if has_bad:
                                 continue
 
-                            _IS_BASE2, in_base_local= self.ck_base(THIS_LN, base_lnks_loc)
+                        except Exception as e:
+                            self.handle_exc(e, THIS_LN, par_link)
+                            continue
 
+                        try:
+                            _IS_BASE2, in_base_local= self.ck_base(THIS_LN, base_lnks_loc)
 
                             if _IS_BASE2 and good_suffix:  # IS MAIN_DICT type
                                 if not in_base_local:
@@ -185,11 +145,10 @@ class LinkCheck(LinkCheckLib):
 
 
 
-    #############----------------------------------MAIN--------------------------
-      #############----------------------------------MAIN-------------------------
+    #############-----------------------------------------------
+
     def rem_errs(self, tlinks=None):
-        rd = self.rd
-        done_ln_gl_sing = self.MAIN_DICT.get(rd)
+        done_ln_gl_sing = self.MAIN_DICT.get(self.rd)
         if tlinks is None:
             tlinks = []
         for link in tlinks:
@@ -198,6 +157,7 @@ class LinkCheck(LinkCheckLib):
         return tlinks
 
 
+      #############----------------------------------MAIN-------------------------
 
     def main(self, a_site="a.htm"):
         _IS_BASE2, _IS_BASE = False, False

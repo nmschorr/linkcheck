@@ -27,8 +27,8 @@ class AppSupport:
         git_url = "<a href=https://github.com/nmschorr/linkcheck>See the code for this on Github</a></h3>"
         spaces = "&ensp;"  #two spaces
         first = "BAD LINK-->  "
-        sec = "**ERROR-->  "
-        third = "  ***FOUND ON: "
+        sec = "<br><span style=font-size:12px;padding-left:2em>**ERROR-->  "
+        third = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;---> Found on: "
         fourth = "Here are your broken links:"
         if special == 1:
             first = "No broken links."
@@ -55,7 +55,7 @@ class AppSupport:
             f.write("</a>")
             f.write(spaces)
             f.write(sec)
-            f.write(str(line[1]))  ## the error
+            f.write(str(line[1])+ "</span>")  ## the error
             f.write(spaces)
             f.write("<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;" + third)
             f.write("<a href='")
