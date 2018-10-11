@@ -52,7 +52,6 @@ class LinkCheckLib(object):
         if mdebug:
             print(print_str)
 
-
     #-----------------------------------------------------------------------------
 
     def ck_g(self, this_link):
@@ -91,7 +90,7 @@ class LinkCheckLib(object):
                     err_links.clear()
                     er_len = len(errs)
                     nstring = '\n' + "Total errors: " + str(er_len) + " Here are the errors ---:"
-                    self.myprint(nstring)
+                    #self.myprint(nstring)
                     errs2 = sorted(errs, key=lambda x: x[0])  # sort on first
 
                     errs2 = set(errs2)
@@ -102,7 +101,7 @@ class LinkCheckLib(object):
                         answer_string = [an0, an1, an2]
                         fin_list.append(answer_string)
                         finlist = fin_list.copy()
-                        self.myprint(str(answer_string))
+                        #self.myprint(str(answer_string))
                 else:
                     finlist = [answer_string]
                     self.myprint("len of finlist: " + str(len(finlist)))
@@ -136,7 +135,7 @@ class LinkCheckLib(object):
 
         if (rebuild == par_loc) or (rebuild == par_locwww):
             is_same_link = True
-            self.myprint("--Is same: " + inlink + " found: " + par_loc + " and: " + par_locwww)
+            #self.myprint("--Is same: " + inlink + " found: " + par_loc + " and: " + par_locwww)
 
         return is_same_link
 
@@ -163,10 +162,10 @@ class LinkCheckLib(object):
 
             if this_link == basepart or this_link == basepartwww:
                 _IS_BASE = True
-                self.myprint(  "--------------!!basepart or this_link == basepartwww!! _IS_BASE = True: " + this_link + " found : " + basepart + " in: " + this_link)
+                #self.myprint(  "--------------!!basepart or this_link == basepartwww!! _IS_BASE = True: " + this_link + " found : " + basepart + " in: " + this_link)
             elif this_sub == basepart[0:30] or this_sub == basepartwww[0:30]:
                 _IS_BASE = True
-                self.myprint(  "--------------!!_IS_BASE = True " + this_link + " found : " + basepart + " in: " + this_link)
+                #self.myprint(  "--------------!!_IS_BASE = True " + this_link + " found : " + basepart + " in: " + this_link)
                 if base_links_local:
                     in_base_loc = bool(this_link in [i for i in base_links_local])
                 else:
@@ -185,7 +184,7 @@ class LinkCheckLib(object):
         resp = None
         try:
             if a_link not in done_ln_gl_sing:
-                self.myprint("Starting-get_home_links - just got this link: " + str(a_link))
+                #self.myprint("Starting-get_home_links - just got this link: " + str(a_link))
                 done_ln_gl_sing.append(a_link)  ## add to main done list
 
                 session = HTMLSession()
@@ -318,7 +317,7 @@ class LinkCheckLib(object):
     
     @classmethod
     def ckaddymore(cls, addy):
-        LinkCheckLib.myprint(LinkCheckLib(), "--------testingprinting-----------!!!!!!")
+        #LinkCheckLib.myprint(LinkCheckLib(), "--------testingprinting-----------!!!!!!")
         one = 'http://'
         two = 'https://'
         needprefix = True
@@ -334,19 +333,6 @@ class LinkCheckLib(object):
         return full_addy
     #-----------------------------------------------------------------------------
 
-    # @classmethod
-    # def divide_url(cls, parent_local):
-    #     thebase_part_local = ""
-    #     try:
-    #         thebase_part_local = (urlsplit(parent_local))[1]
-    #         if thebase_part_local.startswith('www'):
-    #             thebase_part_local = thebase_part_local[4:]
-    #     except Exception as e:
-    #         tstr = 'Exception divide_url: ' + str(e)[:45]
-    #         #cls.myprintc(tstr)
-    #         LinkCheckLib.myprint(LinkCheckLib(), tstr)
-    #
-    #     return thebase_part_local
 
     #-----------------------------------------------------------------------------
     def reset_timer( self, name, tstart):

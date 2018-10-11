@@ -22,11 +22,27 @@ h4 {
 
 
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
+
 var nIntervId;
+var donefile = '{{ name }}';
+console.log("donefile: " + donefile);
+
+$(function() {
+    run_ck_ready();
+});
+
+$.mjs = function(df) {
+    $("#content").load(df );
+};
+
+function display() {
+    $.mjs(donefile);
+}
 
 function find_done(ur)    {
-    var xhr = new XMLHttpRequest() ;
+    var xhr = new XMLHttpRequest();
     xhr.open("HEAD", ur, true);
     xhr.send();
     if (xhr.status == "404")
@@ -35,7 +51,7 @@ function find_done(ur)    {
     }
     else {
        clearInterval(nIntervId);
-       console.log("clearing interval")
+       console.log("clearing interval");
        return true;
    }}
 
@@ -44,37 +60,17 @@ function ck_done_file(done_file){
     if (answer==true)
     {
         display(done_file);
-        console.log("found done_file: " + done_file)
+        console.log("found done_file: " + done_file);
         clearInterval(nIntervId);
     }}
 
  function run_ck_ready() {
-    var donefile = '{{ name }}';
-    nIntervId = setInterval(ck_done_file(donefile, ), 2000);
+    nIntervId = setInterval(ck_done_file(donefile), 2000);
   }
-
 </script>
+
 
 <title>LinkCheck Results</title>
-
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script>
-
-$(document).ready(function(){
-    run_ck_ready();
-});
-
-$.mjs = function(df) {
-    var df = '{{ name }}';
-    $( "#content" ).load(df );
-};
-
-function display() {
-$.mjs();
-};
-
-</script>
 
 </head>
 

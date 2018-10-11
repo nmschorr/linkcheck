@@ -75,7 +75,7 @@ class LinkCheck(LinkCheckLib):
         rd = self.rd
         done_ln_gl_sing = self.MAIN_DICT.get(rd)
         any_link_glob= self.MAIN_DICT.get(ra)
-        self.myprint("------------ ")
+        #self.myprint("------------ ")
 
         self.myprint("-------------Starting get_links with: " + mainlin)
         has_bad, any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = False,[], [], [], "0", []
@@ -111,7 +111,7 @@ class LinkCheck(LinkCheckLib):
                     if not _IN_AN_LOC and not self._DONE_YET(THIS_LN):    #NOT done yet  cg = check glob
 
                         try:
-                            self.myprint("new_lnks_loc === going to check bad data next: " + str(THIS_LN))
+                            #self.myprint("new_lnks_loc === going to check bad data next: " + str(THIS_LN))
                             has_bad, good_suffix = self.ck_bad_data(THIS_LN)  # check for bad data
                             if has_bad:
                                 continue
@@ -181,7 +181,7 @@ class LinkCheck(LinkCheckLib):
         full_addy = self.ckaddymore(a_site)
         new_sorted, repeats, the_len = [], 0, 0
         tstart_main = perf_counter()
-        self.myprint('In main() STARTING OVER Getting first address: ' + full_addy)
+        self.myprint('In main() Getting first address: ' + full_addy)
         try:
             #############---------step ONE:
             base_only_plain_repeat = self.get_links(full_addy, full_addy)  #first set of MAIN_DICT

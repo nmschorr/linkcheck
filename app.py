@@ -74,7 +74,8 @@ def index():
 def indexn():  # git name of url, construct names and pages, present page with button to next step
     site = request.form['name']  # from index.html
     done = set_names(site)
-    print("done = ", done)
+    print("----------------------------------------------------")
+    print("Starting over. Is it True that setting filename is done? ", done)
     sleep(2)
     return render_template('indexn.html', name = site)  ## has a form
 
@@ -83,6 +84,7 @@ def indexn():  # git name of url, construct names and pages, present page with b
 def indexnn():  # git name of ur
     e_unused = request.form['name']  # from indexn.html
     fname = pcf.get_just_stat()
+    print("fname: ", fname)
     main_work()
     sleep(1)
     return render_template('indexnn.html', name = fname)  ## has a form
