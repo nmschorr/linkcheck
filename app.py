@@ -23,47 +23,26 @@ env = Environment(    # jinja2
 #-----------------------------------------------------------------------------
 def main_work():   # run LinkCheck and ac.myprint to console
     site = pcf.get_site()
-    #print("Just started. You entered: " + site)
     ac.myprint("running main_work")
+    just_name = pcf.get_just_name()
+    os_path_plus_stat = path.join(app.root_path, "static")
+    file_path = path.join(os_path_plus_stat, just_name)
 
-    # donefile_path = pcf.get_donefile_path()
-    # ac.myprint("donefile: " + donefile_path)
     lc = LinkCheck()
     answers = lc.main(site)
     len_ans = len(answers)
-    # ac.myprint("donefile in worker1: " + donefile_path + \
-    #      "!!!!!!!!!!==---- len of answers: " + str(len_ans))
-    file_path = pcf.get_file_path()
     if len_ans == 0:
         ac.datalines(file_path, [('','','')], special=1)  #special=1 is a page with no broken links
     else:
         ac.datalines(file_path,answers)
-
     dt = str(datetime.now())
-    sleep(10)
-    pcf.prod_reset()
-
     print( dt + "  main_work done")
 
     #-----------------------------------------------------------------------------
-def set_names(site):
-    osroot = app.root_path  # os path
-    timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
-    just_name = "res" + timestp1 + ".html"
-    just_stat = "./static/" + just_name
-    # donefile = just_name + "done"
-    os_path_plus_stat = path.join(osroot, "static")
-    file_path = path.join(os_path_plus_stat, just_name)
-    # donefile_path = path.join(os_path_plus_stat, donefile)
-    #AppSupport.myprint("make_filenames os_donefile_path: " + os_donefile_path)
-    pcf.set_timestp(timestp1)
-    pcf.set_site(site)
-    pcf.set_just_name(just_name)
-    pcf.set_just_stat(just_stat)
-    pcf.set_file_path(file_path)
-    # pcf.set_donefile(donefile)
-    # pcf.set_donefile_path(donefile_path)
-    return True
+# def set_names(site):
+#     just_name = "res" + timestp1 + ".html"
+#     pcf.set_site(site)
+#     return True
 
 @app.route('/')
 def index():
@@ -72,25 +51,30 @@ def index():
 @nocache             # very important so client server doesn'w_thread cache results
 @app.route('/indexn', methods = ['POST', 'GET', 'HEAD'])
 def indexn():  # git name of url, construct names and pages, present page with button to next step
-    site = request.form['name']  # from index.html
-    done = set_names(site)
+    site = request.form['tsite']  # from index.html
+    timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
+    just_name = "res" + timestp1 + ".html"
+    pcf.set_site(site)
+    pcf.set_just_name(just_name)
     print("----------------------------------------------------")
-    print("Starting over. Is it True that setting filename is done? ", done)
+    print("Starting over. Is it True that setting filename is done? ", just_name)
     sleep(2)
     return render_template('indexn.html', name = site)  ## has a form
 
 @nocache             # very important so client server doesn'w_thread cache results
 @app.route('/indexnn', methods = ['POST', 'GET', 'HEAD'])
 def indexnn():  # git name of ur
-    e_unused = request.form['name']  # from indexn.html
-    fname = pcf.get_just_stat()
+    fname='none'
+    # e_unused = request.form['name']  # from indexn.html
+    just_name = pcf.get_just_name()
+    fname = "./static/" + just_name
     print("fname: ", fname)
     main_work()
-    sleep(1)
-    return render_template('indexnn.html', name = fname)  ## has a form
+    sleep(4)
+    return render_template('indexnn.html', filename=fname)  ## has a form
 
 if __name__ == '__main__':
-    serve(app)
-    #app.run('127.0.0.1', 5000, debug=True)
+    #serve(app)
+    app.run('127.0.0.1', 5000, debug=True)
 
 #    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));

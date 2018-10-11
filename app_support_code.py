@@ -1,34 +1,21 @@
-from config import conf_debug, thishost
+from config import conf_debug
 from flask import make_response
 from functools import wraps, update_wrapper
 from datetime import datetime
 
 
 class AppSupport:
-    _DEBUG = conf_debug
-
-    def __init__(self):
-        self.conf_debug = conf_debug
 
     @staticmethod
-    def myprint(print_str,_DEBUG=0 ):
-        _DEBUG = conf_debug
-        if _DEBUG:
+    def myprint(print_str):
+        if conf_debug:   # change in file config.py
             print(print_str)
 
     @classmethod
     def datalines(cls, filey, data, special=0):
-        home_url = "&nbsp;&nbsp;&nbsp;&nbsp;" +  "&nbsp;&nbsp;&nbsp;&nbsp;" + \
-                "<h2><a href=" + thishost + ">Start Over</a></h2><p></p>"
-
-        sm = "http://schorrmedia.com"
-        smedia_url = "<h3><a href=" + sm + ">Visit SchorrMedia.com</a>"
-
-        git_url = "<a href=https://github.com/nmschorr/linkcheck>See the code for this on Github</a></h3>"
-        spaces = "&ensp;"  #two spaces
         first = "BAD LINK-->  "
-        sec = "<br><span style=font-size:12px;padding-left:2em>**ERROR-->  "
-        third = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;---> Found on: "
+        sec = "<br><span id='errline'>&nbsp;*** ERROR-->  "
+        third = "&emsp;&emsp;---> Found on: "
         fourth = "Here are your broken links:"
         if special == 1:
             first = "No broken links."
@@ -37,41 +24,16 @@ class AppSupport:
             fourth = "Thanks for using LinkCheck."
 
         f = open(filey, 'w')
-        f.write("<!DOCTYPE html><html><head><style> h3 { color:#36d1af;}</style>")
-        f.write('<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />')
-        f.write('<meta http-equiv="Cache-Control" content="no-cache" />')
-        f.write('<meta http-equiv="Pragma" content="no-cache"  />')
-        f.write('<meta http-equiv="Expires" content="0"  />')
-
-        f.write('<link rel=stylesheet href="./static/style.css"></head><body><div style="margin-left:5em;line-height:1.4;">')
         f.write("<p></p><h3>" + fourth + "</h3><p></p>")
 
         for line in data:
             f.write(first)
-            f.write("<a href='")
-            f.write(str(line[0]))
-            f.write("'>")
-            f.write(str(line[0]))
-            f.write("</a>")
-            f.write(spaces)
-            f.write(sec)
-            f.write(str(line[1])+ "</span>")  ## the error
-            f.write(spaces)
-            f.write("<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;" + third)
-            f.write("<a href='")
-            f.write(str(line[2]))
-            f.write("'>")
-            f.write(str(line[2]))
-            f.write("</a>")
-            f.write('<p></p>')
-
-        f.write('<p></p>')
-        f.write(home_url)
-        f.write("&nbsp;&nbsp;&nbsp;&nbsp;")
-        f.write(smedia_url)
-        f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-        f.write(git_url)
-        f.write("</div>" + "</body></html>")
+            f.write("<a href='" + str(line[0]) + "'>")
+            f.write(str(line[0])+ "</a>&ensp;")
+            f.write(sec + str(line[1])+ "</span>&ensp;")  ## the error  # span needed!!
+            f.write("<br>&ensp;&ensp;" + third + "<a href='")
+            f.write(str(line[2]) + "'>")
+            f.write(str(line[2])+ "</a>")
         f.close()
 
 

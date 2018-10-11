@@ -10,14 +10,43 @@
 <meta http-equiv="Cache-Control" content="no-cache" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
+<link rel=stylesheet href="./static/style.css">
 
 <style type="text/css">
+
+.bodstyle {
+        margin-left:5em;
+        line-height:1.4;
+        }
+
 h4 {
      color: #003399;
      font-family:"Arial", "Helvetica Neue", Helvetica, sans-serif;
      font-weight: 700;
      padding-left: 4em;
     }
+
+#errline {
+        font-size:12px;
+        padding-left:2em;
+        font-style:italic;
+        }
+
+.cstyle {
+     padding-top:2em;
+     padding-bottom:2em;
+     margin-left:5em;
+     line-height:1.4;
+}
+
+h3 {
+    color:#36d1af;
+    }
+
+
+
+
+
 </style>
 
 
@@ -25,61 +54,38 @@ h4 {
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
 
-var nIntervId;
-var donefile = '{{ name }}';
-console.log("donefile: " + donefile);
+
+var donefile = '{{ filename }}';
+var doneObject = { "name" : donefile };
+console.log("donefile: " + doneObject.name);
 
 $(function() {
-    run_ck_ready();
+   $("#content").load(donefile );
 });
 
-$.mjs = function(df) {
-    $("#content").load(df );
-};
-
-function display() {
-    $.mjs(donefile);
-}
-
-function find_done(ur)    {
-    var xhr = new XMLHttpRequest();
-    xhr.open("HEAD", ur, true);
-    xhr.send();
-    if (xhr.status == "404")
-    {
-    return false;
-    }
-    else {
-       clearInterval(nIntervId);
-       console.log("clearing interval");
-       return true;
-   }}
-
-function ck_done_file(done_file){
-    var answer=find_done(done_file);
-    if (answer==true)
-    {
-        display(done_file);
-        console.log("found done_file: " + done_file);
-        clearInterval(nIntervId);
-    }}
-
- function run_ck_ready() {
-    nIntervId = setInterval(ck_done_file(donefile), 2000);
-  }
 </script>
-
 
 <title>LinkCheck Results</title>
 
 </head>
 
-<body>
+<body class="bodstyle">
+
+<div class=cstyle>
+
+<div id="content"></div>
+
+</div>
+<div style="padding-left:4em;padding-bottom:3em; font-family: Arial, Helvetica, sans-serif;">
+<h2 style="color:purple"><a href="jetgal.pythonanywhere.com">Start Over</a></h2><p></p>
+
+<h3><a href="http://schorrmedia.com">Visit SchorrMedia.com</a>
+<span style="padding-left:2em"></span>
+<a href=https://github.com/nmschorr/linkcheck>See the code for this on Github</a></h3>
 
 
+</div>
 
-<div id="content" style="padding-top:2em; padding-bottom:2em; ">
-    <h4 style="font-style: italic;">Your results are almost ready . . . </h4></div>
 
 
 </body>
