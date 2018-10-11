@@ -1,5 +1,5 @@
 
-from urllib.parse import urlsplit, urlparse
+from urllib.parse import urlparse
 from requests_html import HTMLSession
 from random import random
 from time import perf_counter

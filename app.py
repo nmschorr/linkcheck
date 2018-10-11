@@ -26,13 +26,13 @@ def main_work():   # run LinkCheck and ac.myprint to console
     #print("Just started. You entered: " + site)
     ac.myprint("running main_work")
 
-    donefile_path = pcf.get_donefile_path()
-    ac.myprint("donefile: " + donefile_path)
+    # donefile_path = pcf.get_donefile_path()
+    # ac.myprint("donefile: " + donefile_path)
     lc = LinkCheck()
     answers = lc.main(site)
     len_ans = len(answers)
-    ac.myprint("donefile in worker1: " + donefile_path + \
-         "!!!!!!!!!!==---- len of answers: " + str(len_ans))
+    # ac.myprint("donefile in worker1: " + donefile_path + \
+    #      "!!!!!!!!!!==---- len of answers: " + str(len_ans))
     file_path = pcf.get_file_path()
     if len_ans == 0:
         ac.datalines(file_path, [('','','')], special=1)  #special=1 is a page with no broken links
@@ -40,6 +40,9 @@ def main_work():   # run LinkCheck and ac.myprint to console
         ac.datalines(file_path,answers)
 
     dt = str(datetime.now())
+    sleep(10)
+    pcf.prod_reset()
+
     print( dt + "  main_work done")
 
     #-----------------------------------------------------------------------------
@@ -48,29 +51,30 @@ def set_names(site):
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
     just_name = "res" + timestp1 + ".html"
     just_stat = "./static/" + just_name
-    donefile = just_name + "done"
+    # donefile = just_name + "done"
     os_path_plus_stat = path.join(osroot, "static")
     file_path = path.join(os_path_plus_stat, just_name)
-    donefile_path = path.join(os_path_plus_stat, donefile)
+    # donefile_path = path.join(os_path_plus_stat, donefile)
     #AppSupport.myprint("make_filenames os_donefile_path: " + os_donefile_path)
     pcf.set_timestp(timestp1)
     pcf.set_site(site)
     pcf.set_just_name(just_name)
     pcf.set_just_stat(just_stat)
     pcf.set_file_path(file_path)
-    pcf.set_donefile(donefile)
-    pcf.set_donefile_path(donefile_path)
+    # pcf.set_donefile(donefile)
+    # pcf.set_donefile_path(donefile_path)
+    return True
 
 @app.route('/')
 def index():
-    pcf.prod_reset()
     return render_template('index.html')  ## has a form
 
 @nocache             # very important so client server doesn'w_thread cache results
 @app.route('/indexn', methods = ['POST', 'GET', 'HEAD'])
 def indexn():  # git name of url, construct names and pages, present page with button to next step
     site = request.form['name']  # from index.html
-    set_names(site)
+    done = set_names(site)
+    print("done = ", done)
     sleep(2)
     return render_template('indexn.html', name = site)  ## has a form
 
