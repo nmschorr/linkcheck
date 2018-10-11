@@ -13,7 +13,7 @@ class AppSupport:
 
     @classmethod
     def datalines(cls, filey, data, special=0):
-        first = "BAD LINK-->  "
+        first = "<br>BAD LINK-->  "
         sec = "<br><span id='errline'>&nbsp;*** ERROR-->  "
         third = "&emsp;&emsp;---> Found on: "
         fourth = "Here are your broken links:"
