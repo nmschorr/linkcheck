@@ -19,14 +19,14 @@ class TestCls_cklib_two(unittest.TestCase):
         test_link = "one.html"
         exp_link = "http://one.html"
 
-        ans = self.lcb.ckaddymore(test_link)
+        ans = self.lcb.mk_link_w_scheme(test_link)
         self.assertEquals(ans, exp_link)
 
     def test_cklib_two2(self):
         test_link = "one.html"
         exp_link = "http://one.html"
 
-        ans = self.lcb.ckaddymore(test_link)
+        ans = self.lcb.mk_link_w_scheme(test_link)
         self.assertEquals(ans, exp_link)
 
 
@@ -34,35 +34,35 @@ class TestCls_cklib_two(unittest.TestCase):
         test_link = "one.html"
         exp_link = "http://one.html"
 
-        ans = self.lcb.ckaddymore(test_link)
+        ans = self.lcb.mk_link_w_scheme(test_link)
         self.assertEquals(ans, exp_link)
 
     def test_cklib_two4(self):
         test_link = "http://one.html"
         exp_link = "http://one.html"
 
-        ans = self.lcb.ckaddymore(test_link)
+        ans = self.lcb.mk_link_w_scheme(test_link)
         self.assertEquals(ans, exp_link)
 
     def test_cklib_two5(self):
         test_link = "https://one.html"
         exp_link = "https://one.html"
 
-        ans = self.lcb.ckaddymore(test_link)
+        ans = self.lcb.mk_link_w_scheme(test_link)
         self.assertEquals(ans, exp_link)
 
     def test_cklib_two6(self):
         test_link6 = "http//one.html"
         exp_link = "https://one.html"
 
-        ans = self.lcb.ckaddymore(test_link6)
+        ans = self.lcb.mk_link_w_scheme(test_link6)
         self.assertEquals(ans, exp_link)
 
     def test_cklib_two7(self):
         test_link7 = "http//one.html"
         exp_link = "https://one.html"
 
-        ans = self.lcb.ckaddymore(test_link7)
+        ans = self.lcb.mk_link_w_scheme(test_link7)
         self.assertEquals(ans, exp_link)
 
     def test_cklib_two8(self):

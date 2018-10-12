@@ -74,29 +74,29 @@ class TestCls_cklib_one(unittest.TestCase):
 
     def test_link7(self):
         test_link = 'http://abcd.com'
-        tanswer = self.lcb.ckaddymore(test_link)
+        tanswer = self.lcb.mk_link_w_scheme(test_link)
         right_answer = 'http://abcd.com'
-        self.assertEquals(self.lcb.ckaddymore(tanswer), right_answer)
+        self.assertEquals(self.lcb.mk_link_w_scheme(tanswer), right_answer)
 
     def test_link8(self):
         test_link = 'https://abcd.com'
         right_answer = 'https://abcd.com'
-        self.assertEquals(self.lcb.ckaddymore(test_link), right_answer)
+        self.assertEquals(self.lcb.mk_link_w_scheme(test_link), right_answer)
 
     def test_link9(self):
         test_link = 'http://abcdesomethingelse.xxx.com'
         right_answer =  'http://abcdesomethingelse.xxx.com'
-        self.assertEquals(self.lcb.ckaddymore(test_link), right_answer)
+        self.assertEquals(self.lcb.mk_link_w_scheme(test_link), right_answer)
 
     def test_link10(self):
         test_link = 'abcdesomethingelse.xxx.com'
         right_answer = 'http://abcdesomethingelse.xxx.com'
-        self.assertEquals(self.lcb.ckaddymore(test_link), right_answer)
+        self.assertEquals(self.lcb.mk_link_w_scheme(test_link), right_answer)
 
     def test_link11(self):
         test_link = 'abcdg.com'
         right_answer = 'http://abcdg.com'
-        self.assertEquals(self.lcb.ckaddymore(test_link), right_answer)
+        self.assertEquals(self.lcb.mk_link_w_scheme(test_link), right_answer)
     # ---------------------------------------ck_status_code [400, 404, 408, 409]
     def test_link12(self):
         test_link = 'https://abcd.com'
