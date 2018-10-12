@@ -8,10 +8,8 @@ from datetime import datetime
 from linkcheck import LinkCheck
 from app_support_code import nocache
 from app_support_code import AppSupport as ac
-from prodconf import ProfConf
 #sys.stderr = sys.stdout   rootloglev = 40
 
-pcf = ProfConf()
 
 app = Flask(__name__)
 
@@ -21,9 +19,8 @@ env = Environment(    # jinja2
 )
 
 #-----------------------------------------------------------------------------
-def main_work(just_name):   # run LinkCheck and ac.myprint to console
-    site = pcf.get_rsite()
-    ac.myprint("running main_work")
+def main_work(site, just_name):   # run LinkCheck and ac.myprint to console
+    ac.myprint("running main_work. site is: " + site)
     os_path_plus_stat = path.join(app.root_path, "static")
     file_path = path.join(os_path_plus_stat, just_name)
 
@@ -38,10 +35,7 @@ def main_work(just_name):   # run LinkCheck and ac.myprint to console
     print( dt + "  main_work done")
 
     #-----------------------------------------------------------------------------
-# def set_names(site):
-#     just_name = "res" + timestp1 + ".html"
-#     pcf.set_site(site)
-#     return True
+
 
 @app.route('/')
 def index():
@@ -50,35 +44,23 @@ def index():
 @nocache             # very important so client server doesn'w_thread cache results
 @app.route('/indexn', methods = ['POST', 'GET', 'HEAD'])
 def indexn():  # git name of url, construct names and pages, present page with button to next step
-    import random
-    rand = random.random()
-    rnm = str(rand)[2:0]
-    rtimestp = "rtimestp" + rnm
-    rsite = "rsite" + rnm
 
-    pcf.prod_dict.update({rtimestp: "empty"})
-    pcf.prod_dict.update({rsite: "empty"})
-
-    site = request.form['tsite']  # from index.html
-
-    pcf.set_rsite(site)
-
+    name = request.form['name']  # from index.html   # the site
     print("----------------------------------------------------")
-    # print("Starting over. Is it True that setting filename is done? ", just_name)
+    print("Starting over. site is: ", name)
     sleep(3)
-    return render_template('indexn.html', name = site)  ## has a form
+    return render_template('indexn.html', name = name)  ## has a form
 
 @nocache             # very important so client server doesn'w_thread cache results
 @app.route('/indexnn', methods = ['POST', 'GET', 'HEAD'])
 def indexnn():  # git name of ur
+    name = request.form['name']  # from index.html  the site name
     timestp1 = format(datetime.now(), '%Y%m%d%H%M%S')
-    pcf.set_rtimestp(timestp1)
     just_name = "res" + timestp1 + ".html"
     just_name_st = "./static/" + just_name
 
-    # e_unused = request.form['name']  # from indexn.html
     print("just made names just_name and just_name_st: " + just_name + "  " + just_name_st)
-    main_work(just_name)
+    main_work(name, just_name)
     sleep(3)
     return render_template('indexnn.html', filename=just_name_st)  ## has a form
 
