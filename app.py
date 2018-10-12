@@ -64,8 +64,8 @@ def indexnn():  # git name of ur
     sleep(3)
     return render_template('indexnn.html', filename=just_name_st)  ## has a form
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     #serve(app)
-    app.run('127.0.0.1', 5000, debug=True)
+    #app.run('127.0.0.1', 5000, debug=True)
 
 #    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
