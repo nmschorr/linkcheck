@@ -11,6 +11,8 @@ class LinkCheckLib(object):
         self.MAIN_DICT = dict()
         rand = str(random())[2:]
 
+        self.ORIGNAME = "ORIG" + rand
+        self.ORIGNAMEwww = "ORIGwww" + rand
         self.BASENAME = "BURL" + rand
         self.BASENAMEwww = "BURLwww" + rand
         self.re = "re_" + rand
@@ -26,6 +28,8 @@ class LinkCheckLib(object):
         redirs_dat = []
 
         self.tlds_list = []
+        self.MAIN_DICT.update({self.ORIGNAME: "init"})
+        self.MAIN_DICT.update({self.ORIGNAMEwww: "init"})
         self.MAIN_DICT.update({self.BASENAME: "init"})
         self.MAIN_DICT.update({self.BASENAMEwww: "init"})
         self.MAIN_DICT.update({self.re: err_links})
@@ -35,8 +39,9 @@ class LinkCheckLib(object):
         self.MAIN_DICT.update({self.redirs: redirs_dat})
         self.load_tlds()
 
-        self.myprint("name of list: " + self.re)
-        self.myprint("name of list: " + self.re)
+        self.myprint("self.ORIGNAME: " + self.ORIGNAME)
+        self.myprint("self.ORIGNAMEwww: " + self.ORIGNAMEwww)
+        self.myprint("name of err list: " + self.re)
 
     #-----------------------------------------------------------------------------
     def myprint(self, print_str ):
@@ -120,36 +125,66 @@ class LinkCheckLib(object):
             return []
 
         # -----------------------------------------------------------------------------
+    def mkwww(self, tlink):  # is it THE parent? part of the main website?
+        lens = 0
+        f = 0
+        front = urlparse(tlink).scheme
+        f = len(front)
+        netl = urlparse(tlink).netloc
+        if "www." in netl:
+            return tlink
+        else:
+            newlink = tlink[f:]
+            n2 = "www." + newlink
+            best = front + n2
+            return best
 
-    def ispar(self, main_link):  # is it a parent? part of the main website?
-        parsed = urlparse(main_link)
-        if parsed.scheme != '':
-            main_link = parsed.netloc
+
+
+
+
+
+    def isTHEparent(self, main_link):  # is it THE parent? part of the main website?
+        lens = 0
+        schemeonly = urlparse(main_link).scheme
+        if schemeonly:
+            lens = len(schemeonly)
+        if lens:
+            frontlen = lens + 3
+            mainew = main_link[frontlen:]
+        else:
+            mainew = main_link
+        self.myprint("new mainew:  " + mainew)
+
+
+        # if parsed.scheme != '':
+        #     main_link = parsed.netloc
 
         par_loc = self.MAIN_DICT.get(self.BASENAME)
         par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
-        if main_link == par_loc or main_link == par_locwww:
+        if mainew in par_loc:
+            return True
+        elif mainew in par_locwww:
             return True
         else:
             return False  # is it the parent?
     # -----------------------------------------------------------------------
     def is_same_site_link(self, inlink):
         is_same_link = False
-        par_loc = self.MAIN_DICT.get(self.BASENAME)
-        par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
+        orig = self.MAIN_DICT.get(self.ORIGNAME)
+        origwww = self.MAIN_DICT.get(self.ORIGNAMEwww)
 
         (scheme, netloc, path, params, query, fragment) = urlparse(inlink)
         rebuild = netloc + path + params + query
 
-        if (rebuild == par_loc) or (rebuild == par_locwww):
+        if (rebuild == orig) or (rebuild == origwww):
             is_same_link = True
-            #self.myprint("--Is same: " + inlink + " found: " + par_loc + " and: " + par_locwww)
 
         return is_same_link
 
     # -----------------------------------------------------------------------
 
-    def ck_base(self, in_link, base_links_local=None):
+    def ck_for_base(self, in_link, base_links_local=None):
 
         this_link = in_link
         _IS_BASE = False
@@ -277,10 +312,11 @@ class LinkCheckLib(object):
             return False
     #-----------------------------------------------------------------------------
 
-    def handle_exc( self, e, link, plink):
+    def handle_exc( self, e, tlink, plink):
         err_links = self.MAIN_DICT.get(self.re)
 
         the_err = str(e)
+        tbs = the_err[:72]
         self.myprint('!!!!! Inside handle_exc. Error------------------> ' + the_err)
 
         badlist = ["Document is empty","object has no attribute","ConnectionResetError","RemoteDisconnected"]
@@ -289,9 +325,12 @@ class LinkCheckLib(object):
             if i in the_err:  # for mp3 and similar files
                 return
 
-        if link not in err_links:
-            err_links.append((link, the_err[:72], plink))
+        if tlink not in err_links:
+            err_links.append((tlink, tbs, plink))
             self.MAIN_DICT.update({self.re:err_links})
+            return tlink, tbs
+        else:
+            return tlink, tbs
 
     #-----------------------------------------------------------------------------
 

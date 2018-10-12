@@ -132,19 +132,19 @@ class TestCls_cklib_one(unittest.TestCase):
     #------------------------------------------------------------ispar()
     def test_link16(self):
         test_link = 'https://www.myabcd.com'
-        ans = self.lcb.ispar(test_link)
+        ans = self.lcb.isTHEparent(test_link)
         correct_ans = False  # error is 1, no error 0
         self.assertEquals(ans, correct_ans)
 
     def test_link17(self):
         test_link = 'http://schorrmedia.com'
-        ans = self.lcb.ispar(test_link)
+        ans = self.lcb.isTHEparent(test_link)
         correct_ans = True  # error is 1, no error 0
         self.assertEquals(ans, correct_ans)
 
     def test_link18(self):
         test_link = 'http://appls.schorrmedia.com'
-        ans = self.lcb.ispar(test_link)
+        ans = self.lcb.isTHEparent(test_link)
         correct_ans = True  # error is 1, no error 0
         self.assertEquals(ans, correct_ans)
 
