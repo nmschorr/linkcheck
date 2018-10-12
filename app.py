@@ -70,7 +70,7 @@ def indexnn():  # git name of ur
     fname = "./static/" + just_name
     print("fname: ", fname)
     main_work()
-    sleep(4)
+    sleep(3)
     return render_template('indexnn.html', filename=fname)  ## has a form
 
 if __name__ == '__main__':

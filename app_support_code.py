@@ -13,7 +13,7 @@ class AppSupport:
 
     @classmethod
     def datalines(cls, filey, data, special=0):
-        first = "<br>BAD LINK-->  "
+        first = "<br><br> BAD LINK-->  "
         sec = "<br><span id='errline'>&nbsp;*** ERROR-->  "
         third = "&emsp;&emsp;---> Found on: "
         fourth = "Here are your broken links:"
@@ -31,9 +31,9 @@ class AppSupport:
             f.write("<a href='" + str(line[0]) + "'>")
             f.write(str(line[0])+ "</a>&ensp;")
             f.write(sec + str(line[1])+ "</span>&ensp;")  ## the error  # span needed!!
-            f.write("<br><span  style=padding-bottom=4px>&ensp;&ensp;" + third + "<a href='")
-            f.write(str(line[2]) + "'>")
-            f.write(str(line[2])+ "</a></span>")
+            f.write("<br>&ensp;&ensp;" + third + "<a href='")
+            f.write(str(line[2]) + "' >")
+            f.write(str(line[2])+ "</a>")
         f.close()
 
 
