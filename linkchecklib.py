@@ -89,7 +89,7 @@ class LinkCheckLib(object):
 
 
     def ck_if_in_base_glob(self, this_lin):
-        base_lnks_g = self.MAIN_DICT.get({self.rbase})
+        base_lnks_g = self.MAIN_DICT.get(self.rbase)
         return bool(this_lin in [i[0] for i in base_lnks_g])  # is it local?
 
     # -----------------------------------------------------------------------------

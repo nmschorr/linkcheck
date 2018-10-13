@@ -92,10 +92,11 @@ class LinkCheck(LinkCheckLib):
                     return
 
                 for the_link in new_lnks_loc:
-                    self.findlinks_two(the_link, par_link)
+                    b = self.findlinks_two(the_link, par_link)
                              # self.MAIN_DICT.update({self.rdonesingles: done_ln_gl_sing})
                             # self.MAIN_DICT.update({self.rothers: other_lns_gl})
-                            #
+                    if b:
+                        base_lnks_loc.append(b)
 
             return list(set(base_lnks_loc))
         else:
@@ -115,6 +116,7 @@ class LinkCheck(LinkCheckLib):
 
         elif the_link not in done_already_chkd_glob:  # if it hasn't been done yet
             done_already_chkd_glob.append(the_link)
+            self.MAIN_DICT.update({self.rdonesingles: done_already_chkd_glob})
             in_other_local = self.ck_if_in_other_loc(the_link, other_lk_loc)  #check again
             if not in_other_local and not self._DONE_YET(the_link):    #NOT done yet  cg = check glob
                 good_suffix = True
@@ -132,25 +134,16 @@ class LinkCheck(LinkCheckLib):
 
                     if is_base and good_suffix:  # IS MAIN_DICT type
                         if not in_base_glob:
-                            base_lnks_loc.append(the_link)
-                        #else:
-                            #self.base_add_to_b_globs(the_link, par_link)
-                    else:                   #if not a home based link
-                        if not self.ck_other_ln_glob(the_link):  ## add bad suffix here too
-                            self.add_to_others_glob(the_link, par_link)  #does global too
+                            return the_link
+
+                    else:
+                        self.add_to_others_glob(the_link, par_link)  #does global too
+                        return
 
                 except Exception as e:
                     self.handle_exc(e, the_link, par_link)
                     return
 
-            self.MAIN_DICT.update({self.rdonesingles: done_already_chkd_glob})
-            self.myprint("- done with getlinks-----------\n")
-            # self.myprint('---returning base_links_local: ' + str(base_lnks_loc))
-            # self.myprint('!! NEW----end get_home_links \n\n')
-
-            return base_lnks_loc
-        else:
-            return []
 
 
       #############----------------------------------MAIN-------------------------
@@ -182,7 +175,7 @@ class LinkCheck(LinkCheckLib):
             self.myprint("Exception inside main_run: " + str(e))
 
         self.get_more_baselinks()
-        self.any_link_ck()
+        self.other_link_ck()
 
         finlist = self.return_errors()
         for i in finlist:
@@ -193,6 +186,7 @@ class LinkCheck(LinkCheckLib):
     #-------------------------------------------------------------------
 
     def step_one(self, base_only_plain_repeat_here, link_w_scheme_here):
+        self.myprint("In step_one")
         try:
             new_base_links_two, new_base_links_one = [], base_only_plain_repeat_here
             repeats = 0
@@ -219,6 +213,7 @@ class LinkCheck(LinkCheckLib):
     #-------------------------------------------------------------------
 
     def get_more_baselinks(self):
+        self.myprint("In get_more_baselinks")
         base_glob_now = self.MAIN_DICT.get(self.rbase)
         repeats = 0
         alreadychecked = []
@@ -243,17 +238,18 @@ class LinkCheck(LinkCheckLib):
 
     #-------------------------------------------------------------------
 
-    def any_link_ck(self):
-        self.myprint("Step Two Done")
+    def other_link_ck(self):
+        self.myprint("Step Two Done. In any_link_ck")
         ag= self.MAIN_DICT.get(self.rothers)
         rde= self.MAIN_DICT.get(self.rdonesingles)
-        any_link_to_check  =  list(set(ag))
+        other_to_ck  =  list(set(ag))
 
         try:
-            if any_link_to_check:
-                for tupy in any_link_to_check:  # check non-MAIN_DICT links
+            if other_to_ck:
+                for tupy in other_to_ck:  # check non-MAIN_DICT links
                     rde.append(tupy[0])
                     self.get_simple_response(tupy)
+
                 self.MAIN_DICT.update({self.rdonesingles: rde})
 
         except Exception as e:
@@ -263,9 +259,10 @@ class LinkCheck(LinkCheckLib):
             else:
                 self.myprint((str(e)))
                 return 0, 0
+    #-------------------------------------------------------------------
 
-# k = "kaldu.com"
-# s = 'schorrmedia.com/m.html'
-# if __name__ == "__main__":
-#     lc = LinkCheck()
-#     lc.main(k)
+k = "kaldu.com"
+s = 'schorrmedia.com/m.html'
+if __name__ == "__main__":
+    lc = LinkCheck()
+    lc.main(s)
