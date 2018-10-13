@@ -26,9 +26,9 @@ class LinkCheck(LinkCheckLib):
             return a, b
 
     #---------------------------------------------------------------------------------------
-    def add_any_bse_g(self, zlink, parent_local):  # Adding this MAIN_DICT link to MAIN_DICT glob
+    def base_add_to_b_globs(self, zlink, parent_local):  # Adding this MAIN_DICT link to MAIN_DICT glob
        # rb = self.rb
-        base_lnks_g = self.MAIN_DICT.get(self.rb)
+        base_lnks_g = self.MAIN_DICT.get(self.rbase)
 
         if base_lnks_g is None:
             base_lnks_g = []
@@ -42,41 +42,36 @@ class LinkCheck(LinkCheckLib):
                 base_lnks_g = [(zlink, parent_local)]
 
         except Exception as e:
-            self.myprint("Exception add_any_bse_g: " + str(e))
+            self.myprint("Exception base_add_to_b_globs: " + str(e))
         base_lnks_g2 = list(set(base_lnks_g))
-        self.MAIN_DICT.update({self.rb: base_lnks_g2})
+        self.MAIN_DICT.update({self.rbase: base_lnks_g2})
     #---------------------------------------------------------------------------------------
-    def add_any(self, tlink, parent_local, any_link_loc=None):  # Adding this MAIN_DICT link to any glob
-        any_link_glob = self.MAIN_DICT.get(self.rany)
-        isparent = self.isTHEparent(tlink)
+    def add_to_others_glob(self, tlink, parent_local):  # Adding this MAIN_DICT link to any glob
+        if self.isTHEparent(tlink):
+            return
+        other_lns_gl = self.MAIN_DICT.get(self.rothers)
 
-        if any_link_loc is None:
-            any_link_loc = []
-        if isparent:
-            return any_link_loc
         try:
-            if any_link_glob:  # don'w_thread try without something there
-                glob_bool = bool(tlink in [i[0] for i in any_link_glob])
+            if other_lns_gl:  # don'w_thread try without something there
+                glob_bool = bool(tlink in [i[0] for i in other_lns_gl])
                 if not glob_bool:
-                    any_link_glob.append((tlink, parent_local))  # add if not there
-                    any_link_loc.append((tlink, parent_local))
+                    other_lns_gl.append((tlink, parent_local))  # add if not there
             else:
-                any_link_glob.append((tlink, parent_local))  # make it if starting empty
-                any_link_loc.append((tlink, parent_local))
-            self.MAIN_DICT.update({self.rany: any_link_glob})
+                other_lns_gl.append((tlink, parent_local))  # make it if starting empty
         except Exception as e:
-            self.myprint("exception in add_any: " + str(e))
+            self.myprint("exception in add_others: " + str(e))
 
-        return any_link_loc
+        self.MAIN_DICT.update({self.rothers: other_lns_gl})
+        return
 
 
     # #----------------------------------------------------------------------get_links-
     def get_links(self, mainlin, par_link):
-        done_ln_gl_sing = self.MAIN_DICT.get(self.rdone)
-        any_link_glob= self.MAIN_DICT.get(self.rany)
+        done_ln_gl_sing = self.MAIN_DICT.get(self.rdonesingles)
+        other_lns_gl= self.MAIN_DICT.get(self.rothers)
         if mainlin not in done_ln_gl_sing:
 
-            any_lnk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = [], [], [], "0", []
+            other_lk_loc, new_lnks_loc, base_lnks_loc, response, ab_links = [], [], [], "0", []
             # #---------------  web response get here!!!!!!!!--------------------------------
             response, resp_err = self.do_response(mainlin, par_link)
 
@@ -91,62 +86,71 @@ class LinkCheck(LinkCheckLib):
                 try:
                     ab_links = response.html.absolute_links
                     new_lnks_loc2 = [ab for ab in ab_links]
-                    new_lnks_loc  = list(set(new_lnks_loc2))
+                    new_lnks_loc  = list(set(new_lnks_loc2))  #reduce dupes
                 except Exception as e:
                     self.myprint("Exception inside get_links: " + str(e))
                     return
 
-                self.myprint("Starting Main Check of: " + mainlin + "\n")
                 for the_link in new_lnks_loc:
-                    _IS_BASE2 = False
-                    has_bad = False
-                    issame = self.is_same_site_link(the_link)
-                    if issame:
-                        continue
-
-                    elif the_link not in done_ln_gl_sing:
-
-                        _IN_AN_LOC = self.ck_loc(the_link, any_lnk_loc)
-                        if not _IN_AN_LOC and not self._DONE_YET(the_link):    #NOT done yet  cg = check glob
-                            good_suffix = True
-
-                            try:
-                                #self.myprint("new_lnks_loc === going to check bad data next: " + str(THIS_LN))
-                                has_bad, good_suffix = self.ck_bad_data(the_link)  # check for bad data
-                                if has_bad:
-                                    continue
-
-                            except Exception as e:
-                                self.handle_exc(e, the_link, par_link)
-                                continue
-
-                            try:
-                                _IS_BASE2, in_base_local= self.ck_for_base(the_link, base_lnks_loc)
-
-                                if _IS_BASE2 and good_suffix:  # IS MAIN_DICT type
-                                    if not in_base_local:
-                                        base_lnks_loc.append(the_link)
-                                    else:
-                                        self.add_any_bse_g(the_link, par_link)
-                                else:                   #if not a home based link
-                                    if not self.ck_g(the_link):  ## add bad suffix here too
-                                        if not _IS_BASE2:
-                                            any_lnk_loc = self.add_any(the_link, par_link)  #does global too
-
-                            except Exception as e:
-                                self.handle_exc(e, the_link, par_link)
-                                continue
-
-            #self.myprint('---returning base_links_local: ' + str(base_lnks_loc))
-            #self.myprint('!! NEW----end get_home_links \n\n')
-            self.MAIN_DICT.update({self.rdone: done_ln_gl_sing})
-            self.MAIN_DICT.update({self.rany: any_link_glob})
-            self.myprint("- done with getlinks-----------\n")
+                    self.findlinks_two(the_link, par_link)
+                             # self.MAIN_DICT.update({self.rdonesingles: done_ln_gl_sing})
+                            # self.MAIN_DICT.update({self.rothers: other_lns_gl})
+                            #
 
             return list(set(base_lnks_loc))
         else:
             return []
 
+            # #----------------------------------------------------------------------get_links-
+
+    def findlinks_two(self, the_link, par_link):
+        done_already_chkd_glob = self.MAIN_DICT.get(self.rdonesingles)
+        self.myprint("Starting Main Check of: " + the_link + "\n")
+        other_lk_loc, new_lnks_loc, base_lnks_loc, ab_links = [], [], [], []
+
+        issame = self.is_same_site_link(the_link)
+
+        if issame:
+            return
+
+        elif the_link not in done_already_chkd_glob:  # if it hasn't been done yet
+            done_already_chkd_glob.append(the_link)
+            in_other_local = self.ck_if_in_other_loc(the_link, other_lk_loc)  #check again
+            if not in_other_local and not self._DONE_YET(the_link):    #NOT done yet  cg = check glob
+                good_suffix = True
+                is_base = False
+                has_bad = False
+
+                try:    #check for good suffix
+                    #self.myprint("new_lnks_loc === going to check bad data next: " + str(THIS_LN))
+                    has_bad, good_suffix = self.ck_bad_data(the_link)  # check for bad data
+                    if has_bad:
+                        return
+
+                    is_base, notused = self.ck_for_base(the_link)
+                    in_base_glob  = self.ck_if_in_base_glob(the_link)
+
+                    if is_base and good_suffix:  # IS MAIN_DICT type
+                        if not in_base_glob:
+                            base_lnks_loc.append(the_link)
+                        #else:
+                            #self.base_add_to_b_globs(the_link, par_link)
+                    else:                   #if not a home based link
+                        if not self.ck_other_ln_glob(the_link):  ## add bad suffix here too
+                            self.add_to_others_glob(the_link, par_link)  #does global too
+
+                except Exception as e:
+                    self.handle_exc(e, the_link, par_link)
+                    return
+
+            self.MAIN_DICT.update({self.rdonesingles: done_already_chkd_glob})
+            self.myprint("- done with getlinks-----------\n")
+            # self.myprint('---returning base_links_local: ' + str(base_lnks_loc))
+            # self.myprint('!! NEW----end get_home_links \n\n')
+
+            return base_lnks_loc
+        else:
+            return []
 
 
       #############----------------------------------MAIN-------------------------
@@ -192,6 +196,7 @@ class LinkCheck(LinkCheckLib):
         try:
             new_base_links_two, new_base_links_one = [], base_only_plain_repeat_here
             repeats = 0
+
             base_len = len(base_only_plain_repeat_here)
             while base_len and repeats < 6:
                 repeats +=1
@@ -214,7 +219,7 @@ class LinkCheck(LinkCheckLib):
     #-------------------------------------------------------------------
 
     def get_more_baselinks(self):
-        base_glob_now = self.MAIN_DICT.get(self.rb)
+        base_glob_now = self.MAIN_DICT.get(self.rbase)
         repeats = 0
         alreadychecked = []
         try:
@@ -231,7 +236,7 @@ class LinkCheck(LinkCheckLib):
                         base_glob_now = base_glob_now.append(new_base_links_here)
                         the_len_b  = len(new_base_links_here)
 
-            self.MAIN_DICT.update({self.rb: base_glob_now})
+            self.MAIN_DICT.update({self.rbase: base_glob_now})
 
         except Exception as e:
             self.myprint("Exception after baselink in base_glob_now: " + str(e))
@@ -240,8 +245,8 @@ class LinkCheck(LinkCheckLib):
 
     def any_link_ck(self):
         self.myprint("Step Two Done")
-        ag= self.MAIN_DICT.get(self.rany)
-        rde= self.MAIN_DICT.get(self.rdone)
+        ag= self.MAIN_DICT.get(self.rothers)
+        rde= self.MAIN_DICT.get(self.rdonesingles)
         any_link_to_check  =  list(set(ag))
 
         try:
@@ -249,9 +254,7 @@ class LinkCheck(LinkCheckLib):
                 for tupy in any_link_to_check:  # check non-MAIN_DICT links
                     rde.append(tupy[0])
                     self.get_simple_response(tupy)
-                # for tup in base_lnks_g:
-                #     self.get_simple_response(tup)
-                self.MAIN_DICT.update({self.rdone: rde})
+                self.MAIN_DICT.update({self.rdonesingles: rde})
 
         except Exception as e:
             if tupy:
@@ -260,12 +263,6 @@ class LinkCheck(LinkCheckLib):
             else:
                 self.myprint((str(e)))
                 return 0, 0
-
-        # rederdatf = self.MAIN_DICT.get(self.redirs)
-        # print()
-        # print('Here are the redirect errors - they should be fixed too:')
-        # for i in rederdatf:
-        #     print(i)
 
 # k = "kaldu.com"
 # s = 'schorrmedia.com/m.html'

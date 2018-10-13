@@ -15,33 +15,33 @@ class LinkCheckLib(object):
         self.ORIGNAMEwww = "ORIGwww" + rand
         self.BASENAME = "BURL" + rand
         self.BASENAMEwww = "BURLwww" + rand
-        self.re = "re_" + rand
-        self.rdone = "rdone_" + rand
-        self.rany = "rany_" + rand
-        self.rb = "rb_" + rand
-        self.redirs = "redirs" + rand
+        self.rerr = "rerr_" + rand
+        self.rdonesingles = "rdone_" + rand
+        self.rothers = "rothers_" + rand
+        self.rbase = "rbase_" + rand
+        self.redirecterrs = "redirecterrs" + rand
 
         err_links = []   # final error links found
         done_ln_glob_singles = []
-        any_link_glob = []
+        other_links_gl = []
         base_lnks_g = []
-        redirs_dat = []
+        redirecterrs_dat = []
 
         self.tlds_list = []
         self.MAIN_DICT.update({self.ORIGNAME: "init"})
         self.MAIN_DICT.update({self.ORIGNAMEwww: "init"})
         self.MAIN_DICT.update({self.BASENAME: "init"})
         self.MAIN_DICT.update({self.BASENAMEwww: "init"})
-        self.MAIN_DICT.update({self.re: err_links})
-        self.MAIN_DICT.update({self.rdone: done_ln_glob_singles})
-        self.MAIN_DICT.update({self.rany: any_link_glob})
-        self.MAIN_DICT.update({self.rb: base_lnks_g})
-        self.MAIN_DICT.update({self.redirs: redirs_dat})
+        self.MAIN_DICT.update({self.rerr: err_links})
+        self.MAIN_DICT.update({self.rdonesingles: done_ln_glob_singles})
+        self.MAIN_DICT.update({self.rothers: other_links_gl})
+        self.MAIN_DICT.update({self.rbase: base_lnks_g})
+        self.MAIN_DICT.update({self.redirecterrs: redirecterrs_dat})
         self.load_tlds()
 
         self.myprint("self.ORIGNAME: " + self.ORIGNAME)
         self.myprint("self.ORIGNAMEwww: " + self.ORIGNAMEwww)
-        self.myprint("name of err list: " + self.re)
+        self.myprint("name of err list: " + self.rerr)
 
     #-----------------------------------------------------------------------------
     def myprint(self, print_str ):
@@ -60,7 +60,7 @@ class LinkCheckLib(object):
 
     #-----------------------------------------------------------------------------
     def rem_errs(self, tlinks=None):
-        done_ln_gl_sing = self.MAIN_DICT.get(self.rdone)
+        done_ln_gl_sing = self.MAIN_DICT.get(self.rdonesingles)
         if tlinks is None:
             tlinks = []
         for link in tlinks:
@@ -70,28 +70,34 @@ class LinkCheckLib(object):
 
     #-----------------------------------------------------------------------------
 
-    def ck_g(self, this_link):
-        any_link_glob = self.MAIN_DICT.get(self.rany)
-        return bool(this_link in [i[0] for i in any_link_glob])
+    def ck_other_ln_glob(self, this_link):
+        other_link_glov = self.MAIN_DICT.get(self.rothers)
+        return bool(this_link in [i[0] for i in other_link_glov])
 
     #-----------------------------------------------------------------------------
      
     def _DONE_YET(self, this_link):
-        done_ln_gl_sing = self.MAIN_DICT.get(self.rdone)
+        done_ln_gl_sing = self.MAIN_DICT.get(self.rdonesingles)
 
         return bool(this_link in done_ln_gl_sing)
     #-----------------------------------------------------------------------------
 
     @classmethod
-    def ck_loc(cls, this_lin, any_link_loc):
-        return bool(this_lin in [i[0] for i in any_link_loc])  # is it local?
+    def ck_if_in_other_loc(cls, this_lin, other_link_loc):
+        return bool(this_lin in [i[0] for i in other_link_loc])  # is it local?
     #-----------------------------------------------------------------------------
 
-    
+
+    def ck_if_in_base_glob(self, this_lin):
+        base_lnks_g = self.MAIN_DICT.get({self.rbase})
+        return bool(this_lin in [i[0] for i in base_lnks_g])  # is it local?
+
+    # -----------------------------------------------------------------------------
+
     def return_errors(self):
 
         finlist = []
-        err_links = self.MAIN_DICT.get(self.re)
+        err_links = self.MAIN_DICT.get(self.rerr)
         
         if err_links is None:
             err_links = []
@@ -220,14 +226,14 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------
 
     def do_response(self, a_link, p_link):
-        rederdat = self.MAIN_DICT.get(self.redirs)
-        done_ln_glob_singles = self.MAIN_DICT.get(self.rdone)
-        any_link_gl = self.MAIN_DICT.get(self.rany)
+        redirecterr = self.MAIN_DICT.get(self.redirecterrs)
+        done_ln_glob_singles = self.MAIN_DICT.get(self.rdonesingles)
+        other_lin_loc = self.MAIN_DICT.get(self.rothers)
         t_err = 0
         resp = None
         try:
             if a_link not in done_ln_glob_singles:
-                if a_link not in any_link_gl:
+                if a_link not in other_lin_loc:
                     done_ln_glob_singles.append(a_link)  ## add to main done list
 
                     session = HTMLSession()
@@ -240,13 +246,13 @@ class LinkCheckLib(object):
                     self.myprint("LINK: in do_response: " + a_link + "  status code: " + str(code))
 
                     if code == 301:
-                        rederdat.append(a_link)  # no need to recheck because it's automatic
+                        redirecterr.append(a_link)  # no need to recheck because it's automatic
 
         except Exception as e:
             self.myprint("GOT AN EXCEPTION inside do_response: " + str(e))
             self.handle_exc(e, a_link, p_link)
             pass
-        self.MAIN_DICT.update({self.redirs: rederdat})
+        self.MAIN_DICT.update({self.redirecterrs: redirecterr})
         return resp, t_err
 
     #----------------------------------------------------------------------get_links-
@@ -313,7 +319,7 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------------
 
     def handle_exc( self, e, tlink, plink):
-        err_links = self.MAIN_DICT.get(self.re)
+        err_links = self.MAIN_DICT.get(self.rerr)
 
         the_err = str(e)
         tbs = the_err[:72]
@@ -327,7 +333,7 @@ class LinkCheckLib(object):
 
         if tlink not in err_links:
             err_links.append((tlink, tbs, plink))
-            self.MAIN_DICT.update({self.re:err_links})
+            self.MAIN_DICT.update({self.rerr:err_links})
             return tlink, tbs
         else:
             return tlink, tbs
@@ -335,13 +341,13 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------------
 
     def ck_status_code(self, t_link, tpar, st_code):
-        err_links = self.MAIN_DICT.get(self.re)
+        err_links = self.MAIN_DICT.get(self.rerr)
         try:
             err_codes = [400, 404, 408, 409]
             if st_code in err_codes:
                 if t_link not in err_links:
                     err_links.append((t_link, st_code, tpar))
-                    self.MAIN_DICT.update({self.re: err_links})
+                    self.MAIN_DICT.update({self.rerr: err_links})
                 return 1
             else:
                 return 0  # ok
