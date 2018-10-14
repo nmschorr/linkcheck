@@ -262,7 +262,7 @@ class LinkCheckLib(object):
 
         r_errs = self.MAIN_DICT.get(self.rerr)
 
-        redirecterr = self.MAIN_DICT.get(self.redirecterrs)
+        # redirecterr = self.MAIN_DICT.get(self.redirecterrs)
         done_ln_glob_singles = self.MAIN_DICT.get(self.rdonesingles)
         other_lin_loc = self.MAIN_DICT.get(self.rothers)
         t_err = 0
@@ -276,7 +276,9 @@ class LinkCheckLib(object):
                     self.myprint("do_response 4")
 
                     session = HTMLSession()
+                    # ---------------------------------------------------------session.get--------------
                     resp = session.get(a_link)
+                    # ----------------------------------------------------------session.get-------------
                     if resp is not None:
                         self.myprint("THIS_LN: " + str(a_link) + " parent: " + p_link)
                         session.close()
@@ -296,7 +298,7 @@ class LinkCheckLib(object):
 
         except Exception as e:
             self.myprint("GOT AN EXCEPTION inside do_response: " + str(e))
-            self.handle_exc(e, a_link, p_link)
+            self.handle_exc(a_link, e, p_link)
 
         #self.MAIN_DICT.update({self.redirecterrs: redirecterr})
         return resp, t_err
@@ -406,7 +408,7 @@ class LinkCheckLib(object):
 
         except Exception as e:
             self.myprint("Exception inside get_simple_response: ")
-            self.handle_exc(e, link_to_ck, parent)
+            self.handle_exc(link_to_ck, e, parent)
             return
 
         try:
@@ -416,7 +418,7 @@ class LinkCheckLib(object):
                 print("response stat: " + str(stat))
                 rdonesings.append(link_to_ck)
                 self.myprint("status: " + str(stat))
-                self.ck_status_code(link_to_ck, str(stat), parent)
+                self.ck_status_code(link_to_ck, stat, parent)
 
             # elif not resp:
             #     rdonesings.append(link_to_ck)
@@ -446,7 +448,7 @@ class LinkCheckLib(object):
             return False
     #-----------------------------------------------------------------------------
 
-    def handle_exc( self, e, tlink, plink):
+    def handle_exc( self, tlink, e, plink):
         err_links = self.MAIN_DICT.get(self.rerr)
 
         the_err = str(e)
@@ -468,14 +470,14 @@ class LinkCheckLib(object):
 
     #-----------------------------------------------------------------------------
 
-    def ck_status_code(self, t_link, st_code, tpar):
+    def ck_status_code(self, t_link, st_code_int, tpar):
         err_links = self.MAIN_DICT.get(self.rerr)
         try:
             err_codes = [400, 404, 408, 409]
-            if st_code in err_codes:
+            if st_code_int in err_codes:
                 if t_link not in err_links:
-                    print("adding error in ck_status_code " + t_link + str(st_code) + tpar)
-                    err_links.append((t_link, st_code, tpar))
+                    print("adding error in ck_status_code " + t_link + str(st_code_int) + tpar)
+                    err_links.append((t_link, st_code_int, tpar))
                     self.MAIN_DICT.update({self.rerr: err_links})
                 return 1
             else:

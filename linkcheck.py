@@ -73,7 +73,7 @@ class LinkCheck(LinkCheckLib):
                 self.myprint("!! added to others: " + the_link)
 
         except Exception as e:
-            self.handle_exc(e, the_link, par_link)
+            self.handle_exc(the_link, e, par_link)
 
 
       #############----------------------------------MAIN-------------------------
@@ -217,7 +217,7 @@ class LinkCheck(LinkCheckLib):
 
         except Exception as e:
             if tupy:
-                self.handle_exc(e, tupy[0], tupy[1])
+                self.handle_exc(tupy[0],e, tupy[1])
             else:
                 self.myprint((str(e)))
 
@@ -228,7 +228,7 @@ class LinkCheck(LinkCheckLib):
 
         except Exception as e:
             if tupy:
-                self.handle_exc(e, tupy[0], tupy[1])
+                self.handle_exc(tupy[0],e, tupy[1])
             else:
                 self.myprint((str(e)))
     #-------------------------------------------------------------------
