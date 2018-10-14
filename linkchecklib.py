@@ -71,6 +71,14 @@ class LinkCheckLib(object):
                 tlinks.remove(link)
         return tlinks
 
+    def rem_errs_tups(self, tlinks=[()]):
+        done_ln_gl_sing = self.MAIN_DICT.get(self.rdonesingles)
+        if tlinks is None:
+            tlinks = []
+        for link in tlinks:
+            if link[0] in done_ln_gl_sing:
+                tlinks.remove(link)
+        return tlinks
     #-----------------------------------------------------------------------------
 
     def ck_other_ln_glob(self, this_link):
