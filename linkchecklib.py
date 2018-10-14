@@ -23,8 +23,8 @@ class LinkCheckLib(object):
 
         err_links = []   # final error links found
         done_ln_glob_singles = []
-        other_links_gl = []
-        base_lnks_g = []
+        other_links_gl = []  #list of tups
+        base_lnks_g = []  #list of tups
         redirecterrs_dat = []
 
         self.tlds_list = []
@@ -76,7 +76,7 @@ class LinkCheckLib(object):
 
     #-----------------------------------------------------------------------------
      
-    def _DONE_YET(self, this_link):
+    def ck_if_in_done_singles_glob(self, this_link):
         done_ln_gl_sing = self.MAIN_DICT.get(self.rdonesingles)
 
         return bool(this_link in done_ln_gl_sing)
@@ -151,29 +151,43 @@ class LinkCheckLib(object):
 
 
     def isTHEparent(self, main_link):  # is it THE parent? part of the main website?
-        lens = 0
-        schemeonly = urlparse(main_link).scheme
-        if schemeonly:
-            lens = len(schemeonly)
-        if lens:
-            frontlen = lens + 3
-            mainew = main_link[frontlen:]
-        else:
-            mainew = main_link
-        self.myprint("new mainew:  " + mainew)
+        self.myprint( "in isTHEparent "  )
 
 
-        # if parsed.scheme != '':
-        #     main_link = parsed.netloc
+        try:
+            lens = 0
+            self.myprint("in isTHEparent 1")
+            urlpar = urlparse(main_link)
 
-        par_loc = self.MAIN_DICT.get(self.BASENAME)
-        par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
-        if mainew in par_loc:
-            return True
-        elif mainew in par_locwww:
-            return True
-        else:
-            return False  # is it the parent?
+            schemeonly = urlpar.scheme
+            self.myprint("in isTHEparent2 ")
+            if schemeonly:
+                lens = len(schemeonly)
+            self.myprint("in isTHEparent ")
+            if lens:
+                frontlen = lens + 3
+                mainew = main_link[frontlen:]
+                self.myprint("in isTHEparent ")
+            else:
+                mainew = main_link
+            self.myprint("new mainew:  " + mainew)
+
+
+    # if parsed.scheme != '':
+    #     main_link = parsed.netloc
+
+            par_loc = self.MAIN_DICT.get(self.BASENAME)
+            self.myprint("in isTHEparent ")
+            par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
+            if mainew in par_loc:
+                return True
+                self.myprint("in isTHEparent ")
+            elif mainew in par_locwww:
+                return True
+            else:
+                return False  # is it the parent?
+        except Exception as e:
+            print(str(e))
     # -----------------------------------------------------------------------
     def is_same_site_link(self, inlink):
         is_same_link = False
@@ -226,14 +240,20 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------
 
     def do_response(self, a_link, p_link):
+        self.myprint("do_response1")
+
         redirecterr = self.MAIN_DICT.get(self.redirecterrs)
         done_ln_glob_singles = self.MAIN_DICT.get(self.rdonesingles)
         other_lin_loc = self.MAIN_DICT.get(self.rothers)
         t_err = 0
         resp = None
         try:
+            self.myprint("do_response 2")
+            self.myprint("THIS_LN: " + str(a_link) + " parent: " + p_link)
             if a_link not in done_ln_glob_singles:
+                self.myprint("do_response 3")
                 if a_link not in other_lin_loc:
+                    self.myprint("do_response 4")
                     done_ln_glob_singles.append(a_link)  ## add to main done list
 
                     session = HTMLSession()
@@ -244,6 +264,9 @@ class LinkCheckLib(object):
                     code = resp.status_code
                     t_err = self.ck_status_code(a_link, p_link, code)  ## if there's    an error
                     self.myprint("LINK: in do_response: " + a_link + "  status code: " + str(code))
+                    e = self.MAIN_DICT.get(self.rerr)
+                    e.append((a_link, code, p_link))
+                    self.MAIN_DICT.update({self.rerr: e})
 
                     if code == 301:
                         redirecterr.append(a_link)  # no need to recheck because it's automatic
@@ -346,6 +369,7 @@ class LinkCheckLib(object):
             err_codes = [400, 404, 408, 409]
             if st_code in err_codes:
                 if t_link not in err_links:
+                    print("adding error in ck_status_code")
                     err_links.append((t_link, st_code, tpar))
                     self.MAIN_DICT.update({self.rerr: err_links})
                 return 1
