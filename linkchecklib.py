@@ -4,6 +4,9 @@ from requests_html import HTMLSession
 from random import random
 from time import perf_counter
 from config import conf_debug
+import requests
+
+
 
 class LinkCheckLib(object):
 
@@ -149,44 +152,49 @@ class LinkCheckLib(object):
 
 
 
-
+#------------------------------------------------------------------------------------------
     def isTHEparent(self, main_link):  # is it THE parent? part of the main website?
-        self.myprint( "in isTHEparent "  )
-
+        schemeonly = ''
+        lens=0
+        self.myprint("in isTHEparent 1")
+        self.myprint("-----mainlink--------------- 7" + main_link)
 
         try:
-            lens = 0
-            self.myprint("in isTHEparent 1")
             urlpar = urlparse(main_link)
-
-            schemeonly = urlpar.scheme
-            self.myprint("in isTHEparent2 ")
-            if schemeonly:
+            self.myprint("-------------------- 5 " )
+            try:
+                schemeonly = urlpar.scheme
                 lens = len(schemeonly)
-            self.myprint("in isTHEparent ")
+            except:
+                schemeonly = ''
+                lens = 0
+
             if lens:
+                self.myprint("-------------------- 4x ")
                 frontlen = lens + 3
                 mainew = main_link[frontlen:]
                 self.myprint("in isTHEparent ")
             else:
+                self.myprint("-------------------- 5x ")
                 mainew = main_link
             self.myprint("new mainew:  " + mainew)
 
 
-    # if parsed.scheme != '':
-    #     main_link = parsed.netloc
+                # if parsed.scheme != '':
+                #     main_link = parsed.netloc
 
             par_loc = self.MAIN_DICT.get(self.BASENAME)
             self.myprint("in isTHEparent ")
             par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
+            self.myprint("in isTHEparent ")
             if mainew in par_loc:
                 return True
-                self.myprint("in isTHEparent ")
             elif mainew in par_locwww:
                 return True
             else:
                 return False  # is it the parent?
         except Exception as e:
+            print("-------------------------------------------------except in isTHEparent-------------------------------------------------")
             print(str(e))
     # -----------------------------------------------------------------------
     def is_same_site_link(self, inlink):
@@ -194,8 +202,9 @@ class LinkCheckLib(object):
         orig = self.MAIN_DICT.get(self.ORIGNAME)
         origwww = self.MAIN_DICT.get(self.ORIGNAMEwww)
 
-        (scheme, netloc, path, params, query, fragment) = urlparse(inlink)
-        rebuild = netloc + path + params + query
+        pf = urlparse(inlink)
+
+        rebuild = pf.netloc + pf.path + pf.params + pf.query
 
         if (rebuild == orig) or (rebuild == origwww):
             is_same_link = True
@@ -257,7 +266,7 @@ class LinkCheckLib(object):
                     done_ln_glob_singles.append(a_link)  ## add to main done list
 
                     session = HTMLSession()
-                    resp = session.get(a_link, timeout=7.0)
+                    resp = session.get(a_link)
                     self.myprint("THIS_LN: " + str(a_link) + " parent: " + p_link)
                     session.close()
 
@@ -321,14 +330,74 @@ class LinkCheckLib(object):
             for g in goods:      # in case tld list fails for some reason
                 if link.endswith(g):
                     answ2 = True
-            if answ == True or answ2 == True:
+
+            if answ is True or answ2 is True:
                 final_answer = True
         except Exception as e:
             self.myprint("Exception in has_correct_suffix: " + str(e))
         return final_answer
     #-----------------------------------------------------------------------------
+    def add_to_others_glob(self, tlink, parent_local):  # Adding this MAIN_DICT link to any glob
+        self.myprint("----------------------------!!! !!!! in add_to_others_glob: ")
+        is_par = self.isTHEparent(tlink)
+        if is_par:
+            return
+        other_lns_gl = self.MAIN_DICT.get(self.rothers)
+
+        try:
+            glob_bool = bool(tlink in [i[0] for i in other_lns_gl])
+            if not glob_bool:
+                self.myprint("appending to others: ")
+                other_lns_gl.append((tlink, parent_local))  # add if not there
+
+        except Exception as e:
+            self.myprint("exception in add_others: " + str(e))
+
+        self.MAIN_DICT.update({self.rothers: other_lns_gl})
+        return
+
+    # ---------------------------------------------------------------------------------------
+    def base_add_to_b_globs(self, zlink, parent_local):  # Adding this MAIN_DICT link to MAIN_DICT glob
+        base_lnks_g = self.MAIN_DICT.get(self.rbase)
+
+        try:
+            if base_lnks_g:
+                _IN_BASE_GLOB = bool(zlink in [i[0] for i in base_lnks_g])
+                if not _IN_BASE_GLOB:  # if not already in this
+                    base_lnks_g.append((zlink, parent_local))
+                    self.myprint("Adding this BASE LINK to MAIN_DICT glob: " + zlink)
+
+        except Exception as e:
+            self.myprint("Exception base_add_to_b_globs: " + str(e))
+        base_lnks_g2 = list(set(base_lnks_g))
+        self.MAIN_DICT.update({self.rbase: base_lnks_g2})
 
     #-----------------------------------------------------------------------------
+    #---------------------------------------------------------------------------------------
+    def get_simple_response(self, lin_and_par_tup):
+
+        rdonesings = self.MAIN_DICT.get(self.rdonesingles)
+
+
+        self.myprint("inside get_simple_response: ")
+        link_to_ck, parent = lin_and_par_tup[0], lin_and_par_tup[1]
+        try:
+            resp = requests.head(link_to_ck, timeout=7.0)
+            self.myprint("THIS_LN: " + link_to_ck + " parent: " + parent + " in get_simple_response")
+            stat = resp.status_code
+            print("response stat: " + stat)
+            rdonesings.append(link_to_ck)
+            self.myprint("status: " + stat)
+            self.ck_status_code(link_to_ck, parent, stat)
+
+            self.MAIN_DICT.update({self.rdonesingles: rdonesings})
+
+        except Exception as e:
+            self.myprint("Exception inside get_simple_response: ")
+            a, b = self.handle_exc(e, link_to_ck, parent)
+            return
+        return
+#---------------------------------------------------------------------------------------
 
     def ck_tld_sufx(self, alink):
         the_suf = alink.lower().split(".")[-1]
