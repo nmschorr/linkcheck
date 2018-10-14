@@ -258,6 +258,7 @@ class LinkCheckLib(object):
 
     def do_response(self, a_link, p_link):
         self.myprint("do_response1")
+        r_errs = self.MAIN_DICT.get(self.rerr)
 
         redirecterr = self.MAIN_DICT.get(self.redirecterrs)
         done_ln_glob_singles = self.MAIN_DICT.get(self.rdonesingles)
@@ -274,20 +275,22 @@ class LinkCheckLib(object):
 
                     session = HTMLSession()
                     resp = session.get(a_link)
-                    self.myprint("THIS_LN: " + str(a_link) + " parent: " + p_link)
-                    session.close()
-                    done_ln_glob_singles.append(a_link)  ## add to main done list
-                    self.MAIN_DICT.update({self.rdonesingles: done_ln_glob_singles})
+                    if resp is not None:
+                        self.myprint("THIS_LN: " + str(a_link) + " parent: " + p_link)
+                        session.close()
+                        done_ln_glob_singles.append(a_link)  ## add to main done list
+                        self.MAIN_DICT.update({self.rdonesingles: done_ln_glob_singles})
 
-                    code = resp.status_code
-                    t_err = self.ck_status_code(a_link, p_link, code)  ## if there's    an error
-                    self.myprint("LINK: in do_response: " + a_link + "  status code: " + str(code))
-                    r_errs = self.MAIN_DICT.get(self.rerr)
-                    r_errs.append((a_link, code, p_link))
-                    self.MAIN_DICT.update({self.rerr: r_errs})
+                        code = resp.status_code
+                        t_err = self.ck_status_code(a_link, p_link, code)  ## if there's    an error
+                        self.myprint("LINK: in do_response: " + a_link + "  status code: " + str(code))
+                        r_errs.append((a_link, code, p_link))
+                    else:
+                        r_errs.append((a_link, 404, p_link))
 
                     # if code == 301:
                     #     redirecterr.append(a_link)  # no need to recheck because it's automatic
+                    self.MAIN_DICT.update({self.rerr: r_errs})
 
         except Exception as e:
             self.myprint("GOT AN EXCEPTION inside do_response: " + str(e))
@@ -391,7 +394,7 @@ class LinkCheckLib(object):
         self.myprint("inside get_simple_response: ")
         link_to_ck, parent = lin_and_par_tup[0], lin_and_par_tup[1]
         try:
-            resp = requests.head(link_to_ck, timeout=7.0)
+            resp = requests.head(link_to_ck)
             self.myprint("THIS_LN: " + link_to_ck + " parent: " + parent + " in get_simple_response")
             stat = resp.status_code
             print("response stat: " + stat)
@@ -403,7 +406,7 @@ class LinkCheckLib(object):
 
         except Exception as e:
             self.myprint("Exception inside get_simple_response: ")
-            a, b = self.handle_exc(e, link_to_ck, parent)
+            self.handle_exc(e, link_to_ck, parent)
             return
         return
 #---------------------------------------------------------------------------------------

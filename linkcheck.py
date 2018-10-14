@@ -6,23 +6,26 @@ from urllib.parse import urlparse
 from linkchecklib import LinkCheckLib
 
 class LinkCheck(LinkCheckLib):
+    base_only_plain_repeat_tup = []
 
     def __init__(self):
         super().__init__()
+        base_only_plain_repeat_tup = []
+        self.base_only_plain_repeat_tup = base_only_plain_repeat_tup
+
 
     # #----------------------------------------------------------------------get_links-
-    def get_links(self, mainlin, par_link):
-        self.myprint(" in get_links: " + mainlin)
+
+    def get_links_for_one_pair(self, mainlin, par_link):
         done_ln_gl_sing = self.MAIN_DICT.get(self.rdonesingles)
         if mainlin not in done_ln_gl_sing:
             self.myprint(" in get_links:2 " + mainlin)
 
-            #other_lk_loc, new_lnks_loc, base_lnks_loc_tup, response, ab_links = [], [], [], "0", []
             # #---------------  web response get here!!!!!!!!------------------------web response get here!!!!!!!!--------
             response, resp_err = self.do_response(mainlin, par_link)
             # #---------------  web response get here!!!!!!!!------------------------web response get here!!!!!!!!--------
 
-            if resp_err == 0:  ## GOOD!  0 is good to continue
+            if response is not None:  ## GOOD!  0 is good to continue
                 try:
                     ab_links = response.html.absolute_links
                     new_lnks_loc2 = [ab for ab in ab_links]
@@ -32,19 +35,18 @@ class LinkCheck(LinkCheckLib):
                     return
 
                 for the_link in new_lnks_loc:
-                    issame_url = self.is_same_site_link(the_link)
-                    if issame_url:
+                    if self.is_same_site_link(the_link):
                         continue
                     self.getlinks_base_ck_two(the_link, par_link)
-
-        else:
-            return
 
 # #----------------------------------------------------------------------get_links-
 
     def getlinks_base_ck_two(self, the_link, par_link):
         rbas = self.MAIN_DICT.get(self.rbase)
         self.myprint("Starting parsing of: " + the_link + "\n")
+        # for ttup in  self.base_only_plain_repeat_tup:
+        #     the_link = ttup[0]
+        #     par_link = ttup[1]
 
         try:    #check for good suffix
             self.myprint("new_lnks_loc === going to check bad data next: " + the_link)
@@ -62,6 +64,7 @@ class LinkCheck(LinkCheckLib):
                     self.myprint("!! adding to base: " + the_link)
                     rbas.append((the_link, par_link))
                     self.MAIN_DICT.update({self.rbase: rbas})
+                    self.base_only_plain_repeat_tup.append((the_link, par_link))
 
             else:
                 self.add_to_others_glob(the_link, par_link)  #does global too
@@ -73,7 +76,6 @@ class LinkCheck(LinkCheckLib):
 
       #############----------------------------------MAIN-------------------------
     def main_setup(self, msite):
-        tstart = perf_counter()
         self.MAIN_DICT.update({ self.ORIGNAME: msite })
         w_site = self.mkwww(msite)
         self.MAIN_DICT.update({self.ORIGNAMEwww:w_site})
@@ -86,21 +88,19 @@ class LinkCheck(LinkCheckLib):
         self.MAIN_DICT.update({ self.BASENAMEwww: base_parsed_www })
         self.myprint('In main() Getting first address: ' + link_w_scheme)
         return link_w_scheme
+
+
+
       #############----------------------------------MAIN-------------------------
 
     def main(self, msite="a.htm"):
+        tstart = perf_counter()
         link_w_scheme = self.main_setup(msite)
         try:
             #############---------step ONE:
-            base_only_plain_repeat_tup = self.get_links(link_w_scheme, link_w_scheme)  #first set of MAIN_DICT
+            self.get_links_for_one_pair(link_w_scheme, link_w_scheme)  #first set of MAIN_DICT
             self.myprint("Step One Done with base_only_plain_repeat")   ##first time:  HOME PAGE ONLY  ##first time
-            new_base_tups = self.main_loop(the_link, par_link)
-            if base_only_plain_repeat_tup:
-                base_first_len = len(base_only_plain_repeat_tup)
-                print("length base_only_plain_repeat: " + str(base_first_len))
-                print("xxxxxxxxxxxxxxxxxx 1")
-                new_base_tups = self.main_loop(base_only_plain_repeat_tup, link_w_scheme)
-                print("xxxxxxxxxxxxxxxx 2")
+            self.main_loop_get_links(link_w_scheme, link_w_scheme)
 
         except Exception as e:
             self.myprint("Exception inside main: " + str(e))
@@ -112,22 +112,22 @@ class LinkCheck(LinkCheckLib):
         self.myprint("Errors: ")
         for i in finlist:
                print("err: " + i[0])
-        print("totalTime: " + str(perf_counter() - tstart))
+       # print("totalTime: " + str(perf_counter() - tstart))
         return finlist
 
     #-------------------------------------------------------------------
 
-    def main_loop(self, base_only_plain_repeat_tup2, link_w_scheme_here):
+    def main_loop_get_links(self, link_w_scheme_here):
         self.myprint("In step_one")
         try:
             repeats = 0
-
-            base_len = len(base_only_plain_repeat_tup2)
+            new_base_links_two_tup = []
+            base_len = len(self.base_only_plain_repeat_tup2)
             while base_len and repeats < 6:
                 self.myprint("step_one 1xxx")
                 repeats +=1
                 self.myprint('\n' + " -----repeats: " + str(repeats) + "--------- In set_one loop ")
-                for baselink in base_only_plain_repeat_tup2[0]:
+                for baselink in self.base_only_plain_repeat_tup2[0]:
                     self.myprint("step_one 1aaaaa")
                     print("xxxxxxxxxxxxxxxxxx 3 about to check if parent-------------------------------------")
                     isparent_bool= self.isTHEparent(baselink)
@@ -138,18 +138,18 @@ class LinkCheck(LinkCheckLib):
                         self.myprint("step_one 2")
                         self.myprint('\n' + " -----repeats: " + str(repeats) + "--------- In set_one loop ")
           #---------------------getlinks !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                        new_base_links_tmp = self.get_links(baselink, link_w_scheme_here)  # first set of MAIN_DICT
+                        new_base_links_tmp = self.get_links_for_one_pair(baselink, link_w_scheme_here)  # first set of MAIN_DICT
 
                         self.myprint("step_one 3")
-                        new_base_links_two = self.rem_errs_tups(new_base_links_tmp)
+                        new_base_links_two_tup = self.rem_errs_tups(new_base_links_tmp)
 
                 self.myprint("step_one 3")
                 print("xxxxxxxxxxxxxxxxxx 5")
 
                 self.myprint("five3")
-                if new_base_links_two:
+                if new_base_links_two_tup:
                     base_glob_now = self.MAIN_DICT.get(self.rbase)
-                    base_glob_now.append(new_base_links_two)
+                    base_glob_now.append(new_base_links_two_tup)
                     #self.MAIN_DICT.update({self.rbase:base_glob_now})
                 else:
                     continue
@@ -174,7 +174,7 @@ class LinkCheck(LinkCheckLib):
                     if baselink not in alreadychecked:
                         base_lin, BASE_URL = baselink[0], baselink[1]  # split
 
-                        new_base_links_here = self.get_links(base_lin, BASE_URL)  # first set of MAIN_DICT
+                        new_base_links_here = self.get_links_for_one_pair(base_lin, BASE_URL)  # first set of MAIN_DICT
                         self.myprint("------------------------xxxxxxx")
 
                         alreadychecked.append(baselink)
@@ -193,24 +193,33 @@ class LinkCheck(LinkCheckLib):
         self.myprint("-----------------------------------In other_links_big_check2")
         other_to_ck= self.MAIN_DICT.get(self.rothers)
         done_singles= self.MAIN_DICT.get(self.rdonesingles)
+        base_to_ck= self.MAIN_DICT.get(self.rbase)
+        tupy = None
 
         self.myprint("done_singles: " + str(done_singles)+"other_to_ck: " + str(other_to_ck))
         #self.myprint("-----------------------------------In other_links_big_check2")
 
         try:
             if other_to_ck:
-
                 for tupy in other_to_ck:  # check non-MAIN_DICT links
                     a, b = self.get_simple_response(tupy)
-
 
         except Exception as e:
             if tupy:
                 a, b = self.handle_exc(e, tupy[0], tupy[1])
-                return
             else:
                 self.myprint((str(e)))
-                return
+
+        try:
+            if base_to_ck:
+                for tupy in base_to_ck:  # check non-MAIN_DICT links
+                    a, b = self.get_simple_response(tupy)
+
+        except Exception as e:
+            if tupy:
+                a, b = self.handle_exc(e, tupy[0], tupy[1])
+            else:
+                self.myprint((str(e)))
     #-------------------------------------------------------------------
 
 k = "kaldu.com"
