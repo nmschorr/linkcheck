@@ -263,28 +263,29 @@ class LinkCheckLib(object):
                 self.myprint("do_response 3")
                 if a_link not in other_lin_loc:
                     self.myprint("do_response 4")
-                    done_ln_glob_singles.append(a_link)  ## add to main done list
 
                     session = HTMLSession()
                     resp = session.get(a_link)
                     self.myprint("THIS_LN: " + str(a_link) + " parent: " + p_link)
                     session.close()
+                    done_ln_glob_singles.append(a_link)  ## add to main done list
+                    self.MAIN_DICT.update({self.rdonesingles: done_ln_glob_singles})
 
                     code = resp.status_code
                     t_err = self.ck_status_code(a_link, p_link, code)  ## if there's    an error
                     self.myprint("LINK: in do_response: " + a_link + "  status code: " + str(code))
-                    e = self.MAIN_DICT.get(self.rerr)
-                    e.append((a_link, code, p_link))
-                    self.MAIN_DICT.update({self.rerr: e})
+                    r_errs = self.MAIN_DICT.get(self.rerr)
+                    r_errs.append((a_link, code, p_link))
+                    self.MAIN_DICT.update({self.rerr: r_errs})
 
-                    if code == 301:
-                        redirecterr.append(a_link)  # no need to recheck because it's automatic
+                    # if code == 301:
+                    #     redirecterr.append(a_link)  # no need to recheck because it's automatic
 
         except Exception as e:
             self.myprint("GOT AN EXCEPTION inside do_response: " + str(e))
             self.handle_exc(e, a_link, p_link)
-            pass
-        self.MAIN_DICT.update({self.redirecterrs: redirecterr})
+
+        #self.MAIN_DICT.update({self.redirecterrs: redirecterr})
         return resp, t_err
 
     #----------------------------------------------------------------------get_links-
@@ -356,21 +357,21 @@ class LinkCheckLib(object):
         self.MAIN_DICT.update({self.rothers: other_lns_gl})
         return
 
-    # ---------------------------------------------------------------------------------------
-    def base_add_to_b_globs(self, zlink, parent_local):  # Adding this MAIN_DICT link to MAIN_DICT glob
-        base_lnks_g = self.MAIN_DICT.get(self.rbase)
-
-        try:
-            if base_lnks_g:
-                _IN_BASE_GLOB = bool(zlink in [i[0] for i in base_lnks_g])
-                if not _IN_BASE_GLOB:  # if not already in this
-                    base_lnks_g.append((zlink, parent_local))
-                    self.myprint("Adding this BASE LINK to MAIN_DICT glob: " + zlink)
-
-        except Exception as e:
-            self.myprint("Exception base_add_to_b_globs: " + str(e))
-        base_lnks_g2 = list(set(base_lnks_g))
-        self.MAIN_DICT.update({self.rbase: base_lnks_g2})
+    # # ---------------------------------------------------------------------------------------
+    # def base_add_to_b_globs(self, zlink, parent_local):  # Adding this MAIN_DICT link to MAIN_DICT glob
+    #     base_lnks_g = self.MAIN_DICT.get(self.rbase)
+    #
+    #     try:
+    #         if base_lnks_g:
+    #             _IN_BASE_GLOB = bool(zlink in [i[0] for i in base_lnks_g])
+    #             if not _IN_BASE_GLOB:  # if not already in this
+    #                 base_lnks_g.append((zlink, parent_local))
+    #                 self.myprint("Adding this BASE LINK to MAIN_DICT glob: " + zlink)
+    #
+    #     except Exception as e:
+    #         self.myprint("Exception base_add_to_b_globs: " + str(e))
+    #     base_lnks_g2 = list(set(base_lnks_g))
+    #     self.MAIN_DICT.update({self.rbase: base_lnks_g2})
 
     #-----------------------------------------------------------------------------
     #---------------------------------------------------------------------------------------

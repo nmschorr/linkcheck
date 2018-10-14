@@ -20,21 +20,10 @@ class LinkCheck(LinkCheckLib):
             other_lk_loc, new_lnks_loc, base_lnks_loc_tup, response, ab_links = [], [], [], "0", []
             # #---------------  web response get here!!!!!!!!--------------------------------
             response, resp_err = self.do_response(mainlin, par_link)
-            done_ln_gl_sing.append(mainlin)
             self.myprint("mainlin: " + mainlin  )
             self.myprint("Status code: " + str(response.status_code))
 
-            try:
-                if response.ok is True:
-                    self.myprint("Status code: " + str(response.status_code))
-                    e = self.MAIN_DICT.get(self.rerr)
-                    e.append((mainlin, response.status_code, par_link))
-                    self.MAIN_DICT.update({self.rerr: e})
-            except Exception as e:
-                self.myprint("Exception no valid response from: " + mainlin)
-                return
-
-            if resp_err == 0:  ## if there's an error  - 0 is good to continue
+            if resp_err == 0:  ## 0 is good to continue
                 try:
                     ab_links = response.html.absolute_links
                     new_lnks_loc2 = [ab for ab in ab_links]
@@ -44,13 +33,14 @@ class LinkCheck(LinkCheckLib):
                     return
 
                 for the_link in new_lnks_loc:
+                    issame = self.is_same_site_link(the_link)
+                    if issame:
+                        continue
                     base = self.getlinks_inside(the_link, par_link)
                              # self.MAIN_DICT.update({self.rdonesingles: done_ln_gl_sing})
                             # self.MAIN_DICT.update({self.rothers: other_lns_gl})
                     if base:
                         base_lnks_loc_tup.append((the_link, par_link))
-
-            self.MAIN_DICT.update({self.rdonesingles: done_ln_gl_sing})
 
             return list(set(base_lnks_loc_tup))
         else:
@@ -62,16 +52,12 @@ class LinkCheck(LinkCheckLib):
         done_already_singles_g = self.MAIN_DICT.get(self.rdonesingles)
         self.myprint("Starting parsing of: " + the_link + "\n")
 
-        issame = self.is_same_site_link(the_link)
-        if issame:
-            return
+        # issame = self.is_same_site_link(the_link)
+        # if issame:
+        #     return
 
-        elif the_link not in done_already_singles_g:  # if it hasn't been done yet
+        if the_link not in done_already_singles_g:  # if it hasn't been done yet
             self.myprint("in elif the_link")
-            ###done_already_singles_g.append(the_link)
-            good_suffix = True
-            is_base = False
-            has_bad = False
 
             try:    #check for good suffix
                 self.myprint("new_lnks_loc === going to check bad data next: " + the_link)
@@ -102,7 +88,6 @@ class LinkCheck(LinkCheckLib):
                 return
 
         self.MAIN_DICT.update({self.rdonesingles: done_already_singles_g})
-        #self.MAIN_DICT.update({self.rothers: add_to_others_glob})
 
 
       #############----------------------------------MAIN-------------------------
@@ -129,7 +114,7 @@ class LinkCheck(LinkCheckLib):
                 base_first_len = len(base_only_plain_repeat_tup)
                 print("length base_only_plain_repeat: " + str(base_first_len))
                 print("xxxxxxxxxxxxxxxxxx 1")
-                self.step_one(base_only_plain_repeat_tup, link_w_scheme)
+                new_base_tups = self.main_step_one_for_base(base_only_plain_repeat_tup, link_w_scheme)
                 print("xxxxxxxxxxxxxxxx 2")
 
         except Exception as e:
@@ -147,11 +132,10 @@ class LinkCheck(LinkCheckLib):
 
     #-------------------------------------------------------------------
 
-    def step_one(self, base_only_plain_repeat_tup2, link_w_scheme_here):
+    def main_step_one_for_base(self, base_only_plain_repeat_tup2, link_w_scheme_here):
         self.myprint("In step_one")
-        self.myprint("step_one 0c")
         try:
-            new_base_links_two, new_base_links_one = [], base_only_plain_repeat_tup2
+            new_base_links_two, new_base_links_one_tups = [], base_only_plain_repeat_tup2
             repeats = 0
 
             base_len = len(base_only_plain_repeat_tup2)
@@ -159,7 +143,7 @@ class LinkCheck(LinkCheckLib):
                 self.myprint("step_one 1xxx")
                 repeats +=1
                 self.myprint('\n' + " -----repeats: " + str(repeats) + "--------- In set_one loop ")
-                for baselink in new_base_links_one[0]:
+                for baselink in new_base_links_one_tups[0]:
                     self.myprint("step_one 1aaaaa")
                     print("xxxxxxxxxxxxxxxxxx 3 about to check if parent-------------------------------------")
                     isparent_bool= self.isTHEparent(baselink)
@@ -172,18 +156,23 @@ class LinkCheck(LinkCheckLib):
                         new_base_links_tmp = self.get_links(baselink, link_w_scheme_here)  # first set of MAIN_DICT
                         self.myprint("step_one 3")
                         new_base_links_two = self.rem_errs(new_base_links_tmp)
+
                 self.myprint("step_one 3")
                 print("xxxxxxxxxxxxxxxxxx 5")
 
                 base_len = len(new_base_links_two)
                 self.myprint("five3")
                 if base_len > 0:
-                    new_base_links_one = new_base_links_two
+                    base_glob_now = self.MAIN_DICT.get(self.rbase)
+                    base_glob_now.append(new_base_links_two)
+                    #self.MAIN_DICT.update({self.rbase:base_glob_now})
                 else:
                     continue
 
         except Exception as e:
             self.myprint("Exception inside step_one-------------------------------------------: " + str(e))
+
+        return new_base_links_one_tups
 
     #-------------------------------------------------------------------
 
