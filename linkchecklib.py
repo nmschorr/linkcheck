@@ -71,14 +71,14 @@ class LinkCheckLib(object):
                 tlinks.remove(link)
         return tlinks
 
-    def rem_errs_tups(self, tlinks=None):
+    def rem_errs_tups(self, tlinks_tups=None):
         done_ln_gl_sing = self.MAIN_DICT.get(self.rdonesingles)
-        if tlinks is None:
-            tlinks = []
-        for link in tlinks:
+        if tlinks_tups is None:
+            tlinks_tups = []
+        for link in tlinks_tups:
             if link[0] in done_ln_gl_sing:
-                tlinks.remove(link)
-        return tlinks
+                tlinks_tups.remove(link)
+        return tlinks_tups
     #-----------------------------------------------------------------------------
 
     def ck_other_ln_glob(self, this_link):
@@ -165,12 +165,12 @@ class LinkCheckLib(object):
     def isTHEparent(self, main_link):  # is it THE parent? part of the main website?
         schemeonly = ''
         lens=0
-        self.myprint("in isTHEparent 1")
-        self.myprint("-----mainlink--------------- 7" + main_link)
+        #self.myprint("in isTHEparent 1")
+        #self.myprint("-----mainlink--------------- 7" + main_link)
 
         try:
             urlpar = urlparse(main_link)
-            self.myprint("-------------------- 5 " )
+            #self.myprint("-------------------- 5 " )
             try:
                 schemeonly = urlpar.scheme
                 lens = len(schemeonly)
@@ -179,23 +179,23 @@ class LinkCheckLib(object):
                 lens = 0
 
             if lens:
-                self.myprint("-------------------- 4x ")
+                #self.myprint("-------------------- 4x ")
                 frontlen = lens + 3
                 mainew = main_link[frontlen:]
-                self.myprint("in isTHEparent ")
+                #self.myprint("in isTHEparent ")
             else:
-                self.myprint("-------------------- 5x ")
+                #self.myprint("-------------------- 5x ")
                 mainew = main_link
-            self.myprint("new mainew:  " + mainew)
+            #self.myprint("new mainew:  " + mainew)
 
 
                 # if parsed.scheme != '':
                 #     main_link = parsed.netloc
 
             par_loc = self.MAIN_DICT.get(self.BASENAME)
-            self.myprint("in isTHEparent ")
+            #self.myprint("in isTHEparent ")
             par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
-            self.myprint("in isTHEparent ")
+            #self.myprint("in isTHEparent ")
             if mainew in par_loc:
                 return True
             elif mainew in par_locwww:
@@ -266,42 +266,38 @@ class LinkCheckLib(object):
         done_ln_glob_singles = self.MAIN_DICT.get(self.rdonesingles)
         other_lin_loc = self.MAIN_DICT.get(self.rothers)
         t_err = 0
-        resp = None
+        the_big_response = None
         try:
-            self.myprint("do_response 2")
+            #self.myprint("do_response 2")
             self.myprint("THIS_LN: " + str(a_link) + " parent: " + p_link)
             if a_link not in done_ln_glob_singles:
-                self.myprint("do_response 3")
+                #self.myprint("do_response 3")
                 if a_link not in other_lin_loc:
-                    self.myprint("do_response 4")
+                    #self.myprint("do_response 4")
 
                     session = HTMLSession()
                     # ---------------------------------------------------------session.get--------------
-                    resp = session.get(a_link)
+                    the_big_response = session.get(a_link)
                     # ----------------------------------------------------------session.get-------------
-                    if resp is not None:
+                    if the_big_response is not None:
                         self.myprint("THIS_LN: " + str(a_link) + " parent: " + p_link)
                         session.close()
                         done_ln_glob_singles.append(a_link)  ## add to main done list
                         self.MAIN_DICT.update({self.rdonesingles: done_ln_glob_singles})
 
-                        code = resp.status_code
+                        code = the_big_response.status_code
                         self.ck_status_code(a_link, code, p_link)  ## if there's    an error
                         self.myprint("LINK: in do_response: " + a_link + "  status code: " + str(code))
-                        #r_errs.append((a_link, code, p_link))
                     else:
                         r_errs.append((a_link, 404, p_link))
 
-                    # if code == 301:
-                    #     redirecterr.append(a_link)  # no need to recheck because it's automatic
                     self.MAIN_DICT.update({self.rerr: r_errs})
 
         except Exception as e:
             self.myprint("GOT AN EXCEPTION inside do_response: " + str(e))
             self.handle_exc(a_link, e, p_link)
 
-        #self.MAIN_DICT.update({self.redirecterrs: redirecterr})
-        return resp, t_err
+        return the_big_response
 
     #----------------------------------------------------------------------get_links-
 
@@ -363,7 +359,7 @@ class LinkCheckLib(object):
         try:
             glob_bool = bool(tlink in [i[0] for i in other_lns_gl])
             if not glob_bool:
-                self.myprint("appending to others: ")
+                #self.myprint("appending to others: ")
                 other_lns_gl.append((tlink, parent_local))  # add if not there
 
         except Exception as e:
@@ -372,39 +368,28 @@ class LinkCheckLib(object):
         self.MAIN_DICT.update({self.rothers: other_lns_gl})
         return
 
-    # # ---------------------------------------------------------------------------------------
-    # def base_add_to_b_globs(self, zlink, parent_local):  # Adding this MAIN_DICT link to MAIN_DICT glob
-    #     base_lnks_g = self.MAIN_DICT.get(self.rbase)
-    #
-    #     try:
-    #         if base_lnks_g:
-    #             _IN_BASE_GLOB = bool(zlink in [i[0] for i in base_lnks_g])
-    #             if not _IN_BASE_GLOB:  # if not already in this
-    #                 base_lnks_g.append((zlink, parent_local))
-    #                 self.myprint("Adding this BASE LINK to MAIN_DICT glob: " + zlink)
-    #
-    #     except Exception as e:
-    #         self.myprint("Exception base_add_to_b_globs: " + str(e))
-    #     base_lnks_g2 = list(set(base_lnks_g))
-    #     self.MAIN_DICT.update({self.rbase: base_lnks_g2})
-
     #-----------------------------------------------------------------------------
     #---------------------------------------------------------------------------------------
     def get_simple_response(self, lin_and_par_tup):
+
+        rdone_sings = self.MAIN_DICT.get(self.rdonesingles)
+        if lin_and_par_tup[0] in rdone_sings:
+            print('!!!!!============================found dupe: ')
+            return
+
         if not lin_and_par_tup:
             return
 
-        rdonesings = self.MAIN_DICT.get(self.rdonesingles)
-        from time import sleep
         parent = "empty"
-        resp = None
-        self.myprint("inside get_simple_response: ")
-        print("here is the tuple : " + str(lin_and_par_tup) )
+        the_response_simple = None
+        #self.myprint("inside get_simple_response: ")
+        #print("here is the tuple : " + str(lin_and_par_tup) )
         link_to_ck, parent = lin_and_par_tup[0], lin_and_par_tup[1]
-        self.myprint("trying THIS_LN: " + link_to_ck + " parent: " + parent + " in get_simple_response")
+
+                #self.myprint("trying THIS_LN: " + link_to_ck + " parent: " + parent + " in get_simple_response")
 
         try:
-            resp = requests.head(link_to_ck)
+            the_response_simple = requests.head(link_to_ck)
 
         except Exception as e:
             self.myprint("Exception inside get_simple_response: ")
@@ -412,27 +397,17 @@ class LinkCheckLib(object):
             return
 
         try:
-            if resp:
-                self.myprint("THIS_LN: " + link_to_ck + " parent: " + parent + " in get_simple_response")
-                stat = resp.status_code
-                print("response stat: " + str(stat))
-                rdonesings.append(link_to_ck)
-                self.myprint("status: " + str(stat))
+            if the_response_simple:
+                self.myprint("THIS_LN: " + link_to_ck + " parent: " + parent )
+                stat = the_response_simple.status_code
+                rdone_sings.append(link_to_ck)
+                #self.myprint("status: " + str(stat))
                 self.ck_status_code(link_to_ck, stat, parent)
 
-            # elif not resp:
-            #     rdonesings.append(link_to_ck)
-            #     print("no response for HEAD from get_simple_response for: " + link_to_ck)
-            #     err_links = self.MAIN_DICT.get(self.rerr)
-            #     err_links.append((link_to_ck, 404, parent))
-            #     self.MAIN_DICT.update({self.rerr: err_links})
-
-            self.MAIN_DICT.update({self.rdonesingles: rdonesings})
-
+            self.MAIN_DICT.update({self.rdonesingles: rdone_sings})
 
         except Exception as e:
             self.myprint("Exception inside get_simple_response: " + str(e))
-            #self.handle_exc(e, link_to_ck, parent)
 
 
 #---------------------------------------------------------------------------------------
@@ -452,7 +427,7 @@ class LinkCheckLib(object):
         err_links = self.MAIN_DICT.get(self.rerr)
 
         the_err = str(e)
-        tbs = the_err[:72]
+        the_err_str = the_err[:72]
         self.myprint('!!!!! Inside handle_exc. Error------------------> ' + the_err)
 
         badlist = ["Document is empty","object has no attribute","ConnectionResetError","RemoteDisconnected"]
@@ -462,11 +437,8 @@ class LinkCheckLib(object):
                 return
 
         if tlink not in err_links:
-            err_links.append((tlink, tbs, plink))
+            err_links.append((tlink, the_err_str, plink))
             self.MAIN_DICT.update({self.rerr:err_links})
-            return tlink, tbs
-        else:
-            return tlink, tbs
 
     #-----------------------------------------------------------------------------
 
@@ -476,7 +448,7 @@ class LinkCheckLib(object):
             err_codes = [400, 404, 408, 409]
             if st_code_int in err_codes:
                 if t_link not in err_links:
-                    print("adding error in ck_status_code " + t_link + str(st_code_int) + tpar)
+                    #self.myprint("adding error in ck_status_code " + t_link + str(st_code_int) + tpar)
                     err_links.append((t_link, st_code_int, tpar))
                     self.MAIN_DICT.update({self.rerr: err_links})
                 return 1
@@ -484,14 +456,12 @@ class LinkCheckLib(object):
                 return 0  # ok
         except Exception as e:
             self.myprint("Exception in ck_status_code: " + str(e))
-            pass
 
     #-----------------------------------------------------------------------------
 
     
     @classmethod
     def mk_link_w_scheme(cls, addy):
-        #LinkCheckLib.myprint(LinkCheckLib(), "--------testingprinting-----------!!!!!!")
         one = 'http://'
         two = 'https://'
         needprefix = True
@@ -505,7 +475,6 @@ class LinkCheckLib(object):
         else:
             full_addy = addy
         return full_addy
-    #-----------------------------------------------------------------------------
 
 
     #-----------------------------------------------------------------------------

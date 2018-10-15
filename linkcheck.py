@@ -19,10 +19,10 @@ class LinkCheck(LinkCheckLib):
     def get_links_for_one_pair(self, mainlin, par_link):
         done_ln_gl_sing = self.MAIN_DICT.get(self.rdonesingles)
         if mainlin not in done_ln_gl_sing:
-            self.myprint(" in get_links:2 " + mainlin)
+            self.myprint(" in get_links_for_one_pair " + mainlin)
 
             # #---------------  web response get here!!!!!!!!------------------------web response get here!!!!!!!!--------
-            response, resp_err = self.do_response(mainlin, par_link)
+            response = self.do_response(mainlin, par_link)
             # #---------------  web response get here!!!!!!!!------------------------web response get here!!!!!!!!--------
 
             if response is not None:  ## GOOD!  0 is good to continue
@@ -31,7 +31,7 @@ class LinkCheck(LinkCheckLib):
                     new_lnks_loc2 = [ab for ab in ab_links]
                     new_lnks_loc  = list(set(new_lnks_loc2))  #reduce dupes
                 except Exception as e:
-                    self.myprint("Exception inside get_links: " + str(e))
+                    self.myprint("Exception inside get_links_for_one_pair: " + str(e))
                     return
 
                 for the_link in new_lnks_loc:
@@ -43,7 +43,11 @@ class LinkCheck(LinkCheckLib):
 
     def getlinks_base_ck_two(self, the_link, par_link):
         rbas = self.MAIN_DICT.get(self.rbase)
-        self.myprint("Starting parsing of: " + the_link + "\n")
+        self.myprint("Starting getlinks_base_ck_two for: " + the_link + "\n")
+        inbase_bool = self.ck_if_in_base_glob(the_link)
+        if inbase_bool:
+            print("================== found inbase_bool dupe")
+            return
         # for ttup in  self.base_only_plain_repeat_tup:
         #     the_link = ttup[0]
         #     par_link = ttup[1]
@@ -56,8 +60,8 @@ class LinkCheck(LinkCheckLib):
 
             is_base, notused = self.ck_for_base(the_link)
 
-            print("answers: the_link, is_base, notused: ", the_link, str(is_base))
-            print(" rbas: ",  rbas)
+            #print("answers: the_link, is_base, notused: ", the_link, str(is_base))
+            #print(" rbas: ",  rbas)
 
             if is_base and good_suffix:  # IS MAIN_DICT type
                 inbase_bool = self.ck_if_in_base_glob(the_link)
@@ -113,8 +117,8 @@ class LinkCheck(LinkCheckLib):
         finlist = self.return_errors()
         self.myprint("Errors: ")
         for i in finlist:
-               print("err: " + i[0] + " parent: " + i[1])
-       # print("totalTime: " + str(perf_counter() - tstart))
+               print("err: " + i[0] + " parent: " + i[2])
+        print("totalTime: " + str(perf_counter() - tstart))
         return finlist
 
     #-------------------------------------------------------------------
@@ -126,28 +130,28 @@ class LinkCheck(LinkCheckLib):
             new_base_links_two_tup = []
             base_len = len(self.base_only_plain_repeat_tup)
             while base_len and repeats < 6:
-                self.myprint("step_one 1xxx")
+                #self.myprint("step_one 1xxx")
                 repeats +=1
                 self.myprint('\n' + " -----repeats: " + str(repeats) + "--------- In set_one loop ")
                 for baselink, parent in self.base_only_plain_repeat_tup[0], self.base_only_plain_repeat_tup[1]:
-                    self.myprint("step_one 1aaaaa")
-                    print("xxxxxxxxxxxxxxxxxx 3 about to check if parent-------------------------------------")
+                    #self.myprint("step_one 1aaaaa")
+                    #print("xxxxxxxxxxxxxxxxxx 3 about to check if parent-------------------------------------")
                     isparent_bool= self.isTHEparent(baselink)
                     #print("xxxxxxxxxxxxxxxxxx 4")
-                    self.myprint("isparent: " + str(isparent_bool))
+                    #self.myprint("isparent: " + str(isparent_bool))
                     if not isparent_bool:
-                        self.myprint("step_one 2")
-                        self.myprint('\n' + " -----repeats: " + str(repeats) + "--------- In set_one loop ")
+                        #self.myprint("step_one 2")
+                        #self.myprint('\n' + " -----repeats: " + str(repeats) + "--------- In set_one loop ")
           #---------------------getlinks !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         new_base_links_tmp = self.get_links_for_one_pair(baselink, parent)  # first set of MAIN_DICT
 
-                        self.myprint("step_one 3")
+                        #self.myprint("step_one 3")
                         new_base_links_two_tup = self.rem_errs_tups(new_base_links_tmp)
 
-                self.myprint("step_one 3")
-                print("xxxxxxxxxxxxxxxxxx 5")
+                #self.myprint("step_one 3")
+                #print("xxxxxxxxxxxxxxxxxx 5")
 
-                self.myprint("five3")
+                #self.myprint("five3")
                 if new_base_links_two_tup:
                     base_glob_now = self.MAIN_DICT.get(self.rbase)
                     base_glob_now.append(new_base_links_two_tup)
@@ -182,7 +186,7 @@ class LinkCheck(LinkCheckLib):
                                 base_lin, BASE_URL = baselink[0], baselink[1]  # split
 
                                 new_base_links_here = self.get_links_for_one_pair(base_lin, BASE_URL)  # first set of MAIN_DICT
-                                self.myprint("------------------------xxxxxxx")
+                                #self.myprint("------------------------xxxxxxx")
 
                                 alreadychecked.append(baselink)
                                 if new_base_links_here:
@@ -190,7 +194,7 @@ class LinkCheck(LinkCheckLib):
                                     the_len_b  = len(new_base_links_here)
                                 else:
                                     the_len_b = 0
-                                self.myprint("------------------------xxxxxxxyyy")
+                                #self.myprint("------------------------xxxxxxxyyy")
 
                         self.myprint("adding to rbase: " + base_glob_now)
                         self.MAIN_DICT.update({self.rbase: base_glob_now})
@@ -207,7 +211,7 @@ class LinkCheck(LinkCheckLib):
         base_to_ck= self.MAIN_DICT.get(self.rbase)
         tupy = None
 
-        self.myprint("done_singles: " + str(done_singles)+"other_to_ck: " + str(other_to_ck))
+        #self.myprint("done_singles: " + str(done_singles)+"other_to_ck: " + str(other_to_ck))
         #self.myprint("-----------------------------------In other_links_big_check2")
 
         try:
@@ -236,7 +240,9 @@ class LinkCheck(LinkCheckLib):
 k = "kaldu.com"
 s = 'schorrmedia.com/m.html'
 #s = 'schorrmedia.com'
+r = 'repercussions.com'
+a = 'astrology1234.com'
 
 if __name__ == "__main__":
     lc = LinkCheck()
-    lc.main(s)
+    lc.main(a)

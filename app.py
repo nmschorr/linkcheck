@@ -30,7 +30,7 @@ def main_work(site, just_name):   # run LinkCheck and ac.myprint to console
     if len_ans == 0:
         ac.datalines(file_path, [('','','')], special=1)  #special=1 is a page with no broken links
     else:
-        ac.datalines(file_path,answers)
+        ac.datalines(file_path, answers)
     dt = str(datetime.now())
     print( dt + "  main_work done")
 
