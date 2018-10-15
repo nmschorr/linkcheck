@@ -35,22 +35,19 @@ class LinkCheck(LinkCheckLib):
                     return
 
                 for the_link in new_lnks_loc:
-                    if self.is_same_site_link(the_link):
+                    if self.ret_bool_if_same_as_orig_url(the_link):
                         continue
-                    self.getlinks_base_ck_two(the_link, par_link)
+                    self.push_links_Base_or_Other(the_link, par_link)
 
 # #----------------------------------------------------------------------get_links-
 
-    def getlinks_base_ck_two(self, the_link, par_link):
+    def push_links_Base_or_Other(self, the_link, par_link):
         rbas = self.MAIN_DICT.get(self.rbase)
         self.myprint("Starting getlinks_base_ck_two for: " + the_link + "\n")
-        inbase_bool = self.ck_if_in_base_glob(the_link)
+        inbase_bool = self.ret_bool_if_in_BASE_glob(the_link)
         if inbase_bool:
             print("================== found inbase_bool dupe")
             return
-        # for ttup in  self.base_only_plain_repeat_tup:
-        #     the_link = ttup[0]
-        #     par_link = ttup[1]
 
         try:    #check for good suffix
             self.myprint("new_lnks_loc === going to check bad data next: " + the_link)
@@ -58,13 +55,10 @@ class LinkCheck(LinkCheckLib):
             if has_bad:
                 return
 
-            is_base, notused = self.ck_for_base(the_link)
-
-            #print("answers: the_link, is_base, notused: ", the_link, str(is_base))
-            #print(" rbas: ",  rbas)
+            is_base = self.ret_bool_if_BASE(the_link)
 
             if is_base and good_suffix:  # IS MAIN_DICT type
-                inbase_bool = self.ck_if_in_base_glob(the_link)
+                inbase_bool = self.ret_bool_if_in_BASE_glob(the_link)
                 if not inbase_bool:
                     self.myprint("!! adding to base: " + the_link + " " +  par_link)
                     if (the_link, par_link):
@@ -74,7 +68,6 @@ class LinkCheck(LinkCheckLib):
 
             else:
                 self.add_to_others_glob(the_link, par_link)  #does global too
-                self.myprint("!! added to others: " + the_link)
 
         except Exception as e:
             self.handle_exc(the_link, e, par_link)
@@ -83,7 +76,7 @@ class LinkCheck(LinkCheckLib):
       #############----------------------------------MAIN-------------------------
     def main_setup(self, msite):
         self.MAIN_DICT.update({ self.ORIGNAME: msite })
-        w_site = self.mkwww(msite)
+        w_site = self.make_www_url(msite)
         self.MAIN_DICT.update({self.ORIGNAMEwww:w_site})
 
         link_w_scheme = LinkCheckLib.mk_link_w_scheme(msite)
@@ -100,31 +93,35 @@ class LinkCheck(LinkCheckLib):
       #############----------------------------------MAIN-------------------------
 
     def main(self, msite="a.htm"):
+        finlist = None
         tstart = perf_counter()
         link_w_scheme = self.main_setup(msite)
         try:
             #############---------step ONE:
             self.get_links_for_one_pair(link_w_scheme, link_w_scheme)  #first set of MAIN_DICT
             self.myprint("Step One Done with base_only_plain_repeat")   ##first time:  HOME PAGE ONLY  ##first time
-            self.main_loop_get_links(link_w_scheme)
+            self.main_loop_get_links()
 
         except Exception as e:
             self.myprint("Exception inside main: " + str(e))
 
-        self.main_two_more_baselinks()
-        self.main_run_simple()
+        try:
+            self.main_two_more_baselinks()
+            self.main_run_simple()
 
-        finlist = self.return_errors()
-        self.myprint("Errors: ")
-        for i in finlist:
-               print("err: " + i[0] + " parent: " + i[2])
+            finlist = self.return_errors()
+            for i in finlist:
+                print("broken link: " + i[0] + " found on parent: " + i[2])
+        except Exception as e:
+            self.myprint("Exception inside main: " + str(e))
+
         print("totalTime: " + str(perf_counter() - tstart))
         return finlist
 
     #-------------------------------------------------------------------
 
     def main_loop_get_links(self):
-        self.myprint("In step_one")
+        self.myprint("In main_loop_get_links")
         try:
             repeats = 0
             new_base_links_two_tup = []
@@ -135,23 +132,13 @@ class LinkCheck(LinkCheckLib):
                 self.myprint('\n' + " -----repeats: " + str(repeats) + "--------- In set_one loop ")
                 for baselink, parent in self.base_only_plain_repeat_tup[0], self.base_only_plain_repeat_tup[1]:
                     #self.myprint("step_one 1aaaaa")
-                    #print("xxxxxxxxxxxxxxxxxx 3 about to check if parent-------------------------------------")
                     isparent_bool= self.isTHEparent(baselink)
-                    #print("xxxxxxxxxxxxxxxxxx 4")
                     #self.myprint("isparent: " + str(isparent_bool))
                     if not isparent_bool:
-                        #self.myprint("step_one 2")
                         #self.myprint('\n' + " -----repeats: " + str(repeats) + "--------- In set_one loop ")
-          #---------------------getlinks !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                        new_base_links_tmp = self.get_links_for_one_pair(baselink, parent)  # first set of MAIN_DICT
+                        self.get_links_for_one_pair(baselink, parent)  # first set of MAIN_DICT
 
-                        #self.myprint("step_one 3")
-                        new_base_links_two_tup = self.rem_errs_tups(new_base_links_tmp)
-
-                #self.myprint("step_one 3")
-                #print("xxxxxxxxxxxxxxxxxx 5")
-
-                #self.myprint("five3")
+                        # new_base_links_two_tup = self.rem_base_dupes(new_base_links_tmp)
                 if new_base_links_two_tup:
                     base_glob_now = self.MAIN_DICT.get(self.rbase)
                     base_glob_now.append(new_base_links_two_tup)
@@ -245,4 +232,4 @@ a = 'astrology1234.com'
 
 if __name__ == "__main__":
     lc = LinkCheck()
-    lc.main(a)
+    lc.main(k)

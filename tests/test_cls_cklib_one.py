@@ -102,7 +102,7 @@ class TestCls_cklib_one(unittest.TestCase):
         test_link = 'https://abcd.com'
         p_link = 'https://abcde.com'
         stat_code = 404
-        ans = self.lcb.ck_status_code(test_link,p_link, stat_code)
+        ans = self.lcb.add_err_to_errlinks(test_link, p_link, stat_code)
         correct_ans = 1  #error is 1, no error 0
         self.assertEquals(ans,correct_ans)
 
@@ -110,7 +110,7 @@ class TestCls_cklib_one(unittest.TestCase):
         test_link = 'http://abcdesomethingelse.xxx.com'
         p_link = 'https://abcde.com'
         stat_code = 304  # not doing this one
-        ans = self.lcb.ck_status_code(test_link,p_link, stat_code)
+        ans = self.lcb.add_err_to_errlinks(test_link, p_link, stat_code)
         correct_ans = 0  #error is 1, no error 0
         self.assertEquals(ans,correct_ans)
 
@@ -118,7 +118,7 @@ class TestCls_cklib_one(unittest.TestCase):
         test_link = 'abcdesomethingelse.xxx.com'
         p_link = 'https://abcde.com'
         stat_code = 200
-        ans = self.lcb.ck_status_code(test_link,p_link, stat_code)
+        ans = self.lcb.add_err_to_errlinks(test_link, p_link, stat_code)
         correct_ans = 0  #error is 1, no error 0
         self.assertEquals(ans,correct_ans)
 
@@ -126,7 +126,7 @@ class TestCls_cklib_one(unittest.TestCase):
         test_link = 'abcdg.com'
         p_link = 'https://abcde.com'
         stat_code = '502'
-        ans = self.lcb.ck_status_code(test_link,p_link, stat_code)
+        ans = self.lcb.add_err_to_errlinks(test_link, p_link, stat_code)
         correct_ans = 0  #error is 1, no error 0
         self.assertEquals(ans,correct_ans)
     #------------------------------------------------------------ispar()
@@ -153,7 +153,7 @@ class TestCls_cklib_one(unittest.TestCase):
         test_link = 'abcdg.com'
         p_link = 'https://abcde.com'
         stat_code = '502'
-        ans = self.lcb.ck_status_code(test_link, p_link, stat_code)
+        ans = self.lcb.add_err_to_errlinks(test_link, p_link, stat_code)
         correct_ans = 0  # error is 1, no error 0
         self.assertEquals(ans, correct_ans)
 
