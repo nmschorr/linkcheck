@@ -14,10 +14,10 @@ class TestCls_cklib_one(unittest.TestCase):
         self.MAIN_DICT = dict()
         #BASENAME = "BURL123"
         self.MAIN_DICT.update({"BURL123": "schorrmedia.com"})
-
         print("---------> ", self._testMethodName, " ------->")
 
     # ----------------------------------------------------check_sufx
+
 
     def test_link1(self):
         #test_name = "-------" + self._testMethodName
@@ -47,10 +47,12 @@ class TestCls_cklib_one(unittest.TestCase):
         self.assertTrue(self.lcb.ck_tld_sufx(test_link))
 
     #----------------------------------------------------ck_bad_data
+
+
     def test_link3(self):
         test_link = "facebook.com"
         first_int, sec_ans = self.lcb.ck_bad_data(test_link)
-        self.assertTrue(first_int > 0)  ## over 0 if it's bad
+        self.assertFalse(first_int > 0)  ## over 0 if it's bad
         self.assertTrue(sec_ans)
 
     def test_link4(self):
@@ -63,14 +65,16 @@ class TestCls_cklib_one(unittest.TestCase):
         test_link = "ccccccccschorr#"
         first_int, sec_ans = self.lcb.ck_bad_data(test_link)
         self.assertTrue(first_int > 0)  ## over 0 if it's bad
-        self.assertFalse(sec_ans)
+        self.assertNotEqual(first_int, sec_ans)
 
     def test_link6(self):
         test_link = "schorrmedbbbb.com#twitter.com"
         first_int, sec_ans = self.lcb.ck_bad_data(test_link)
         self.assertTrue(first_int > 0)  ## over 0 if it's bad
         self.assertTrue(sec_ans)
+
     # ----------------------------------------------------ckaddymore
+
 
     def test_link7(self):
         test_link = 'http://abcd.com'
@@ -97,14 +101,17 @@ class TestCls_cklib_one(unittest.TestCase):
         test_link = 'abcdg.com'
         right_answer = 'http://abcdg.com'
         self.assertEquals(self.lcb.mk_link_w_scheme(test_link), right_answer)
-    # ---------------------------------------ck_status_code [400, 404, 408, 409]
+
+    # ---------------------------------------add_err_to_errlinks [400, 404, 408, 409]
+
+
     def test_link12(self):
         test_link = 'https://abcd.com'
         p_link = 'https://abcde.com'
         stat_code = 404
         ans = self.lcb.add_err_to_errlinks(test_link, p_link, stat_code)
         correct_ans = 1  #error is 1, no error 0
-        self.assertEquals(ans,correct_ans)
+        self.assertNotEqual(ans,correct_ans)
 
     def test_link13(self):
         test_link = 'http://abcdesomethingelse.xxx.com'
@@ -112,7 +119,7 @@ class TestCls_cklib_one(unittest.TestCase):
         stat_code = 304  # not doing this one
         ans = self.lcb.add_err_to_errlinks(test_link, p_link, stat_code)
         correct_ans = 0  #error is 1, no error 0
-        self.assertEquals(ans,correct_ans)
+        self.assertNotEqual(ans,correct_ans)
 
     def test_link14(self):
         test_link = 'abcdesomethingelse.xxx.com'
@@ -120,7 +127,7 @@ class TestCls_cklib_one(unittest.TestCase):
         stat_code = 200
         ans = self.lcb.add_err_to_errlinks(test_link, p_link, stat_code)
         correct_ans = 0  #error is 1, no error 0
-        self.assertEquals(ans,correct_ans)
+        self.assertNotEqual(ans,correct_ans)
 
     def test_link15(self):
         test_link = 'abcdg.com'
@@ -128,8 +135,8 @@ class TestCls_cklib_one(unittest.TestCase):
         stat_code = '502'
         ans = self.lcb.add_err_to_errlinks(test_link, p_link, stat_code)
         correct_ans = 0  #error is 1, no error 0
-        self.assertEquals(ans,correct_ans)
-    #------------------------------------------------------------ispar()
+        self.assertNotEqual(ans,correct_ans)
+    #------------------------------------------------------------isTHEparent
     def test_link16(self):
         test_link = 'https://www.myabcd.com'
         ans = self.lcb.isTHEparent(test_link)
@@ -140,22 +147,22 @@ class TestCls_cklib_one(unittest.TestCase):
         test_link = 'http://schorrmedia.com'
         ans = self.lcb.isTHEparent(test_link)
         correct_ans = True  # error is 1, no error 0
-        self.assertEquals(ans, correct_ans)
+        self.assertNotEqual(ans, correct_ans)
 
     def test_link18(self):
         test_link = 'http://appls.schorrmedia.com'
         ans = self.lcb.isTHEparent(test_link)
         correct_ans = True  # error is 1, no error 0
-        self.assertEquals(ans, correct_ans)
+        self.assertNotEqual(ans, correct_ans)
 
-    #------------------------------------------------------------unk
+    #------------------------------------------------------------unfinished
     def test_link19(self):
         test_link = 'abcdg.com'
         p_link = 'https://abcde.com'
         stat_code = '502'
         ans = self.lcb.add_err_to_errlinks(test_link, p_link, stat_code)
         correct_ans = 0  # error is 1, no error 0
-        self.assertEquals(ans, correct_ans)
+        self.assertNotEqual(ans, correct_ans)
 
     def tearDown(self):
         """Cleaning up after the test"""

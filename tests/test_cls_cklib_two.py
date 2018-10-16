@@ -1,5 +1,6 @@
 import unittest
-from linkcheck import LinkCheckLib as lclib
+# from linkcheck import LinkCheckLib as lclib
+import linkchecklib
 
 class TestCls_cklib_two(unittest.TestCase):
 
@@ -9,88 +10,82 @@ class TestCls_cklib_two(unittest.TestCase):
 
     def setUp(self):
         """ Setting up for the test """
-        self.lcb = lclib()
+        self.lcb = linkchecklib.LinkCheckLib()
         print("\n")
         print("----------------In setUp - CLASS: TestCls_cklib_one")
         print("Running test: ", self._testMethodName)
 
-    # ----------------------------------------------------ckaddymore
+    # ----------------------------------------------------mk_link_w_scheme
     def test_cklib_two1(self):
         test_link = "one.html"
         exp_link = "http://one.html"
-
         ans = self.lcb.mk_link_w_scheme(test_link)
         self.assertEquals(ans, exp_link)
 
     def test_cklib_two2(self):
-        test_link = "one.html"
+        test_link = "http://one.html"
         exp_link = "http://one.html"
-
         ans = self.lcb.mk_link_w_scheme(test_link)
         self.assertEquals(ans, exp_link)
 
 
     def test_cklib_two3(self):
-        test_link = "one.html"
-        exp_link = "http://one.html"
-
+        test_link = "https://one.html"
+        exp_link = "https://one.html"
         ans = self.lcb.mk_link_w_scheme(test_link)
         self.assertEquals(ans, exp_link)
+
+        # ----------------------------------------------------make_www_url
 
     def test_cklib_two4(self):
-        test_link = "http://one.html"
-        exp_link = "http://one.html"
-
-        ans = self.lcb.mk_link_w_scheme(test_link)
+        test_link = "one.html"
+        exp_link = "www.one.html"
+        ans = self.lcb.make_www_url(test_link)
         self.assertEquals(ans, exp_link)
+
 
     def test_cklib_two5(self):
         test_link = "https://one.html"
-        exp_link = "https://one.html"
-
-        ans = self.lcb.mk_link_w_scheme(test_link)
-        self.assertEquals(ans, exp_link)
+        exp_link = "https://www.one.html"
+        ans = self.lcb.make_www_url(test_link)
+        self.assertNotEqual(ans, exp_link)
 
     def test_cklib_two6(self):
         test_link6 = "http//one.html"
-        exp_link = "https://one.html"
+        exp_link = "http://www.one.html"
+        ans = self.lcb.make_www_url(test_link6)
+        self.assertNotEqual(ans, exp_link)
 
-        ans = self.lcb.mk_link_w_scheme(test_link6)
-        self.assertEquals(ans, exp_link)
+
+        # ----------------------------------------------------ck_bad_data
 
     def test_cklib_two7(self):
         test_link7 = "http//one.html"
         exp_link = "https://one.html"
-
-        ans = self.lcb.mk_link_w_scheme(test_link7)
-        self.assertEquals(ans, exp_link)
+        ans = self.lcb.ck_bad_data(test_link7)
+        self.assertNotEqual(ans, exp_link)
 
     def test_cklib_two8(self):
         test_link8 = "http//onebigurlstring#.html"
         exp_link = "https://one.html"
-
-        # ----------------------------------------------------ck_bad_data
         ans, ans2 = self.lcb.ck_bad_data(test_link8)
         self.assertEquals(ans, 1)
         self.assertTrue(ans2)
 
     def test_cklib_two9(self):
-        test_link9 = "http//onebigurlstring.html"
-
+        test_link9 = "http://onebigurlstring+more.html"
         ans, ans2 = self.lcb.ck_bad_data(test_link9)
         self.assertEquals(ans, 0)
         self.assertTrue(ans2)
 
     def test_cklib_two10(self):
         test_link6 = "http//onebigurlstring.fff"
-
         ans, ans2 = self.lcb.ck_bad_data(test_link6)
         self.assertEquals(ans, 0)
         self.assertFalse(ans2)
 
     def test_cklib_two11(self):
         test_link11 = "http//onebigurlstring.fff"  #bad
-
         ans, ans2 = self.lcb.ck_bad_data(test_link11)
         self.assertEquals(ans, 0)
         self.assertFalse(ans2)
@@ -99,9 +94,6 @@ class TestCls_cklib_two(unittest.TestCase):
     def tearDown(self):
         """Cleaning up after the test"""
         print("Done with test: ", self._testMethodName, " --RESULT: ")
-
-
-
 
 
 if __name__ == '__main__':
