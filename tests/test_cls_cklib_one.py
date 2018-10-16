@@ -1,5 +1,5 @@
 import unittest
-from linkcheck import LinkCheckLib as lclib
+import linkchecklib
 # LinkCheckLib: tests check_sufx, ck_bad_data, ckaddymore
 
 class TestCls_cklib_one(unittest.TestCase):
@@ -10,7 +10,7 @@ class TestCls_cklib_one(unittest.TestCase):
 
 
     def setUp(self): # Setting up for the test
-        self.lcb = lclib()
+        self.lcb = linkchecklib.LinkCheckLib()
         self.MAIN_DICT = dict()
         #BASENAME = "BURL123"
         self.MAIN_DICT.update({"BURL123": "schorrmedia.com"})
