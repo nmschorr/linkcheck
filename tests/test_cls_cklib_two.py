@@ -14,6 +14,12 @@ class TestCls_cklib_two(unittest.TestCase):
         print("\n")
         print("----------------In setUp - CLASS: TestCls_cklib_one")
         print("Running test: ", self._testMethodName)
+        self.BASENAME = self.lcb.BASENAME
+        self.BASENAMEwww = self.lcb.BASENAMEwww
+        self.lcb.MAIN_DICT.update({self.BASENAME: "mockname.com"})
+        self.lcb.MAIN_DICT.update({self.BASENAMEwww: "www.mockname.com"})
+        self.lcb.MAIN_DICT.update({self.lcb.rbase: "mockname.com"})
+        #self.base_lnks_g = self.MAIN_DICT.get(self.rbase)
 
     # ----------------------------------------------------mk_link_w_scheme
     def test_cklib_two1(self):
@@ -78,17 +84,49 @@ class TestCls_cklib_two(unittest.TestCase):
         self.assertEquals(ans, 0)
         self.assertTrue(ans2)
 
+        # ----------------------------------------------------isTHEparent
+
+
     def test_cklib_two10(self):
-        test_link6 = "http//onebigurlstring.fff"
-        ans, ans2 = self.lcb.ck_bad_data(test_link6)
-        self.assertEquals(ans, 0)
-        self.assertFalse(ans2)
+        test_link10 = "http//onebigurlstring.fff"
+        ans = self.lcb.isTHEparent(test_link10)
+        self.assertFalse(ans)
 
     def test_cklib_two11(self):
-        test_link11 = "http//onebigurlstring.fff"  #bad
-        ans, ans2 = self.lcb.ck_bad_data(test_link11)
-        self.assertEquals(ans, 0)
-        self.assertFalse(ans2)
+        test_link11 = "mockname"
+        ans = self.lcb.isTHEparent(test_link11)
+        self.assertTrue(ans)
+
+    def test_cklib_two12(self):
+        test_link12 = "www.mockname"
+        ans = self.lcb.isTHEparent(test_link12)
+        self.assertTrue(ans)
+
+    # ----------------------------------------------------ret_bool_if_BASE
+
+    def test_cklib_two13(self):
+        test_link13 = "http//onebigurlstring.fff"
+        ans = self.lcb.ret_bool_if_BASE(test_link13)
+        self.assertFalse(ans)
+
+    def test_cklib_two14(self):
+        test_link14 = "mockname"
+        ans = self.lcb.ret_bool_if_BASE(test_link14)
+        self.assertTrue(ans)
+
+    def test_cklib_two15(self):
+        test_link15 = "www.mockname"
+        ans = self.lcb.ret_bool_if_BASE(test_link15)
+        self.assertTrue(ans)
+
+        # ----------------------------------------------------ret_bool_if_in_BASE_glob
+
+    def test_cklib_two15(self):
+        test_link15 = "mockname.com"
+        ans = self.lcb.ret_bool_if_in_BASE_glob(test_link15)
+        self.assertTrue(ans)
+
+        # ----------------------------------------------------ret_bool_if_in_BASE_glob
 
     # ending the test
     def tearDown(self):
