@@ -11,6 +11,8 @@ import requests
 class LinkCheckLib(object):
 
     def __init__(self):
+        base_only_plain_repeat_tup = []
+        self.base_only_plain_repeat_tup = base_only_plain_repeat_tup
         self.MAIN_DICT = dict()
         rand = str(random())[2:]
 
@@ -94,6 +96,7 @@ class LinkCheckLib(object):
     # -----------------------------------------------------------------------------
 
     def return_errors(self):
+        self.myprint("in return_errors()")
         finlist = []
         err_links = self.MAIN_DICT.get(self.rerr)
 
@@ -119,7 +122,6 @@ class LinkCheckLib(object):
                         answer_string = [an0, an1, an2]
                         finlist.append(answer_string)
 
-                        #self.myprint(str(answer_string))
                     # err_links.clear()
                 else:
                     finlist = [answer_string]
@@ -238,7 +240,6 @@ class LinkCheckLib(object):
     def do_response(self, a_link, p_link):
         self.myprint("do_response link is " + a_link + " parent: " + p_link)
 
-        r_errs = self.MAIN_DICT.get(self.rerr)
 
         # redirecterr = self.MAIN_DICT.get(self.redirecterrs)
         done_ln_glob_singles = self.MAIN_DICT.get(self.rdonesingles)
@@ -254,16 +255,14 @@ class LinkCheckLib(object):
                 # ----------------------------------------------------------session.get-------------
                 session.close()
                 if the_big_response is not None:
-                    done_ln_glob_singles.append(a_link)  ## add to main done list
-                    self.MAIN_DICT.update({self.rdonesingles: done_ln_glob_singles})
+                    self.MAIN_DICT.get(self.rdonesingles).append(a_link)
 
                     code = the_big_response.status_code
                     self.add_err_to_errlinks(a_link, code, p_link)  ## if there's    an error
                     self.myprint("LINK: in do_response: " + a_link + "  status code: " + str(code))
                 else:
-                    r_errs.append((a_link, 404, p_link))
+                    self.MAIN_DICT.get(self.rerr).append((a_link, 000, p_link))
 
-                self.MAIN_DICT.update({self.rerr: r_errs})
 
         except Exception as e:
             self.myprint("GOT AN EXCEPTION inside do_response: " + str(e))
@@ -325,17 +324,15 @@ class LinkCheckLib(object):
             glob_bool = bool(tlink in [i[0] for i in other_lns_gl])
             if not glob_bool:
                 self.myprint("appending to others: " + tlink)
-                other_lns_gl.append((tlink, parent_local))  # add if not there
+                self.MAIN_DICT.get(self.rothers).append((tlink, parent_local))  # add if not there
 
         except Exception as e:
             self.myprint("exception in add_others: " + str(e))
 
-        self.MAIN_DICT.update({self.rothers: other_lns_gl})
-        return
-
     #-----------------------------------------------------------------------------
     #---------------------------------------------------------------------------------------
     def get_simple_response(self, lin_and_par_tup):
+        print('-- in get_simple_response() ')
 
         rdone_sings = self.MAIN_DICT.get(self.rdonesingles)
         if lin_and_par_tup[0] in rdone_sings:
@@ -365,11 +362,8 @@ class LinkCheckLib(object):
             if the_response_simple:
                 self.myprint("THIS_LN: " + link_to_ck + " parent: " + parent )
                 stat = the_response_simple.status_code
-                rdone_sings.append(link_to_ck)
-                #self.myprint("status: " + str(stat))
+                self.MAIN_DICT.get(self.rdonesingles).append(link_to_ck)
                 self.add_err_to_errlinks(link_to_ck, stat, parent)
-
-            self.MAIN_DICT.update({self.rdonesingles: rdone_sings})
 
         except Exception as e:
             self.myprint("Exception inside get_simple_response: " + str(e))
@@ -400,19 +394,16 @@ class LinkCheckLib(object):
 
         err_links = self.MAIN_DICT.get(self.rerr)
         if tlink not in err_links:
-            err_links.append((tlink, the_err_str, plink))
-            self.MAIN_DICT.update({self.rerr:err_links})
+            self.MAIN_DICT.get(self.rerr).append((tlink, the_err_str, plink))
 
     #-----------------------------------------------------------------------------
 
     def add_err_to_errlinks(self, t_link, st_code_int, tpar):
         try:
-            err_links = self.MAIN_DICT.get(self.rerr)
-            err_codes = [400, 404, 408, 409]
-            if (st_code_int in err_codes) and (t_link not in err_links):
+            err_codes = [000, 400, 404, 408, 409]
+            if (st_code_int in err_codes) and (t_link not in self.MAIN_DICT.get(self.rerr)):
                 #self.myprint("adding error in ck_status_code " + t_link + str(st_code_int) + tpar)
-                err_links.append((t_link, st_code_int, tpar))
-                self.MAIN_DICT.update({self.rerr: err_links})
+                self.MAIN_DICT.get(self.rerr).append((t_link, st_code_int, tpar))
         except Exception as e:
             self.myprint("Exception in ck_status_code: " + str(e))
 
