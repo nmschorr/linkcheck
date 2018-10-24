@@ -67,15 +67,21 @@ class LinkCheck(LinkCheckLib):
       #############----------------------------------MAIN-------------------------
     def main_setup(self, msite):
         self.MAIN_DICT.update({ self.ORIGNAME: msite })
-        w_site = self.make_www_url(msite)
-        self.MAIN_DICT.update({self.ORIGNAMEwww:w_site})
+        msite_www = self.make_www_url(msite)
+        self.MAIN_DICT.update({self.ORIGNAMEwww:msite_www})
+        msite_www_w_scheme = LinkCheckLib.mk_link_w_scheme(msite_www)
 
         msite_w_scheme = LinkCheckLib.mk_link_w_scheme(msite)
         parsed = urlparse(msite_w_scheme)
         base_netloc = str(parsed.netloc)
         base_netloc_www = 'www.' + base_netloc
-        self.MAIN_DICT.update({ self.BASENAME: base_netloc })
-        self.MAIN_DICT.update({ self.BASENAMEwww: base_netloc_www })
+
+
+        self.MAIN_DICT.update({ self.BASENAME: msite  })
+        self.MAIN_DICT.update({ self.BASENAMEwww:msite_www })
+        # self.MAIN_DICT.update({ self.BASENAME: base_netloc })
+        # self.MAIN_DICT.update({ self.BASENAMEwww: base_netloc_www })
+
         self.myprint('In main_setup() Getting first address: ' + msite_w_scheme)
         return msite_w_scheme
 
@@ -101,12 +107,15 @@ class LinkCheck(LinkCheckLib):
             self.main_run_simple()
 
             finlist = self.return_errors()
+            print()
+            self.myprint("Here are the broken links: ")
             for i in finlist:
-                print("broken link: " + i[0] + " found on parent: " + i[2])
+                print("  broken link: " + i[0] + " found on parent: " + i[2])
         except Exception as e:
             self.myprint("Exception inside main: " + str(e))
 
-        print("totalTime: " + str(perf_counter() - tstart))
+        print()
+        print("TotalTime: " + str(perf_counter() - tstart))
         return finlist
 
     #-------------------------------------------------------------------
@@ -198,4 +207,4 @@ a = 'astrology1234.com'
 
 if __name__ == "__main__":
     lc = LinkCheck()
-    lc.main(s)
+    lc.main(a)

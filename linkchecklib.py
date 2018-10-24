@@ -15,11 +15,12 @@ class LinkCheckLib(object):
         self.base_only_plain_repeat_tup = base_only_plain_repeat_tup
         self.MAIN_DICT = dict()
         rand = str(random())[2:]
+        self.rand = rand
 
         self.ORIGNAME = "ORIG" + rand
         self.ORIGNAMEwww = "ORIGwww" + rand
-        self.BASENAME = "BURL" + rand
-        self.BASENAMEwww = "BURLwww" + rand
+        self.BASENAME = "BASE" + rand
+        self.BASENAMEwww = "BASEwww" + rand
         self.rerr = "rerr_" + rand
         self.rdonesingles = "rdone_" + rand
         self.rothers = "rothers_" + rand
@@ -344,11 +345,12 @@ class LinkCheckLib(object):
 
         parent = "empty"
         the_response_simple = None
-        #self.myprint("inside get_simple_response: ")
-        #print("here is the tuple : " + str(lin_and_par_tup) )
+        print()
+        self.myprint("inside get_simple_response: ")
+        print("here is the tuple : " + str(lin_and_par_tup) )
         link_to_ck, parent = lin_and_par_tup[0], lin_and_par_tup[1]
 
-                #self.myprint("trying THIS_LN: " + link_to_ck + " parent: " + parent + " in get_simple_response")
+        self.myprint("trying THIS_LN: " + link_to_ck + " parent: " + parent + " in get_simple_response")
 
         try:
             the_response_simple = requests.head(link_to_ck)
@@ -356,10 +358,14 @@ class LinkCheckLib(object):
         except Exception as e:
             self.myprint("Exception inside get_simple_response: ")
             self.handle_exc(link_to_ck, e, parent)
+            self.myprint("returning ")
+
             return
 
+        self.myprint("here now simple response is : " + str(the_response_simple.status_code))
         try:
-            if the_response_simple:
+            if the_response_simple.status_code > 0:
+                self.myprint("here now 2")
                 self.myprint("THIS_LN: " + link_to_ck + " parent: " + parent )
                 stat = the_response_simple.status_code
                 self.MAIN_DICT.get(self.rdonesingles).append(link_to_ck)
@@ -394,7 +400,9 @@ class LinkCheckLib(object):
 
         err_links = self.MAIN_DICT.get(self.rerr)
         if tlink not in err_links:
-            self.MAIN_DICT.get(self.rerr).append((tlink, the_err_str, plink))
+            # self.MAIN_DICT.get(self.rerr).append((tlink, the_err_str, plink))
+            err_links.append((tlink, the_err_str, plink))
+            self.MAIN_DICT.update({self.rerr: err_links})
 
     #-----------------------------------------------------------------------------
 
