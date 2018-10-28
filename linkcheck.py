@@ -207,4 +207,4 @@ a = 'astrology1234.com'
 
 if __name__ == "__main__":
     lc = LinkCheck()
-    lc.main(a)
+    lc.main(k)

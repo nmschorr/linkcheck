@@ -1,6 +1,6 @@
-
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 html {
-  font-family: sans-serif;
+  font-family: 'Montserrat', sans-serif;
   background: #eee;
   padding: 1rem;
 }
@@ -12,7 +12,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Arial", "Helvetica Neue", Helvetica, sans-serif;
+  font-family: 'Montserrat', sans-serif;
   color: #377ba8;
   margin: 1rem 0;
 }
@@ -134,3 +134,70 @@ input[type=submit] {
   min-width: 10em;
 }
 
+.container {
+    position: relative;
+    text-align: center;
+    color: white;
+}
+
+.bottom-left {
+    position: absolute;
+    bottom: 8px;
+    left: 16px;
+}
+
+.top-left {
+    position: absolute;
+    top: 8px;
+    left: 16px;
+}
+
+.top-right {
+    position: absolute;
+    top: 8px;
+    right: 16px;
+}
+
+.bottom-right {
+    position: absolute;
+    bottom: 8px;
+    right: 16px;
+}
+
+.centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.box{
+  position: static;
+  z-index:1
+  height: 30px;
+  width: 79%;
+  color: white;
+  font-size: 1.9em;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 750;
+  padding-top:.5em;
+  text-align: center;
+   box-shadow:2px 4px 8px #168a8a;
+  background-color: #78D0EA;
+  background-color: cyan; /* For browsers that do not support gradients */
+    background-image: linear-gradient(to bottom right, #78D0EA, #168a8a); /* Standard syntax (must be last) */
+}
+
+.box{
+  position: static;
+  z-index:1
+  height: 30px;
+  width: 79%;
+  color: white;
+  font-size: 1.9em;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 750;
+  padding-top:.5em;
+  text-align: center;
+  background-color: #78D0EA;
+  background-image: "https://schorrmedia.com/wp-content/uploads/2013/09/freeVectorBackgroundLandscape.jpg"
+}

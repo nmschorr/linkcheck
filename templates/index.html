@@ -8,32 +8,86 @@
 <meta http-equiv="Cache-Control" content="no-cache" >
 <meta http-equiv="Pragma" content="no-cache" >
 <meta http-equiv="Expires" content=0 >
-<link rel=stylesheet href="./static/style.css">
-
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel=stylesheet href="../static/style.css">
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Montserrat:700" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Yantramanav:800" rel="stylesheet">
 <title>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
         &ensp;&ensp;&emsp;&emsp;&emsp;&emsp;&ensp;Welcome to LinkCheck</title>
+<style>
+#container {
+  height: 170px;
+    width: 100%;
+  position: relative;
+}
 
+#image {
+    z-index=-1;
+  position: absolute;
+height: 160px;
+width: 100%;
+}
+
+#logo {
+    z-index=1;
+  position: absolute;
+height: 47px;
+
+width: 200px;
+padding-left:5px;
+padding-top:5px;
+}
+
+#text {
+  z-index: 100;
+  position: absolute;
+  color: white;
+  font-size: 1.9em;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+    text-shadow: 1px 1px 1px grey;
+  padding-top: 2.7em;
+  padding-left: 9em;
+  text-align: center;
+
+     }
+</style>
 </head>
 
 <body>
+<!--<div class="box2">Welcome to LinkCheck</div>-->
 
-<h1 style="text-align:center; padding-top:1em;">
-Welcome to LinkCheck</h1>
 
-<div style="text-align:center; font-size: 14pt; font-style:bold; color: #377ba8;">
+<div id="container">
+
+  <img id="image" src="https://schorrmedia.com/wp-content/uploads/2013/09/freeVectorBackgroundLandscape.jpg" />
+  <img id="logo" src="https://schorrmedia.com/wp-content/uploads/2016/07/cooltextLogoSmedia-300x71.gif" />
+  <p id="text">
+    Welcome to LinkCheck
+  </p>
+</div>
+
+
+
+
+<div style="text-align: right; font-family: Roboto, sans-serif;  font-size: 11pt;
+    font-style:bold; color: #377ba8; padding-top:2em; ">
     This app is not meant for large websites.  <br>
-    The larger the website the longer it takes.<br> &emsp;<br>
+    The larger the website - the longer it will take.<br> &emsp;<br>
 </div>
 
 
 <form action="indexn" method ="POST" >
-<div style="padding-left:5em;padding-top:2em;">
+<div style="font-family: Roboto, sans-serif;
+     font-style: bold; padding-left: 2em; padding-top: .5em; color: DarkSlateGray;">
 Enter website or webpage<br>
-you want to LinkCheck here<br>
-(no http prefix needed)  http://
+you want to check <br>
+    for broken links <br>
+(no http prefix needed) http://
 <input type="text" size="55" name="name"><br>
-</div><div style="padding-left:25em;  padding-top:10px;padding-bottom:6px;">
+</div><div style="padding-left:20em;  padding-top:10px;padding-bottom:6px;">
 
 <input type="submit" value="Submit" style="min-width:15em; background-color:#48B8C6;
        color: white; padding: 9px 24px; font-size: 16px;
@@ -43,23 +97,23 @@ you want to LinkCheck here<br>
 </form>
 
 
-<div style="padding-left:12em; padding-top:2em; color:#377ba8;" >
+<div style="padding-left:12em; padding-top:2em; color:#377ba8;font-family: Montserrat, sans-serif;" >
 
-    If you're here just to see LinkCheck, <br>you can copy and paste one of these links:<br></div>
-<div  style="padding-left:20em; color:#4271A2">
-<h4>
+    If you're here just to try LinkCheck, <br>you can copy and paste one of these links:<br></div>
+<div  style="padding-left:20em; color:#4271A2; ">
+<h4 style="font-family: Roboto, sans-serif;">
     schorrmedia.com/m.html<br>
         astrology1234.com<br></h4>
 <br>
 </div>
 
 
-<div style="text-align:center; padding-top:1em; font-style:italic; font-size: 120%; color:purple">
+<div style="text-align:center; padding-top:1em; font-style:italic; font-size: 120%; color:purple;font-family: Montserrat, sans-serif;">
 
-Soon another page will appear with a link you'll need to click on.
+
 
 </div>
-<div style="text-align:center; padding-top:1em; font-style:italic; font-size: 92%; color:purple">Only errors 400, 404, 408, 409 are reported.
+<div style="text-align:left;  font-style:italic; font-size: 92%; color:grey;">Only errors 400, 404, 408, 409 are reported.
 </div>
 <p> &nbsp; </p><p>   &nbsp;</p>
 </body>
