@@ -12,7 +12,7 @@ class TestCls_cklib_two(unittest.TestCase):
         """ Setting up for the test """
         self.lcb = linkchecklib.LinkCheckLib()
         print("\n")
-        print("----------------In setUp - CLASS: TestCls_cklib_one")
+        print("----------------In setUp - CLASS: TestCls_cklib_two")
         print("Running test: ", self._testMethodName)
         self.BASENAME = self.lcb.BASENAME
         self.BASENAMEwww = self.lcb.BASENAMEwww
