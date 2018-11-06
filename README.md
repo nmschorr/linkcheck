@@ -7,7 +7,7 @@ It is written with Python 3.6, and uses Flask and a touch of Javascript to displ
 
 The source code can be viewed at: github.com/nmschorr/linkcheck
 
-It's hosted on pythonanywhere.com <a href="http://jetgal.pythonanywhere.com">LinkCheck</a>
+It's hosted on www.fastgalaxy.com <a href="http://www.fastgalaxy.com">LinkCheck</a>
 
 
 

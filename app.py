@@ -48,7 +48,7 @@ def indexn():  # git name of url, construct names and pages, present page with b
     name = request.form['name']  # from index.html   # the site
     print("----------------------------------------------------")
     print("Starting over. site is: ", name)
-    sleep(3)
+    sleep(2)
     return render_template('indexn.html', name = name)  ## has a form
 
 @nocache             # very important so client server doesn'w_thread cache results
