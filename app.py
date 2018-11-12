@@ -67,6 +67,7 @@ def indexnn():  # git name of ur
 
 if __name__ == '__main__':
     serve(app)
+    #serve(app)
     #app.run('127.0.0.1', 5000, debug=True)
 
 #    response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
