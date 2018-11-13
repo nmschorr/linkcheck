@@ -206,6 +206,7 @@ r = 'repercussions.com'
 a = 'astrology1234.com'
 
 if __name__ == "__main__":
-   # lc = LinkCheck()
-    lc = LinkCheck()
-    lc.main(k)
+    None
+    # lc = LinkCheck()
+    #lc = LinkCheck()
+    #lc.main(k)
