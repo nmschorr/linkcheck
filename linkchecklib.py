@@ -107,7 +107,7 @@ class LinkCheckLib(object):
                 if err_links:
                     errs = list(set(err_links))
                     err_links.clear()
-                    er_len = len(errs)
+                    #er_len = len(errs)
                     #nstring = '\n' + "Total errors: " + str(er_len) + " Here are the errors ---:"
                     #self.myprint(nstring)
 
@@ -153,8 +153,7 @@ class LinkCheckLib(object):
     def isTHEparent(self, main_link):  # is it THE parent? part of the main website?
         schemeonly = None
         lens=0
-        #self.myprint("in isTHEparent 1")
-        #self.myprint("-----mainlink--------------- 7" + main_link)
+        #self.myprint("in isTHEparent 1 -----mainlink--------------- 7" + main_link)
 
         try:
             urlpar = urlparse(main_link)
@@ -178,8 +177,7 @@ class LinkCheckLib(object):
             #self.myprint("new mainew:  " + mainew)
 
 
-                # if parsed.scheme != '':
-                #     main_link = parsed.netloc
+                # if parsed.scheme != '':   main_link = parsed.netloc
 
             t_parent = self.MAIN_DICT.get(self.BASENAME)
             par_locwww = self.MAIN_DICT.get(self.BASENAMEwww)
@@ -246,6 +244,7 @@ class LinkCheckLib(object):
         done_ln_glob_singles = self.MAIN_DICT.get(self.rdonesingles)
         other_lin_loc = self.MAIN_DICT.get(self.rothers)
         t_err = 0
+        code = None
         the_big_response = None
         try:
             #self.myprint("do_response 2")
@@ -255,15 +254,20 @@ class LinkCheckLib(object):
                 the_big_response = session.get(a_link)
                 # ----------------------------------------------------------session.get-------------
                 session.close()
+                self.MAIN_DICT.get(self.rdonesingles).append(a_link)  # add this link to done list
+
+
                 if the_big_response is not None:
-                    self.MAIN_DICT.get(self.rdonesingles).append(a_link)
-
                     code = the_big_response.status_code
-                    self.add_err_to_errlinks(a_link, code, p_link)  ## if there's    an error
                     self.myprint("LINK: in do_response: " + a_link + "  status code: " + str(code))
-                else:
-                    self.MAIN_DICT.get(self.rerr).append((a_link, 000, p_link))
+                    if code in [200, 301, 302]:
+                        return the_big_response  # no error - lets leave
 
+                    elif code is not None:
+                        self.add_err_to_errlinks(a_link, code, p_link)  ## if there's an error
+
+                    else:  #no code but still and error
+                        self.MAIN_DICT.get(self.rerr).append((a_link, 000, p_link))  ## we had some kind of error
 
         except Exception as e:
             self.myprint("GOT AN EXCEPTION inside do_response: " + str(e))
@@ -423,7 +427,7 @@ class LinkCheckLib(object):
         if (addy[0:8] == 'https://') or (addy[0:7]== 'http://'):
             return addy
         else:
-            return 'http://' + addy
+            return 'https://' + addy
 
     #-----------------------------------------------------------------------------
     def reset_timer( self, name, tstart):
