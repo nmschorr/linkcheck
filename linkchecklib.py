@@ -22,12 +22,14 @@ class LinkCheckLib(object):
         self.BASENAME = "BASE" + rand
         self.BASENAMEwww = "BASEwww" + rand
         self.rerr = "rerr_" + rand
+        self.redir = "redir_" + rand
         self.rdonesingles = "rdone_" + rand
         self.rothers = "rothers_" + rand
         self.rbase = "rbase_" + rand
         # self.redirecterrs = "redirecterrs" + rand
 
         err_links = []   # final error links found
+        redirs = []   # final error links found
         done_ln_glob_singles = []
         other_links_gl = []  #list of tups
         base_lnks_g = []  #list of tups
@@ -39,6 +41,7 @@ class LinkCheckLib(object):
         self.MAIN_DICT.update({self.BASENAME: "init"})
         self.MAIN_DICT.update({self.BASENAMEwww: "init"})
         self.MAIN_DICT.update({self.rerr: err_links})
+        self.MAIN_DICT.update({self.redir: redirs})
         self.MAIN_DICT.update({self.rdonesingles: done_ln_glob_singles})
         self.MAIN_DICT.update({self.rothers: other_links_gl})
         self.MAIN_DICT.update({self.rbase: base_lnks_g})
@@ -251,7 +254,7 @@ class LinkCheckLib(object):
             if not (( a_link in done_ln_glob_singles) and (a_link not in other_lin_loc)):
                 session = HTMLSession()
                 # ---------------------------------------------------------session.get--------------
-                the_big_response = session.get(a_link)
+                the_big_response = session.get(a_link, allow_redirects=False)
                 # ----------------------------------------------------------session.get-------------
                 session.close()
                 self.MAIN_DICT.get(self.rdonesingles).append(a_link)  # add this link to done list
@@ -260,7 +263,7 @@ class LinkCheckLib(object):
                 if the_big_response is not None:
                     code = the_big_response.status_code
                     self.myprint("LINK: in do_response: " + a_link + "  status code: " + str(code))
-                    if code in [200, 301, 302]:
+                    if code in [200, 302]:
                         return the_big_response  # no error - lets leave
 
                     elif code is not None:
@@ -410,12 +413,17 @@ class LinkCheckLib(object):
 
     #-----------------------------------------------------------------------------
 
-    def add_err_to_errlinks(self, t_link, st_code_int, tpar):
+    def add_err_to_errlinks(self, t_link, er_code_int, tpar):
         try:
             err_codes = [000, 400, 404, 408, 409]
-            if (st_code_int in err_codes) and (t_link not in self.MAIN_DICT.get(self.rerr)):
+            if (er_code_int in err_codes) and (t_link not in self.MAIN_DICT.get(self.rerr)):
                 #self.myprint("adding error in ck_status_code " + t_link + str(st_code_int) + tpar)
-                self.MAIN_DICT.get(self.rerr).append((t_link, st_code_int, tpar))
+                self.MAIN_DICT.get(self.rerr).append((t_link, er_code_int, tpar))
+
+            elif er_code_int == 301:
+                self.MAIN_DICT.get(self.redir).append((t_link, er_code_int, tpar))
+                self.myprint("-- Adding redir in ck_status_code:  " + t_link + "  " + str(er_code_int) + "  " +  tpar)
+
         except Exception as e:
             self.myprint("Exception in ck_status_code: " + str(e))
 

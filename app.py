@@ -25,12 +25,13 @@ def main_work(site, just_name):   # run LinkCheck and ac.myprint to console
     file_path = path.join(os_path_plus_stat, just_name)
 
     lc = LinkCheck()
-    answers = lc.main(site)
+    answers, redirs = lc.main(site)
     len_ans = len(answers)
-    if len_ans == 0:
-        ac.datalines(file_path, [('','','')], special=1)  #special=1 is a page with no broken links
+    len_red = len(redirs)
+    if len_ans + len_red == 0:
+        ac.write_html_file(file_path, [('', '', '')], [('', '', '')], special=1)  #special=1 is a page with no broken links
     else:
-        ac.datalines(file_path, answers)
+        ac.write_html_file(file_path, answers, redirs)
     dt = str(datetime.now())
     print( dt + "  main_work done")
 
@@ -66,6 +67,6 @@ def indexnn():  # git name of ur
 
 
 if __name__ == '__main__':
-    serve(app)
     #serve(app)
-    #app.run('127.0.0.1', 5000, debug=True)
+    #serve(app)
+    app.run('127.0.0.1', 5000, debug=True)

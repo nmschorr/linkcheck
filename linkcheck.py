@@ -112,13 +112,33 @@ class LinkCheck(LinkCheckLib):
             for i in finlist:
                 print("  broken link: " + i[0] + " found on parent: " + i[2])
         except Exception as e:
-            self.myprint("Exception inside main: " + str(e))
+            self.myprint("Exception inside main 1: " + str(e))
 
+        redirrs = self.main_loop_redirs()
         print()
         print("TotalTime: " + str(perf_counter() - tstart))
-        return finlist
+        return finlist, redirrs
 
     #-------------------------------------------------------------------
+    def main_loop_redirs(self):
+        try:
+            reds1 = self.MAIN_DICT.get(self.redir)
+            reds = list(set(reds1))
+            redlist = []
+            for loc in reds:
+                answer_string = [ loc[0], str(loc[1]), loc[2]]
+                redlist.append(answer_string)
+
+            print()
+            self.myprint("Here are the redirected links which should be fixed: ")
+            for i in redlist:
+                print("  broken link: " + i[0] + " found on parent: " + i[2])
+        except Exception as e:
+            self.myprint("Exception inside main_loop_redirs: " + str(e))
+        return redlist
+
+
+    # -------------------------------------------------------------------
 
     def main_loop_get_links(self):
         self.myprint("In main_loop_get_links")
@@ -208,5 +228,5 @@ a = 'astrology1234.com'
 if __name__ == "__main__":
     None
     # lc = LinkCheck()
-    #lc = LinkCheck()
-    #lc.main(k)
+    lc = LinkCheck()
+    lc.main(s)

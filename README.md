@@ -1,5 +1,5 @@
 Program: LinkCheck
-Author:  Nancy Schorr, 2018, http://schorrmedia.com
+Author:  Nancy Schorr, 2018, schorrmedia.com
 
 The app LinkCheck will check the links found on a website and return the broken links. It is written in python and uses these packages as well:
 
@@ -7,8 +7,4 @@ It is written with Python 3.6, and uses Flask and a touch of Javascript to displ
 
 The source code can be viewed at: github.com/nmschorr/linkcheck
 
-It's hosted on www.fastgalaxy.com <a href="http://www.fastgalaxy.com">LinkCheck</a>
-
-
-
-
+It's hosted at linkcheck.schorrmedia.com <a href="https://linkcheck.schorrmedia.com">LinkCheck</a>
