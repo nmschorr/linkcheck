@@ -263,7 +263,15 @@ class LinkCheckLib(object):
                 if the_big_response is not None:
                     code = the_big_response.status_code
                     self.myprint("LINK: in do_response: " + a_link + "  status code: " + str(code))
-                    if code in [200, 302]:
+                    # ---------------------------------------------------new-----------
+                    # ---------------------------------------------------new-----------
+                    # ---------------------------------------------------new-----------
+
+                    if code == 301:
+                        the_big_response = self.do_response_redirects(a_link, p_link)
+                        return the_big_response  # no error - lets leave
+
+                    elif code in [200, 302]:
                         return the_big_response  # no error - lets leave
 
                     elif code is not None:
@@ -279,6 +287,34 @@ class LinkCheckLib(object):
         return the_big_response
 
     #----------------------------------------------------------------------get_links-
+    def do_response_redirects(self, a_link, p_link):
+        self.myprint("do_response_redirect link is " + a_link + " parent: " + p_link)
+        code = None
+        the_big_response2 = None
+        try:
+                session = HTMLSession()
+                # ---------------------------------------------------------session.get2--------------
+                the_big_response2 = session.get(a_link)
+                # ----------------------------------------------------------session.get2-------------
+                session.close()
+
+                if the_big_response2 is not None:
+                    code = the_big_response2.status_code
+                    self.myprint("LINK: in do_response_redirect: " + a_link + "  status code: " + str(code))
+                    if code in [200, 302]:
+                        return the_big_response2  # no error - lets leave
+
+                    elif code is not None:
+                        self.add_err_to_errlinks(a_link, code, p_link)  ## if there's an error
+
+                    else:  # no code but still and error
+                        self.MAIN_DICT.get(self.rerr).append((a_link, 000, p_link))  ## we had some kind of error
+
+        except Exception as e:
+            self.myprint("GOT AN EXCEPTION inside do_response_redirect: " + str(e))
+            self.handle_exc(a_link, e, p_link)
+
+        return the_big_response2
 
     def ck_bad_data(self, dlink):
         #self.myprint("!!!!!=============inside ck_bad_data. val of link: " + dlink)
