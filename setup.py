@@ -7,7 +7,7 @@ setup(
       author='Nancy Schorr',
       author_email='nancyschorr@yahoo.com',
       packages=find_packages(),
-      #url='http://jetgal.pythonanywhere.com,
+      #url='httpd://linkcheck.schorrmedia.com,
       include_package_data=True,
       install_requires=[
             'flask',

@@ -242,8 +242,6 @@ class LinkCheckLib(object):
     def do_response(self, a_link, p_link):
         self.myprint("do_response link is " + a_link + " parent: " + p_link)
 
-
-        # redirecterr = self.MAIN_DICT.get(self.redirecterrs)
         done_ln_glob_singles = self.MAIN_DICT.get(self.rdonesingles)
         other_lin_loc = self.MAIN_DICT.get(self.rothers)
         t_err = 0
@@ -265,7 +263,8 @@ class LinkCheckLib(object):
                     self.myprint("LINK: in do_response: " + a_link + "  status code: " + str(code))
                     # ---------------------------------------------------new-----------
                     # ---------------------------------------------------new-----------
-                    # ---------------------------------------------------new-----------
+
+# ---------------------------------------------------301-----------
 
                     if code == 301:
                         the_big_response = self.do_response_redirects(a_link, p_link)
@@ -387,7 +386,7 @@ class LinkCheckLib(object):
             return
 
         parent = "empty"
-        the_response_simple = None
+        response_simple = None
         print()
         self.myprint("inside get_simple_response: ")
         print("here is the tuple : " + str(lin_and_par_tup) )
@@ -396,22 +395,29 @@ class LinkCheckLib(object):
         self.myprint("trying THIS_LN: " + link_to_ck + " parent: " + parent + " in get_simple_response")
 
         try:
-            the_response_simple = requests.head(link_to_ck)
+ #--------------- simple request of head only -------------------------------!!-------
+            response_simple = requests.head(link_to_ck, allow_redirects=False)
+ # --------------- simple request of head only -----------------------------!!!---------
+
+            stat = response_simple.status_code
+            follow_url = response_simple._next.url
+
+            self.MAIN_DICT.get(self.rdonesingles).append(link_to_ck)
 
         except Exception as e:
             self.myprint("Exception inside get_simple_response: ")
             self.handle_exc(link_to_ck, e, parent)
             self.myprint("returning ")
-
             return
 
-        self.myprint("here now simple response is : " + str(the_response_simple.status_code))
+        self.myprint("here now simple response is : " + str(stat))
         try:
-            if the_response_simple.status_code > 0:
-                self.myprint("here now 2")
+            if stat > 0:
+                if stat == 301:
+                    self.MAIN_DICT.get(self.redir).append((link_to_ck, stat, parent, follow_url))
+
+            else:
                 self.myprint("THIS_LN: " + link_to_ck + " parent: " + parent )
-                stat = the_response_simple.status_code
-                self.MAIN_DICT.get(self.rdonesingles).append(link_to_ck)
                 self.add_err_to_errlinks(link_to_ck, stat, parent)
 
         except Exception as e:
@@ -455,9 +461,10 @@ class LinkCheckLib(object):
             if (er_code_int in err_codes) and (t_link not in self.MAIN_DICT.get(self.rerr)):
                 #self.myprint("adding error in ck_status_code " + t_link + str(st_code_int) + tpar)
                 self.MAIN_DICT.get(self.rerr).append((t_link, er_code_int, tpar))
-
+#####------ 301:
+#--------------------------------------------------
             elif er_code_int == 301:
-                self.MAIN_DICT.get(self.redir).append((t_link, er_code_int, tpar))
+                self.MAIN_DICT.get(self.redir).append((t_link, er_code_int, tpar, 'None'))
                 self.myprint("-- Adding redir in ck_status_code:  " + t_link + "  " + str(er_code_int) + "  " +  tpar)
 
         except Exception as e:
