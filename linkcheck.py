@@ -208,11 +208,11 @@ class LinkCheck(LinkCheckLib):
         try:
             if other_to_ck:
                 for tupy in other_to_ck:  # check non-MAIN_DICT links
-                    self.get_simple_response(tupy)
+                    self.do_simple_response(tupy)
 
             if base_to_ck:
                 for tupy in base_to_ck:  # check non-MAIN_DICT links
-                    self.get_simple_response(tupy)
+                    self.do_simple_response(tupy)
 
         except Exception as e:
                 self.handle_exc(tupy[0], e, tupy[1])
@@ -221,12 +221,13 @@ class LinkCheck(LinkCheckLib):
 
 k = "kaldu.com"
 s = 'schorrmedia.com/m.html'
-#s = 'schorrmedia.com'
+ns = 'nancyschorr.com'
 r = 'repercussions.com'
 a = 'astrology1234.com'
+aa = 'calendarastrology.com'
 
 if __name__ == "__main__":
     None
     # lc = LinkCheck()
     lc = LinkCheck()
-    lc.main(s)
+    lc.main(aa)

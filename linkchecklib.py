@@ -26,7 +26,6 @@ class LinkCheckLib(object):
         self.rdonesingles = "rdone_" + rand
         self.rothers = "rothers_" + rand
         self.rbase = "rbase_" + rand
-        # self.redirecterrs = "redirecterrs" + rand
 
         err_links = []   # final error links found
         redirs = []   # final error links found
@@ -252,7 +251,7 @@ class LinkCheckLib(object):
             if not (( a_link in done_ln_glob_singles) and (a_link not in other_lin_loc)):
                 session = HTMLSession()
                 # ---------------------------------------------------------session.get--------------
-                the_big_response = session.get(a_link, allow_redirects=False)
+                the_big_response = session.get(a_link, allow_redirects=True)
                 # ----------------------------------------------------------session.get-------------
                 session.close()
                 self.MAIN_DICT.get(self.rdonesingles).append(a_link)  # add this link to done list
@@ -284,6 +283,33 @@ class LinkCheckLib(object):
             self.handle_exc(a_link, e, p_link)
 
         return the_big_response
+
+    #----------------------------------------------------------------------get_links-
+    def check_redirs(self, r, given, parent):
+        parent = 'http://www.bukkwyd.com'
+        given = 'http://www.bukkwyd.com'
+        parentbase = urlparse(parent).netloc
+        givenbase = urlparse(given).netloc
+        print("given url: ", given)
+
+        ##r = requests.get(given, allow_redirects=True)
+        newname = r.url
+        histlen = len(r.history)
+        if histlen > 0:
+            histz = r.history[0]
+            print(histz)
+            histz_stat = histz.status_code
+
+        print("histz_stat: ", histz_stat)
+        if histz_stat == 301:
+            None
+
+            newnamebase = urlparse(newname).netloc
+
+            d = dict()
+
+            d.update({givenbase: [newnamebase, histz_stat, histz.reason, parentbase]})
+            print()
 
     #----------------------------------------------------------------------get_links-
     def do_response_redirects(self, a_link, p_link):
@@ -374,7 +400,7 @@ class LinkCheckLib(object):
 
     #-----------------------------------------------------------------------------
     #---------------------------------------------------------------------------------------
-    def get_simple_response(self, lin_and_par_tup):
+    def do_simple_response(self, lin_and_par_tup):
         print('-- in get_simple_response() ')
 
         rdone_sings = self.MAIN_DICT.get(self.rdonesingles)
