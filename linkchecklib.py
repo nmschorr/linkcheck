@@ -292,7 +292,7 @@ class LinkCheckLib(object):
     def check_redirs(self, r, given, parent):
         # parent = 'http://www.bukkwyd.com'
         # given = 'http://www.bukkwyd.com'
-        print("given url: ", given)
+        print("-------------------------------@@@@@@@@@ Inside check_redirs   - given url: ", given)
         parentbase = urlparse(parent).netloc
         givenbase = urlparse(given).netloc
 
@@ -337,28 +337,28 @@ class LinkCheckLib(object):
     #         self.handle_exc(a_link, e, p_link)
     #
     #     return the_big_response2
-    #
-    # def ck_bad_data(self, dlink):
-    #     #self.myprint("!!!!!=============inside ck_bad_data. val of link: " + dlink)
-    #     bad_counter = 0
-    #     mylist = ['#', 'tel:+']
-    #     try:
-    #         for item in mylist:
-    #             if item in dlink:
-    #                 bad_counter += 1
-    #     except Exception as e:
-    #         self.myprint("Exception ck_bad_data: " + str(e))
-    #
-    #     ckme = dlink[7:30]
-    #     if ("pinterest.com" or "facebook.com" or "twitter.com") in ckme:
-    #         if len(dlink) > 50:
-    #             bad_counter += 1
-    #
-    #     good_suffix = self.has_correct_suffix(dlink)  # check suffix
-    #     #self.myprint("!inside ck_bad_data: " + str(good_or_bad) + ' ' + str(good_suffix))
-    #     return bad_counter, good_suffix
 
-    # #-----------------------------------------------------------------------------
+    def ck_bad_data(self, dlink):
+        #self.myprint("!!!!!=============inside ck_bad_data. val of link: " + dlink)
+        bad_counter = 0
+        mylist = ['#', 'tel:+']
+        try:
+            for item in mylist:
+                if item in dlink:
+                    bad_counter += 1
+        except Exception as e:
+            self.myprint("Exception ck_bad_data: " + str(e))
+
+        ckme = dlink[7:30]
+        if ("pinterest.com" or "facebook.com" or "twitter.com") in ckme:
+            if len(dlink) > 50:
+                bad_counter += 1
+
+        good_suffix = self.has_correct_suffix(dlink)  # check suffix
+        #self.myprint("!inside ck_bad_data: " + str(good_or_bad) + ' ' + str(good_suffix))
+        return bad_counter, good_suffix
+
+    #-----------------------------------------------------------------------------
     #-----------------------------------------------------------------------------
 
     def has_correct_suffix(self, link):
@@ -419,7 +419,7 @@ class LinkCheckLib(object):
 
         try:
  #--------------- simple request of head only -------------------------------!!-------
-            response_simple = requests.head(link_to_ck, allow_redirects=False)
+            response_simple = requests.head(link_to_ck)
  # --------------- simple request of head only -----------------------------!!!---------
 
             stat = response_simple.status_code
@@ -436,8 +436,9 @@ class LinkCheckLib(object):
         self.myprint("here now simple response is : " + str(stat))
         try:
             if stat > 0:
-                if stat == 301:
-                    self.MAIN_DICT.get(self.redir).append((link_to_ck, stat, parent, follow_url))
+                None
+                # if stat == 301:
+                #     self.MAIN_DICT.get(self.redir).append((link_to_ck, stat, parent, follow_url))
 
             else:
                 self.myprint("THIS_LN: " + link_to_ck + " parent: " + parent )

@@ -220,7 +220,7 @@ class LinkCheck(LinkCheckLib):
     #-------------------------------------------------------------------
 
 k = "kaldu.com"
-s = 'schorrmedia.com/m.html'
+s = 'schorrmedia.com'
 ns = 'nancyschorr.com'
 r = 'repercussions.com'
 a = 'astrology1234.com'
@@ -230,4 +230,4 @@ if __name__ == "__main__":
     None
     # lc = LinkCheck()
     lc = LinkCheck()
-    lc.main(aa)
+    lc.main(s)
