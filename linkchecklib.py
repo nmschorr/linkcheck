@@ -22,13 +22,13 @@ class LinkCheckLib(object):
         self.BASENAME = "BASE" + rand
         self.BASENAMEwww = "BASEwww" + rand
         self.rerr = "rerr_" + rand
-        self.redir = "redir_" + rand
+        self.redirs = "redirs_" + rand
         self.rdonesingles = "rdone_" + rand
         self.rothers = "rothers_" + rand
         self.rbase = "rbase_" + rand
 
         err_links = []   # final error links found
-        redirs = []   # final error links found
+        redir_list = []   # final error links found
         done_ln_glob_singles = []
         other_links_gl = []  #list of tups
         base_lnks_g = []  #list of tups
@@ -40,7 +40,7 @@ class LinkCheckLib(object):
         self.MAIN_DICT.update({self.BASENAME: "init"})
         self.MAIN_DICT.update({self.BASENAMEwww: "init"})
         self.MAIN_DICT.update({self.rerr: err_links})
-        self.MAIN_DICT.update({self.redir: redirs})
+        self.MAIN_DICT.update({self.redirs: redir_list})
         self.MAIN_DICT.update({self.rdonesingles: done_ln_glob_singles})
         self.MAIN_DICT.update({self.rothers: other_links_gl})
         self.MAIN_DICT.update({self.rbase: base_lnks_g})
@@ -50,6 +50,7 @@ class LinkCheckLib(object):
         self.myprint("self.ORIGNAME: " + self.ORIGNAME)
         self.myprint("self.ORIGNAMEwww: " + self.ORIGNAMEwww)
         self.myprint("name of err list: " + self.rerr)
+        self.myprint("name of redirs list: " + self.redirs)
 
     #-----------------------------------------------------------------------------
     def myprint(self, print_str ):
@@ -135,6 +136,40 @@ class LinkCheckLib(object):
         return finlist
 
         # -----------------------------------------------------------------------------
+
+    def return_redirs(self):
+        self.myprint("in return_redirs()")
+        finlistr = []
+        rerrlinks = self.MAIN_DICT.get(self.redirs)
+
+        if rerrlinks:
+            answer_string, loc_e  = '', ''
+            try:
+                if rerrlinks:
+                    errs = list(set(rerrlinks))
+                    rerrlinks.clear()
+                    errs1 = list(set(errs))
+                    errs2 = sorted(errs1, key=lambda x: x[0])  # sort on first
+                    errs3 = set(errs2)
+                    errs1.clear()
+                    errs2.clear()
+
+                    for loc_e in errs3:
+                        an0, an1, an2 = loc_e[0], str(loc_e[1]), loc_e[2]
+
+                        answer_string = [an0, an1, an2]
+                        finlistr.append(answer_string)
+
+                    # err_links.clear()
+                else:
+                    finlistr = [answer_string]
+            except Exception as loc_e:
+                self.myprint('Exception print_errs: ' + str(loc_e))
+
+        self.myprint("len of finlist: " + str(len(finlistr)))
+        return finlistr
+
+    # -----------------------------------------------------------------------------
     def make_www_url(self, tlink):  # is it THE parent? part of the main website?
         lens = 0
         scheme_len = 0
@@ -255,8 +290,8 @@ class LinkCheckLib(object):
                 the_big_response = session.get(a_link)
                 # ----------------------------------------------------------session.get-------------
                 session.close()
-                self.myprint("do_response 33")
-                self.check_redirs(the_big_response, a_link, p_link)
+                self.myprint("do_response 3.3")
+                self.check_redirs(the_big_response, a_link, p_link)  ##----------CHECK REDIRS ----------!!!!@@!!
                 self.MAIN_DICT.get(self.rdonesingles).append(a_link)  # add this link to done list
                 self.myprint("do_response 4")
 
@@ -290,8 +325,7 @@ class LinkCheckLib(object):
 
     #----------------------------------------------------------------------get_links-
     def check_redirs(self, r, given, parent):
-        # parent = 'http://www.bukkwyd.com'
-        # given = 'http://www.bukkwyd.com'
+        histz_stat = 0
         print("-------------------------------@@@@@@@@@ Inside check_redirs   - given url: ", given)
         parentbase = urlparse(parent).netloc
         givenbase = urlparse(given).netloc
@@ -299,14 +333,23 @@ class LinkCheckLib(object):
         newname = r.url
         histlen = len(r.history)
         if histlen > 0:
-            histz = r.history[0]
-            print(histz)
-            histz_stat = histz.status_code
+            print("------------------redir hist len: " + str(histlen))
+
+            try:
+                histz = r.history[0]
+            #print("------------------histz hist len: " )
+                histz_stat = histz.status_code
+            except Exception as e:
+                print("GOT AN EXCEPTION inside check_redirs: " + str(e))
 
         print("histz_stat: ", histz_stat)
         if histz_stat == 301:
             newnamebase = urlparse(newname).netloc
-            self.MAIN_DICT.get(self.rerr).append((givenbase, newnamebase, histz_stat, parentbase))  ## we had some kind of error
+            mainnew = (givenbase, parentbase, newnamebase)
+            big_redirs = self.MAIN_DICT.get(self.redirs)
+            big_redirs.append(mainnew)
+            self.MAIN_DICT.update({self.redirs: big_redirs})
+            print()
 
     #----------------------------------------------------------------------get_links-
     # def do_response_redirects(self, a_link, p_link):

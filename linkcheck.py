@@ -107,17 +107,27 @@ class LinkCheck(LinkCheckLib):
             self.main_run_simple()
 
             finlist = self.return_errors()
+            finlistr = self.return_redirs()
             print()
             self.myprint("Here are the broken links: ")
             for i in finlist:
-                print("  broken link: " + i[0] + " found on parent: " + i[2])
+                print("  broken link: " + i[0] + " found on parent: " + str(i[2]) )
+
+            print()
+            self.myprint("Here are the redirect links: ")
+            for i in finlistr:
+                print("link: " + i[0] + " redirected to: " + i[1]  + " found on parent: " + i[2]  )
+
+
+
+
         except Exception as e:
             self.myprint("Exception inside main 1: " + str(e))
 
-        redirrs = self.main_loop_redirs()
+        ##redirrs = self.main_loop_redirs()
         print()
         print("TotalTime: " + str(perf_counter() - tstart))
-        return finlist, redirrs
+        return finlist, finlistr
 
     #-------------------------------------------------------------------
     def main_loop_redirs(self):
@@ -219,15 +229,16 @@ class LinkCheck(LinkCheckLib):
 
     #-------------------------------------------------------------------
 
-k = "kaldu.com"
-s = 'schorrmedia.com'
-ns = 'nancyschorr.com'
-r = 'repercussions.com'
-a = 'astrology1234.com'
-aa = 'calendarastrology.com'
+ka = "kaldu.com"
+ss = 'schorrmedia.com'
+nss = 'nancyschorr.com'
+repers = 'repercussions.com'
+ast = 'astrology1234.com'
+aaa = 'calendarastrology.com'
+stt = 'starpresence.net'
 
 if __name__ == "__main__":
     None
     # lc = LinkCheck()
     lc = LinkCheck()
-    lc.main(s)
+    lc.main(ka)
