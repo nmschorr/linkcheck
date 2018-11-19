@@ -13,7 +13,7 @@ class AppSupport:
 
     @classmethod
     def write_html_file(cls, filey, data, redirs, special=0):
-        first = "<span id='errline2'> BAD LINK--> </span> "
+        first = "<br><span id='errline2'> BAD LINK--> </span> "
         sec = "<br><span id='errline'>&nbsp;*** ERROR-->  "
         third = "&emsp;&emsp;---> Found on: "
         fourth = "Here are your broken links:"
