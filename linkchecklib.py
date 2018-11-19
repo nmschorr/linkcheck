@@ -273,7 +273,7 @@ class LinkCheckLib(object):
 
     #-----------------------------------------------------------------------
 
-    def do_response(self, a_link, p_link):
+    def do_get_request(self, a_link, p_link):
         self.myprint("do_response link is " + a_link + " parent: " + p_link)
 
         done_ln_glob_singles = self.MAIN_DICT.get(self.rdonesingles)
@@ -351,40 +351,13 @@ class LinkCheckLib(object):
             self.MAIN_DICT.update({self.redirs: big_redirs})
             print()
 
-    #----------------------------------------------------------------------get_links-
-    # def do_response_redirects(self, a_link, p_link):
-    #     self.myprint("do_response_redirect link is " + a_link + " parent: " + p_link)
-    #     code = None
-    #     the_big_response2 = None
-    #     try:
-    #             session = HTMLSession()
-    #             # ---------------------------------------------------------session.get2--------------
-    #             the_big_response2 = session.get(a_link)
-    #             # ----------------------------------------------------------session.get2-------------
-    #             session.close()
-    #
-    #             if the_big_response2 is not None:
-    #                 code = the_big_response2.status_code
-    #                 self.myprint("LINK: in do_response_redirect: " + a_link + "  status code: " + str(code))
-    #                 if code in [200, 302]:
-    #                     return the_big_response2  # no error - lets leave
-    #
-    #                 elif code is not None:
-    #                     self.add_err_to_errlinks(a_link, code, p_link)  ## if there's an error
-    #
-    #                 else:  # no code but still and error
-    #                     self.MAIN_DICT.get(self.rerr).append((a_link, 000, p_link))  ## we had some kind of error
-    #
-    #     except Exception as e:
-    #         self.myprint("GOT AN EXCEPTION inside do_response_redirect: " + str(e))
-    #         self.handle_exc(a_link, e, p_link)
-    #
-    #     return the_big_response2
+
+    #-----------------------------------------------------------------------------
 
     def ck_bad_data(self, dlink):
         #self.myprint("!!!!!=============inside ck_bad_data. val of link: " + dlink)
         bad_counter = 0
-        mylist = ['#', 'tel:+']
+        mylist = ['#', 'tel:+', '[[']
         try:
             for item in mylist:
                 if item in dlink:
@@ -440,55 +413,53 @@ class LinkCheckLib(object):
 
     #-----------------------------------------------------------------------------
     #---------------------------------------------------------------------------------------
-    def do_simple_response(self, lin_and_par_tup):
-        print('-- in get_simple_response() ')
-
-        rdone_sings = self.MAIN_DICT.get(self.rdonesingles)
-        if lin_and_par_tup[0] in rdone_sings:
-            print('!!!!!============================found dupe: ')
+    def do_head_request(self, lin_and_par_tup):
+        print()
+        print('-- in do_head_request() ')
+        if not lin_and_par_tup:    #nothing correct passed in
             return
 
-        if not lin_and_par_tup:
+        print("here is the tuple  in do_head_request(): " + str(lin_and_par_tup) )
+        rdone_singles = self.MAIN_DICT.get(self.rdonesingles)
+        if lin_and_par_tup[0] in rdone_singles:
+            print('!!!!!============================found dupe in do_head_request() - skipping. ')
             return
 
         parent = "empty"
-        response_simple = None
-        print()
-        self.myprint("inside get_simple_response: ")
-        print("here is the tuple : " + str(lin_and_par_tup) )
+        head_response = None
         link_to_ck, parent = lin_and_par_tup[0], lin_and_par_tup[1]
 
-        self.myprint("trying THIS_LN: " + link_to_ck + " parent: " + parent + " in get_simple_response")
+        self.myprint("trying THIS_LN: " + link_to_ck + " parent: " + parent + " in do_head_request")
 
         try:
  #--------------- simple request of head only -------------------------------!!-------
-            response_simple = requests.head(link_to_ck)
+            head_response = requests.head(link_to_ck)
  # --------------- simple request of head only -----------------------------!!!---------
 
-            stat = response_simple.status_code
-            follow_url = response_simple._next.url
-
-            self.MAIN_DICT.get(self.rdonesingles).append(link_to_ck)
+            self.MAIN_DICT.get(self.rdonesingles).append(link_to_ck)  # record we did this one
+            head_stat = head_response.status_code
+            self.myprint("do_head_request is : " + str(head_stat))
 
         except Exception as e:
-            self.myprint("Exception inside get_simple_response: ")
+            self.myprint("Exception inside do_head_request. " + str(e))
             self.handle_exc(link_to_ck, e, parent)
-            self.myprint("returning ")
             return
 
-        self.myprint("here now simple response is : " + str(stat))
         try:
-            if stat > 0:
-                None
-                # if stat == 301:
-                #     self.MAIN_DICT.get(self.redir).append((link_to_ck, stat, parent, follow_url))
+            if head_stat > 0:
+                if head_stat == 301:  # perm redirect
+                    follow_url = head_response._next.url  # only for 301 errs
+                    self.MAIN_DICT.get(self.redirs).append((link_to_ck, parent, follow_url))
+                elif head_stat in [400, 404, 408, 409]:
+                    self.add_err_to_errlinks(link_to_ck, head_stat, parent)
+                else:
+                    return
 
-            else:
-                self.myprint("THIS_LN: " + link_to_ck + " parent: " + parent )
-                self.add_err_to_errlinks(link_to_ck, stat, parent)
+            else:   # no status means no regular result
+                self.add_err_to_errlinks(link_to_ck, 000 , parent)
 
         except Exception as e:
-            self.myprint("Exception inside get_simple_response: " + str(e))
+            self.myprint("Exception inside do_head_request 2: " + str(e))
 
 
 #---------------------------------------------------------------------------------------
@@ -526,7 +497,7 @@ class LinkCheckLib(object):
         try:
             err_codes = [000, 400, 404, 408, 409]
             if (er_code_int in err_codes) and (t_link not in self.MAIN_DICT.get(self.rerr)):
-                #self.myprint("adding error in ck_status_code " + t_link + str(st_code_int) + tpar)
+                self.myprint("adding error in ck_status_code " + t_link + str(er_code_int) + tpar)
                 self.MAIN_DICT.get(self.rerr).append((t_link, er_code_int, tpar))
 #####------ 301:
 #--------------------------------------------------

@@ -13,13 +13,23 @@ class LinkCheck(LinkCheckLib):
     # #----------------------------------------------------------------------get_links-
 
     def get_links_for_one_pair(self, mainlin, par_link):
+        doespagematch = False
         done_ln_gl_sing = self.MAIN_DICT.get(self.rdonesingles)
         if mainlin not in done_ln_gl_sing:
             self.myprint(" in get_links_for_one_pair " + mainlin)
 
             # #---------------  web response get here!!!!!!!!------------------------web response get here!!!!!!!!--------
-            response = self.do_response(mainlin, par_link)
+            response = self.do_get_request(mainlin, par_link)
             # #---------------  web response get here!!!!!!!!------------------------web response get here!!!!!!!!--------
+
+            if response.url == mainlin:
+                doespagematch = True
+
+            if doespagematch == False:
+                isbase = self.ret_bool_if_BASE(response.url)
+                if not isbase:
+                    return     #don't bother checking with it's links since it's been redirected somewhere
+
 
             if response is not None:  ## GOOD!  0 is good to continue
                 try:
@@ -30,10 +40,13 @@ class LinkCheck(LinkCheckLib):
                     self.myprint("Exception inside get_links_for_one_pair: " + str(e))
                     return
 
+                the_link: object
                 for the_link in new_lnks_loc:
                     if self.ret_bool_if_same_as_orig_url(the_link):
                         continue
-                    self.push_links_Base_or_Other(the_link, par_link)
+
+                    else:
+                        self.push_links_Base_or_Other(the_link, par_link)
 
 # #----------------------------------------------------------------------get_links-
 
@@ -64,7 +77,7 @@ class LinkCheck(LinkCheckLib):
             self.handle_exc(the_link, e, par_link)
 
 
-      #############----------------------------------MAIN-------------------------
+      #############----------------------------------MAIN setup-------------------------
     def main_setup(self, msite):
         self.MAIN_DICT.update({ self.ORIGNAME: msite })
         msite_www = self.make_www_url(msite)
@@ -85,8 +98,6 @@ class LinkCheck(LinkCheckLib):
         self.myprint('In main_setup() Getting first address: ' + msite_w_scheme)
         return msite_w_scheme
 
-
-
       #############----------------------------------MAIN-------------------------
 
     def main(self, msite="a.htm"):
@@ -96,30 +107,28 @@ class LinkCheck(LinkCheckLib):
         try:
             #############---------step ONE:
             self.get_links_for_one_pair(link_w_scheme, link_w_scheme)  #first set of MAIN_DICT
-            self.myprint("In main(). Step One Done with base_only_plain_repeat")   ##first time:  HOME PAGE ONLY  ##first time
-            self.main_loop_get_links()
+            self.myprint("In main(). Step One Done with get_links_for_one_pair. ")   ##first time:  HOME PAGE ONLY  ##first time
+
+            self.main_one_loop_get_links()
 
         except Exception as e:
             self.myprint("Exception inside main: " + str(e))
 
         try:
             self.main_two_more_baselinks()
-            self.main_run_simple()
+            self.main_three_run_head()
 
             finlist = self.return_errors()
             finlistr = self.return_redirs()
             print()
             self.myprint("Here are the broken links: ")
             for i in finlist:
-                print("  broken link: " + i[0] + " found on parent: " + str(i[2]) )
+                print("  Broken link: " + i[0] + " found on parent: " + str(i[2]) )
 
             print()
-            self.myprint("Here are the redirect links: ")
+            self.myprint("Here are the redirect problems: ")
             for i in finlistr:
-                print("link: " + i[0] + " redirected to: " + i[1]  + " found on parent: " + i[2]  )
-
-
-
+                print("  Redirected link: " + i[0]  + " found on parent: " + i[1] + " redirected to: " + i[2]  )
 
         except Exception as e:
             self.myprint("Exception inside main 1: " + str(e))
@@ -130,31 +139,11 @@ class LinkCheck(LinkCheckLib):
         return finlist, finlistr
 
     #-------------------------------------------------------------------
-    def main_loop_redirs(self):
+    def main_one_loop_get_links(self):
+        self.myprint("In main_one_loop_get_links")
         try:
-            reds1 = self.MAIN_DICT.get(self.redir)
-            reds = list(set(reds1))
-            redlist = []
-            for loc in reds:
-                answer_string = [ loc[0], str(loc[1]), loc[2]]
-                redlist.append(answer_string)
+            repeats, new_base_links_two_tup = 0, []
 
-            print()
-            self.myprint("Here are the redirected links which should be fixed: ")
-            for i in redlist:
-                print("  broken link: " + i[0] + " found on parent: " + i[2])
-        except Exception as e:
-            self.myprint("Exception inside main_loop_redirs: " + str(e))
-        return redlist
-
-
-    # -------------------------------------------------------------------
-
-    def main_loop_get_links(self):
-        self.myprint("In main_loop_get_links")
-        try:
-            repeats = 0
-            new_base_links_two_tup = []
             base_len = len(self.base_only_plain_repeat_tup)
             while base_len and repeats < 6:
                 repeats +=1
@@ -176,10 +165,11 @@ class LinkCheck(LinkCheckLib):
 
     #-------------------------------------------------------------------
 
+
+
     def main_two_more_baselinks(self):
-        self.myprint("In get_more_baselinks")
+        self.myprint("In main_two_more_baselinks")
         base_glob_now_tup = self.MAIN_DICT.get(self.rbase)
-        the_len_b = 0
         repeats = 0
         alreadychecked_tups = []
         if base_glob_now_tup:
@@ -190,7 +180,7 @@ class LinkCheck(LinkCheckLib):
                 while the_len_b and repeats < 6:
 
                     repeats += 1
-                    self.myprint('\n' + "Repeats: " + str(repeats) + "-------------------!!In main loop")
+                    self.myprint('\n' + "Repeats: " + str(repeats) + "-------------------!!In main loop main_two_more_baselinks.")
                     if base_glob_now_tup:
 
                         for baselink_tup in base_glob_now_tup:
@@ -198,34 +188,32 @@ class LinkCheck(LinkCheckLib):
                                 self.get_links_for_one_pair(baselink_tup[0], baselink_tup[1])  # first set of MAIN_DICT
                                 alreadychecked_tups.append(baselink_tup)
 
-                        #self.myprint("adding to rbase: " + (str(base_glob_now)))
-                        #self.MAIN_DICT.update({self.rbase: base_glob_now})
-
             except Exception as e:
-                self.myprint("Exception after baselink in base_glob_now: " + str(e))
+                self.myprint("Exception after baselink in main_two_more_baselinks: " + str(e))
 
     #-------------------------------------------------------------------
 
-    def main_run_simple(self):
-        self.myprint("-----------------------------------In main_run_simple()")
+    def main_three_run_head(self):
+        self.myprint("-----------------------------------In main_three_run_head()")
         other_to_ck= self.MAIN_DICT.get(self.rothers)
         base_to_ck= self.MAIN_DICT.get(self.rbase)
-        tupy = (0,0)
+        #tupy1 = (0,0)
 
         #self.myprint("done_singles: " + str(done_singles)+"other_to_ck: " + str(other_to_ck))
         #self.myprint("-----------------------------------In other_links_big_check2")
 
         try:
             if other_to_ck:
-                for tupy in other_to_ck:  # check non-MAIN_DICT links
-                    self.do_simple_response(tupy)
+                for tupy1 in other_to_ck:  # check non-MAIN_DICT links
+                    self.do_head_request(tupy1)
 
             if base_to_ck:
-                for tupy in base_to_ck:  # check non-MAIN_DICT links
-                    self.do_simple_response(tupy)
+                for tupy2 in base_to_ck:  # check non-MAIN_DICT links
+                    self.do_head_request(tupy2)
 
         except Exception as e:
-                self.handle_exc(tupy[0], e, tupy[1])
+                #self.handle_exc(tupy[0], e, tupy[1])
+                self.myprint("Exception main_three_run_head: " + str(e))
 
     #-------------------------------------------------------------------
 
@@ -238,7 +226,31 @@ aaa = 'calendarastrology.com'
 stt = 'starpresence.net'
 
 if __name__ == "__main__":
-    None
+    #None
     # lc = LinkCheck()
     lc = LinkCheck()
     lc.main(ka)
+
+
+
+
+
+    # def main_loop_redirs(self):
+    #     try:
+    #         reds1 = self.MAIN_DICT.get(self.redir)
+    #         reds = list(set(reds1))
+    #         redlist = []
+    #         for loc in reds:
+    #             answer_string = [ loc[0], str(loc[1]), loc[2]]
+    #             redlist.append(answer_string)
+    #
+    #         print()
+    #         self.myprint("Here are the redirected links which should be fixed: ")
+    #         for i in redlist:
+    #             print("  broken link: " + i[0] + " found on parent: " + i[2])
+    #     except Exception as e:
+    #         self.myprint("Exception inside main_loop_redirs: " + str(e))
+    #     return redlist
+
+
+    # -------------------------------------------------------------------
