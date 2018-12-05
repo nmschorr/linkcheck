@@ -5,7 +5,7 @@ from random import random
 from time import perf_counter
 from config import conf_debug
 import requests
-
+import cfscrape
 
 
 class LinkCheckLib(object):
@@ -177,6 +177,8 @@ class LinkCheckLib(object):
         if schemef:
             scheme_len = len(schemef)
         netl = urlparse(tlink).netloc
+        if tlink[:4] == 'www.':
+            return tlink
         if "www." in netl:
             return tlink
         else:
@@ -274,6 +276,17 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------
 
     def do_get_request(self, a_link, p_link):
+
+        scraper = cfscrape.create_scraper(delay=30)  # returns a CloudflareScraper instance
+        # Or: scraper = cfscrape.CloudflareScraper()  # CloudflareScraper inherits from requests.Session
+        print("SCRAPING---------!!!")
+        try:
+            scp = scraper.get(a_link)
+            print()      # => "<!DOCTYPE html><html><head>..."
+        except Exception as e:
+            self.myprint("Exception ck_base: " + str(e))
+
+
         self.myprint("do_response link is " + a_link + " parent: " + p_link)
 
         done_ln_glob_singles = self.MAIN_DICT.get(self.rdonesingles)
@@ -497,7 +510,7 @@ class LinkCheckLib(object):
         try:
             err_codes = [000, 400, 404, 408, 409]
             if (er_code_int in err_codes) and (t_link not in self.MAIN_DICT.get(self.rerr)):
-                self.myprint("adding error in ck_status_code " + t_link + str(er_code_int) + tpar)
+                self.myprint("adding error in ck_status_code " + t_link  + "  " + str(er_code_int)  + "  " + tpar)
                 self.MAIN_DICT.get(self.rerr).append((t_link, er_code_int, tpar))
 #####------ 301:
 #--------------------------------------------------
@@ -516,7 +529,7 @@ class LinkCheckLib(object):
         if (addy[0:8] == 'https://') or (addy[0:7]== 'http://'):
             return addy
         else:
-            return 'http://' + addy
+            return 'https://' + addy
 
     #-----------------------------------------------------------------------------
     def reset_timer( self, name, tstart):

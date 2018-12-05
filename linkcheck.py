@@ -22,6 +22,9 @@ class LinkCheck(LinkCheckLib):
             response = self.do_get_request(mainlin, par_link)
             # #---------------  web response get here!!!!!!!!------------------------web response get here!!!!!!!!--------
 
+
+
+
             if response.url == mainlin:
                 doespagematch = True
 
@@ -87,8 +90,9 @@ class LinkCheck(LinkCheckLib):
         msite_w_scheme = LinkCheckLib.mk_link_w_scheme(msite)
         parsed = urlparse(msite_w_scheme)
         base_netloc = str(parsed.netloc)
-        base_netloc_www = 'www.' + base_netloc
-
+        # base_netloc_www = 'www.' + base_netloc
+        if base_netloc[:4]!= 'www.':
+            base_netloc_www = 'www.' + base_netloc
 
         self.MAIN_DICT.update({ self.BASENAME: msite  })
         self.MAIN_DICT.update({ self.BASENAMEwww:msite_www })
@@ -224,12 +228,13 @@ repers = 'repercussions.com'
 ast = 'astrology1234.com'
 aaa = 'calendarastrology.com'
 stt = 'starpresence.net'
+wb = 'www.workbridgeassociates.com/locations/silicon-valley'
 
 if __name__ == "__main__":
     #None
     # lc = LinkCheck()
     lc = LinkCheck()
-    lc.main(ka)
+    lc.main(wb)
 
 
 
