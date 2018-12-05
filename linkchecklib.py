@@ -427,6 +427,7 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------------
     #---------------------------------------------------------------------------------------
     def do_head_request(self, lin_and_par_tup):
+        scraper = cfscrape.create_scraper(delay=30)  # returns a CloudflareScraper instance
         print()
         print('-- in do_head_request() ')
         if not lin_and_par_tup:    #nothing correct passed in
@@ -452,6 +453,10 @@ class LinkCheckLib(object):
             self.MAIN_DICT.get(self.rdonesingles).append(link_to_ck)  # record we did this one
             head_stat = head_response.status_code
             self.myprint("do_head_request is : " + str(head_stat))
+            if head_stat == 404:
+                print("Trying Cloudflare unit ---------!!!")
+                scp = scraper.get(link_to_ck)
+                head_stat = scp.status_code
 
         except Exception as e:
             self.myprint("Exception inside do_head_request. " + str(e))
@@ -459,17 +464,20 @@ class LinkCheckLib(object):
             return
 
         try:
-            if head_stat > 0:
+            if head_stat < 301:
+                return
+            elif head_stat > 300:
                 if head_stat == 301:  # perm redirect
                     follow_url = head_response._next.url  # only for 301 errs
                     self.MAIN_DICT.get(self.redirs).append((link_to_ck, parent, follow_url))
-                elif head_stat in [400, 404, 408, 409]:
+                    return
+                elif head_stat in [400, 404, 408, 409, 410]:
                     self.add_err_to_errlinks(link_to_ck, head_stat, parent)
                 else:
                     return
 
-            else:   # no status means no regular result
-                self.add_err_to_errlinks(link_to_ck, 000 , parent)
+            # else:   # no status means no regular result
+            #     self.add_err_to_errlinks(link_to_ck, 000 , parent)
 
         except Exception as e:
             self.myprint("Exception inside do_head_request 2: " + str(e))

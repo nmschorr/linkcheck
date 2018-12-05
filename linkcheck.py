@@ -90,14 +90,14 @@ class LinkCheck(LinkCheckLib):
         msite_w_scheme = LinkCheckLib.mk_link_w_scheme(msite)
         parsed = urlparse(msite_w_scheme)
         base_netloc = str(parsed.netloc)
-        # base_netloc_www = 'www.' + base_netloc
+        base_netloc_www = base_netloc
         if base_netloc[:4]!= 'www.':
             base_netloc_www = 'www.' + base_netloc
 
         self.MAIN_DICT.update({ self.BASENAME: msite  })
         self.MAIN_DICT.update({ self.BASENAMEwww:msite_www })
-        # self.MAIN_DICT.update({ self.BASENAME: base_netloc })
-        # self.MAIN_DICT.update({ self.BASENAMEwww: base_netloc_www })
+        self.MAIN_DICT.update({ self.BASENAME: base_netloc })
+        self.MAIN_DICT.update({ self.BASENAMEwww: base_netloc_www })
 
         self.myprint('In main_setup() Getting first address: ' + msite_w_scheme)
         return msite_w_scheme
@@ -236,26 +236,3 @@ if __name__ == "__main__":
     lc = LinkCheck()
     lc.main(wb)
 
-
-
-
-
-    # def main_loop_redirs(self):
-    #     try:
-    #         reds1 = self.MAIN_DICT.get(self.redir)
-    #         reds = list(set(reds1))
-    #         redlist = []
-    #         for loc in reds:
-    #             answer_string = [ loc[0], str(loc[1]), loc[2]]
-    #             redlist.append(answer_string)
-    #
-    #         print()
-    #         self.myprint("Here are the redirected links which should be fixed: ")
-    #         for i in redlist:
-    #             print("  broken link: " + i[0] + " found on parent: " + i[2])
-    #     except Exception as e:
-    #         self.myprint("Exception inside main_loop_redirs: " + str(e))
-    #     return redlist
-
-
-    # -------------------------------------------------------------------
