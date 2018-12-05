@@ -67,6 +67,5 @@ def indexnn():  # git name of ur
 
 
 if __name__ == '__main__':
-    #serve(app)
-    #serve(app)
-    app.run('127.0.0.1', 5000, debug=True)
+    serve(app)
+    #app.run('127.0.0.1', 5000, debug=True)

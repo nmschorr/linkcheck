@@ -277,14 +277,14 @@ class LinkCheckLib(object):
 
     def do_get_request(self, a_link, p_link):
 
-        scraper = cfscrape.create_scraper(delay=30)  # returns a CloudflareScraper instance
-        # Or: scraper = cfscrape.CloudflareScraper()  # CloudflareScraper inherits from requests.Session
-        print("SCRAPING---------!!!")
-        try:
-            scp = scraper.get(a_link)
-            print()      # => "<!DOCTYPE html><html><head>..."
-        except Exception as e:
-            self.myprint("Exception ck_base: " + str(e))
+        # scraper = cfscrape.create_scraper(delay=30)  # returns a CloudflareScraper instance
+        # # Or: scraper = cfscrape.CloudflareScraper()  # CloudflareScraper inherits from requests.Session
+        # print("SCRAPING---------!!!")
+        # try:
+        #     scp = scraper.get(a_link)
+        #     print()      # => "<!DOCTYPE html><html><head>..."
+        # except Exception as e:
+        #     self.myprint("Exception ck_base: " + str(e))
 
 
         self.myprint("do_response link is " + a_link + " parent: " + p_link)
@@ -427,7 +427,6 @@ class LinkCheckLib(object):
     #-----------------------------------------------------------------------------
     #---------------------------------------------------------------------------------------
     def do_head_request(self, lin_and_par_tup):
-        scraper = cfscrape.create_scraper(delay=30)  # returns a CloudflareScraper instance
         print()
         print('-- in do_head_request() ')
         if not lin_and_par_tup:    #nothing correct passed in
@@ -454,6 +453,7 @@ class LinkCheckLib(object):
             head_stat = head_response.status_code
             self.myprint("do_head_request is : " + str(head_stat))
             if head_stat == 404:
+                scraper = cfscrape.create_scraper()  # returns a CloudflareScraper instance
                 print("Trying Cloudflare unit ---------!!!")
                 scp = scraper.get(link_to_ck)
                 head_stat = scp.status_code
