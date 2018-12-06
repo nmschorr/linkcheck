@@ -318,7 +318,8 @@ class LinkCheckLib(object):
 # ---------------------------------------------------301-----------
 
                     if code == 301:
-                        self.add_err_to_errlinks(a_link, code, p_link)  ## if there's an error
+                        if self.ret_bool_if_BASE(p_link):
+                            self.add_err_to_errlinks(a_link, code, p_link)  ## if there's an error
                         return the_big_response  # no error - lets leave
 
                     elif code in [200, 302]:
@@ -342,6 +343,9 @@ class LinkCheckLib(object):
         print("-------------------------------@@@@@@@@@ Inside check_redirs   - given url: ", given)
         parentbase = urlparse(parent).netloc
         givenbase = urlparse(given).netloc
+        is_this_on_base = self.ret_bool_if_BASE(parent)
+        if not is_this_on_base:
+            return
 
         newname = r.url
         histlen = len(r.history)
@@ -523,8 +527,9 @@ class LinkCheckLib(object):
 #####------ 301:
 #--------------------------------------------------
             elif er_code_int == 301:
-                self.MAIN_DICT.get(self.redir).append((t_link, er_code_int, tpar, 'None'))
-                self.myprint("-- Adding redir in ck_status_code:  " + t_link + "  " + str(er_code_int) + "  " +  tpar)
+                if self.ret_bool_if_BASE(tpar):
+                    self.MAIN_DICT.get(self.redir).append((t_link, er_code_int, tpar, 'None'))
+                    self.myprint("-- Adding redir in ck_status_code:  " + t_link + "  " + str(er_code_int) + "  " +  tpar)
 
         except Exception as e:
             self.myprint("Exception in ck_status_code: " + str(e))
