@@ -228,11 +228,10 @@ repers = 'repercussions.com'
 ast = 'astrology1234.com'
 aaa = 'calendarastrology.com'
 stt = 'starpresence.net'
-wb = 'www.workbridgeassociates.com/locations/silicon-valley'
 
 if __name__ == "__main__":
-    #None
+    None
     # lc = LinkCheck()
-    lc = LinkCheck()
-    lc.main(wb)
+    #lc = LinkCheck()
+    #lc.main(wb)
 
