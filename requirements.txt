@@ -2,6 +2,6 @@ Flask==1.0.2
 requests_html==0.9.0
 waitress==1.1.0
 validators==0.12.2
-jinja2==2.10
+jinja2==2.10.1
 requests==2.20.1
 cfscrape==1.9.5
